@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vivid_estate_frontend_flutter/second.dart';
 
 void main() {
   runApp(const MyApp());
@@ -62,7 +63,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF5093A1),
                 fontFamily: "Berlin Sans", // Use a standard font
-              ))
+              )),
+
+          TextButton(
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SecondPage()));
+              },
+              child: const Text("Second"))
         ]),
       ),
     ));
