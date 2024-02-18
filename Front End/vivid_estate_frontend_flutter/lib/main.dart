@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vivid_estate_frontend_flutter/second.dart';
+import 'package:vivid_estate_frontend_flutter/Welcome.dart';
 
 void main() {
   runApp(const MyApp());
@@ -37,12 +37,12 @@ class _MyHomePageState extends State<MyHomePage> {
         // Main Data of our home page
         body: Center(
       child: Container(
-        margin: const EdgeInsets.only(top: 20.0),
+        margin: const EdgeInsets.only(top: 100.0),
         child: Column(children: <Widget>[
           // Application Logo
           Image.asset(
             "assets/logo.png",
-            width: MediaQuery.of(context).size.width * 0.50,
+            width: 200,
           ),
 
           // Application Name
@@ -68,9 +68,9 @@ class _MyHomePageState extends State<MyHomePage> {
           TextButton(
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => SecondPage()));
+                    MaterialPageRoute(builder: (context) => WelcomePage()));
               },
-              child: const Text("Second"))
+              child: const Text("Welcome Page"))
         ]),
       ),
     ));
