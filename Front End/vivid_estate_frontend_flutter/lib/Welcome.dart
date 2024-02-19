@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:vivid_estate_frontend_flutter/SignUp.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
@@ -8,12 +9,12 @@ class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Center(
-      child: SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
             // Top Bar
             Container(
+              margin: const EdgeInsets.only(top: 50),
               padding: const EdgeInsets.only(left: 10, right: 10),
               child: Row(
                 children: <Widget>[
@@ -142,6 +143,10 @@ class WelcomePage extends StatelessWidget {
                           ))),
                       onPressed: () {
                         // Move to Buyer Sign Up Page
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const SignUpPage()));
                       },
                       child: Container(
                         width: 200,
@@ -156,7 +161,9 @@ class WelcomePage extends StatelessWidget {
                             )),
                       )),
 
-                  const Text("---------- OR ----------"),
+                  Container(
+                      margin: const EdgeInsets.only(top: 10, bottom: 10),
+                      child: const Text("---------- OR ----------")),
 
                   // Sell Or Rent Property
                   TextButton(
@@ -173,6 +180,10 @@ class WelcomePage extends StatelessWidget {
                           ))),
                       onPressed: () {
                         // Move to Seller Sign Up Page
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const SignUpPage()));
                       },
                       child: Container(
                         width: 200,
@@ -203,6 +214,6 @@ class WelcomePage extends StatelessWidget {
           ],
         ),
       ),
-    ));
+    );
   }
 }

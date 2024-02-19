@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vivid_estate_frontend_flutter/SignUp.dart';
 import 'package:vivid_estate_frontend_flutter/Welcome.dart';
 
 void main() {
@@ -13,7 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Vivid Estate',
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: true,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -70,7 +71,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => WelcomePage()));
               },
-              child: const Text("Welcome Page"))
+              child: const Text("Welcome Page")),
+
+          TextButton(
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SignUpPage()));
+              },
+              child: const Text("Sign Up"))
         ]),
       ),
     ));
