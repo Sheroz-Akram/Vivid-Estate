@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:vivid_estate_frontend_flutter/Login.dart';
 import 'package:vivid_estate_frontend_flutter/SignUp.dart';
 
 class WelcomePage extends StatelessWidget {
@@ -9,68 +10,59 @@ class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Back",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.w900,
+              color: Color(0xFF5093A1),
+              fontFamily: "Berlin Sans", // Use a standard font
+            )),
+        leading: IconButton(
+          icon: Image.asset(
+            "assets/UI/backButtonImage.png",
+            height: 50,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        actions: <Widget>[
+          // Login Button
+          Container(
+            margin: const EdgeInsets.only(right: 10),
+            child: TextButton(
+                style: ButtonStyle(
+                    backgroundColor:
+                        const MaterialStatePropertyAll(Color(0xFF1EF1EE)),
+                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                      // Rounded border
+                      side: const BorderSide(
+                          color: Color(0xFF0E0F33), width: 2.0), // Border style
+                      borderRadius: BorderRadius.circular(4.0),
+                    ))),
+                onPressed: () {
+                  // Move to Login Page
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginPage()));
+                },
+                child: const Text("Login",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF5006E86),
+                      fontFamily: "Berlin Sans", // Use a standard font
+                    ))),
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            // Top Bar
-            Container(
-              margin: const EdgeInsets.only(top: 50),
-              padding: const EdgeInsets.only(left: 10, right: 10),
-              child: Row(
-                children: <Widget>[
-                  InkWell(
-                    hoverColor: Colors.transparent,
-                    onTap: () {
-                      // Move to Previous Screen
-                      Navigator.pop(context);
-                    },
-                    child: Row(
-                      children: <Widget>[
-                        Image.asset(
-                          "assets/UI/backButtonImage.png",
-                          height: 50,
-                        ),
-                        const Text("Back",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF5093A1),
-                              fontFamily: "Berlin Sans", // Use a standard font
-                            )),
-                      ],
-                    ),
-                  ),
-                  const Spacer(),
-
-                  // Login Button
-                  TextButton(
-                      style: ButtonStyle(
-                          backgroundColor:
-                              const MaterialStatePropertyAll(Color(0xFF1EF1EE)),
-                          shape:
-                              MaterialStateProperty.all(RoundedRectangleBorder(
-                            // Rounded border
-                            side: const BorderSide(
-                                color: Color(0xFF0E0F33),
-                                width: 2.0), // Border style
-                            borderRadius: BorderRadius.circular(4.0),
-                          ))),
-                      onPressed: () {
-                        // Move to Login Page
-                      },
-                      child: const Text("Login",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF5006E86),
-                            fontFamily: "Berlin Sans", // Use a standard font
-                          )))
-                ],
-              ),
-            ),
-
             // Vivid Estate Data
             Column(children: <Widget>[
               // Application Logo

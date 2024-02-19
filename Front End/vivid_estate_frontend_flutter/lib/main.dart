@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vivid_estate_frontend_flutter/Login.dart';
 import 'package:vivid_estate_frontend_flutter/SignUp.dart';
 import 'package:vivid_estate_frontend_flutter/Welcome.dart';
 
@@ -16,9 +17,12 @@ class MyApp extends StatelessWidget {
       title: 'Vivid Estate',
       debugShowCheckedModeBanner: true,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF006E86)),
+          useMaterial3: true,
+          inputDecorationTheme: InputDecorationTheme(
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.pink, width: 4)))),
       home: const MyHomePage(),
     );
   }
@@ -57,7 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
               )),
 
           // Application Text
-          const Text("Your Path to Real Residence",
+          const Text("Development Page Testing V1.00",
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 18.0,
@@ -78,7 +82,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => SignUpPage()));
               },
-              child: const Text("Sign Up"))
+              child: const Text("Sign Up")),
+
+          TextButton(
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => LoginPage()));
+              },
+              child: const Text("Login Page"))
         ]),
       ),
     ));

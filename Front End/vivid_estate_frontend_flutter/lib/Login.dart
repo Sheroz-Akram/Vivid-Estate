@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:vivid_estate_frontend_flutter/Login.dart';
 
-class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<SignUpPage> createState() => _SignUpPage();
+  State<LoginPage> createState() => _LoginPage();
 }
 
-class _SignUpPage extends State<SignUpPage> {
+class _LoginPage extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,7 +41,7 @@ class _SignUpPage extends State<SignUpPage> {
                     // Application Name
                     Container(
                       margin: const EdgeInsets.only(right: 10),
-                      child: const Text("Sign Up",
+                      child: const Text("Login",
                           textAlign: TextAlign.end,
                           style: TextStyle(
                             fontSize: 36.0,
@@ -53,7 +52,7 @@ class _SignUpPage extends State<SignUpPage> {
                     ),
 
                     Image.asset(
-                      "assets/UI/signUpImage.png",
+                      "assets/UI/loginImage.png",
                       width: 150,
                     ),
 
@@ -69,30 +68,6 @@ class _SignUpPage extends State<SignUpPage> {
                 margin: const EdgeInsets.only(left: 20, right: 20),
                 child: Column(
                   children: <Widget>[
-                    // Enter Full Name
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 20),
-                      child: const Column(
-                        children: <Widget>[
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text("Enter Full Name",
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF5093A1),
-                                  fontFamily:
-                                      "Berlin Sans", // Use a standard font
-                                )),
-                          ),
-                          TextField(
-                            decoration:
-                                InputDecoration(hintText: "Example Name"),
-                          ),
-                        ],
-                      ),
-                    ),
-
                     // Enter Email Address
                     Container(
                       margin: const EdgeInsets.only(bottom: 20),
@@ -117,30 +92,7 @@ class _SignUpPage extends State<SignUpPage> {
                       ),
                     ),
 
-                    // Enter User Name
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 20),
-                      child: const Column(
-                        children: <Widget>[
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text("Enter Username",
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF5093A1),
-                                  fontFamily:
-                                      "Berlin Sans", // Use a standard font
-                                )),
-                          ),
-                          TextField(
-                            decoration: InputDecoration(hintText: "User123"),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // Enter User Password
+                    // Enter Password
                     Container(
                       margin: const EdgeInsets.only(bottom: 20),
                       child: const Column(
@@ -157,20 +109,11 @@ class _SignUpPage extends State<SignUpPage> {
                                 )),
                           ),
                           TextField(
-                            obscureText: true,
                             decoration: InputDecoration(
                                 hintText: "8+ Characters, 1 Capital"),
                           ),
                         ],
                       ),
-                    ),
-
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 20),
-                      child: const Text(
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Color(0xFF006E86)),
-                          "Creating a account means you are okay with our terms of service and privacy policy"),
                     ),
 
                     TextButton(
@@ -193,7 +136,7 @@ class _SignUpPage extends State<SignUpPage> {
                         child: Container(
                           width: 200,
                           padding: const EdgeInsets.all(10),
-                          child: const Text("Sign Up",
+                          child: const Text("Login",
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 18.0,
@@ -213,24 +156,18 @@ class _SignUpPage extends State<SignUpPage> {
                             const Text(
                                 textAlign: TextAlign.center,
                                 style: TextStyle(color: Color(0xFF006E86)),
-                                "Already have a account?"),
+                                "Forgot Password?"),
                             TextButton(
                               onPressed: () {
                                 // Move to Login Page
 
-                                Navigator.pop(context);
-
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const LoginPage()));
+                                // To Be Implemented
                               },
                               child: const Text(
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                       color: Color.fromARGB(255, 224, 0, 0)),
-                                  "Login"),
+                                  "Reset"),
                             )
                           ],
                         ),
