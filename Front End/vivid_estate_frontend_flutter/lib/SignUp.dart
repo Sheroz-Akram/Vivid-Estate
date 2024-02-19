@@ -1,6 +1,12 @@
+import 'dart:convert';
+import 'dart:js';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:http/http.dart' as http;
 import 'package:vivid_estate_frontend_flutter/Login.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:vivid_estate_frontend_flutter/ServerInfo.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -10,6 +16,116 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPage extends State<SignUpPage> {
+  final _full_name_controller = TextEditingController();
+  final _email_controller = TextEditingController();
+  final _user_name_controller = TextEditingController();
+  final _password_controller = TextEditingController();
+
+  // Validate Email Address
+  bool isEmailValid(String email) {
+    String pattern =
+        r'^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = RegExp(pattern);
+    return regex.hasMatch(email);
+  }
+
+  // Make Sure Password is Strong
+  bool isPasswordStrong(String password) {
+    // Length Requirement
+    if (password.length < 8) {
+      return false;
+    }
+
+    // Capital Letter Requirement
+    bool hasCapital = false;
+    for (int i = 0; i < password.length; i++) {
+      if (password.codeUnitAt(i) >= 65 && password.codeUnitAt(i) <= 90) {
+        hasCapital = true;
+        break;
+      }
+    }
+
+    return hasCapital;
+  }
+
+  /*
+
+  Send a Request to the Server
+
+
+  */
+  void sendSignUpRequest(fullName, email, username, password, myContext) async {
+    EasyLoading.show(status: "Loading...");
+
+    // URL to Send Request
+    var host = ServerInfo().host;
+    var url = Uri.parse("$host/signup");
+    try {
+      // Our Request
+      var response = await http.post(url, body: {
+        'FullName': fullName,
+        'Email': email,
+        'User': username,
+        'Password': password
+      });
+
+      // Get a Response from the Server
+      if (response.statusCode == 200) {
+        EasyLoading.showSuccess(response.body.toString());
+        var result = jsonDecode(response.body);
+
+        // Valid Request
+        if (result['status'] == "success") {
+          EasyLoading.showSuccess(result['message']);
+        }
+        // Error in request
+        else {
+          EasyLoading.showError(result['message']);
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    }
+
+    // Error Connecting to Server
+    catch (e) {
+      EasyLoading.showError('Failed to connect to the server: $e');
+    }
+  }
+
+  /*
+
+  Validate the input data and send request
+
+  */
+  void createAccount(BuildContext context) {
+    // Check Email is Valid or Not
+    if (!isEmailValid(_email_controller.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Entered email is invalid! Check email")));
+    } else if (_full_name_controller.text == "") {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please enter your full name")));
+    } else if (_user_name_controller.text == "") {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please enter user name")));
+    } else if (_user_name_controller.text == "") {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please enter user name")));
+    } else if (!isPasswordStrong(_password_controller.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Password is weak. Enter Strong Password")));
+    }
+
+    // Clear All the checks
+    // Now send request to the server
+    else {
+      // Send the Request
+      sendSignUpRequest(_full_name_controller.text, _email_controller.text,
+          _user_name_controller.text, _password_controller.text, context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,9 +188,9 @@ class _SignUpPage extends State<SignUpPage> {
                     // Enter Full Name
                     Container(
                       margin: const EdgeInsets.only(bottom: 20),
-                      child: const Column(
+                      child: Column(
                         children: <Widget>[
-                          Align(
+                          const Align(
                             alignment: Alignment.centerLeft,
                             child: Text("Enter Full Name",
                                 style: TextStyle(
@@ -86,8 +202,9 @@ class _SignUpPage extends State<SignUpPage> {
                                 )),
                           ),
                           TextField(
+                            controller: _full_name_controller,
                             decoration:
-                                InputDecoration(hintText: "Example Name"),
+                                const InputDecoration(hintText: "Example Name"),
                           ),
                         ],
                       ),
@@ -96,9 +213,9 @@ class _SignUpPage extends State<SignUpPage> {
                     // Enter Email Address
                     Container(
                       margin: const EdgeInsets.only(bottom: 20),
-                      child: const Column(
+                      child: Column(
                         children: <Widget>[
-                          Align(
+                          const Align(
                             alignment: Alignment.centerLeft,
                             child: Text("Enter Email Address",
                                 style: TextStyle(
@@ -110,7 +227,8 @@ class _SignUpPage extends State<SignUpPage> {
                                 )),
                           ),
                           TextField(
-                            decoration: InputDecoration(
+                            controller: _email_controller,
+                            decoration: const InputDecoration(
                                 hintText: "example@example.com"),
                           ),
                         ],
@@ -120,9 +238,9 @@ class _SignUpPage extends State<SignUpPage> {
                     // Enter User Name
                     Container(
                       margin: const EdgeInsets.only(bottom: 20),
-                      child: const Column(
+                      child: Column(
                         children: <Widget>[
-                          Align(
+                          const Align(
                             alignment: Alignment.centerLeft,
                             child: Text("Enter Username",
                                 style: TextStyle(
@@ -134,7 +252,9 @@ class _SignUpPage extends State<SignUpPage> {
                                 )),
                           ),
                           TextField(
-                            decoration: InputDecoration(hintText: "User123"),
+                            controller: _user_name_controller,
+                            decoration:
+                                const InputDecoration(hintText: "User123"),
                           ),
                         ],
                       ),
@@ -143,9 +263,9 @@ class _SignUpPage extends State<SignUpPage> {
                     // Enter User Password
                     Container(
                       margin: const EdgeInsets.only(bottom: 20),
-                      child: const Column(
+                      child: Column(
                         children: <Widget>[
-                          Align(
+                          const Align(
                             alignment: Alignment.centerLeft,
                             child: Text("Enter Password",
                                 style: TextStyle(
@@ -158,7 +278,8 @@ class _SignUpPage extends State<SignUpPage> {
                           ),
                           TextField(
                             obscureText: true,
-                            decoration: InputDecoration(
+                            controller: _password_controller,
+                            decoration: const InputDecoration(
                                 hintText: "8+ Characters, 1 Capital"),
                           ),
                         ],
@@ -187,8 +308,7 @@ class _SignUpPage extends State<SignUpPage> {
                             ))),
                         onPressed: () {
                           // Create a new Account
-
-                          // To be Implemented
+                          createAccount(context);
                         },
                         child: Container(
                           width: 200,

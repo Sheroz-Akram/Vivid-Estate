@@ -17,5 +17,6 @@ from django.urls import path, include
 from . import views
 
 urlpatterns = [
-    path("ocr_cnic", view=views.OcrCNIC, name="CNIC OCR")
+    path("ocr_cnic", view=views.OcrCNIC, name="CNIC OCR"),
+    path("signup", view=views.SignUp, name="Sign Up")
 ]

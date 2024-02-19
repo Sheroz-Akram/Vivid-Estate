@@ -45,3 +45,22 @@ def OcrCNIC(request):
 
     #Invalid Request
     return HttpResponse("Invalid Request..")
+
+
+# Registor a new user to the application
+@csrf_exempt
+def SignUp(request):
+
+    if request.method == "POST":
+
+        # Get All the Data
+        FullName = request.POST['FullName']
+        Email = request.POST['Email']
+        User = request.POST['User']
+        Password = request.POST['Password']
+
+        print(request.POST)
+
+        return JsonResponse({"status":"success", "message":"Great Done"})
+
+    return JsonResponse({"status":"error", "message":"Invalid Request"})

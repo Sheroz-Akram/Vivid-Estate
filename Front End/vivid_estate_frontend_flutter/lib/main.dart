@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vivid_estate_frontend_flutter/Login.dart';
 import 'package:vivid_estate_frontend_flutter/SignUp.dart';
 import 'package:vivid_estate_frontend_flutter/Welcome.dart';
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(color: Colors.pink, width: 4)))),
       home: const MyHomePage(),
+      builder: EasyLoading.init(),
     );
   }
 }
