@@ -6,6 +6,8 @@ from .modules.ocr import getCnicDetails
 import uuid
 import os
 from django.core.files.storage import FileSystemStorage
+from .models import *
+import random
 
 
 # Create your views here.
@@ -47,20 +49,118 @@ def OcrCNIC(request):
     return HttpResponse("Invalid Request..")
 
 
+
 # Registor a new user to the application
 @csrf_exempt
 def SignUp(request):
 
-    if request.method == "POST":
+    try:
+        
+        if request.method == "POST":
 
-        # Get All the Data
-        FullName = request.POST['FullName']
-        Email = request.POST['Email']
-        User = request.POST['User']
-        Password = request.POST['Password']
+            # Get All the Data
+            FullName = request.POST['FullName']
+            Email = request.POST['Email']
+            User = request.POST['User']
+            Password = request.POST['Password']
+            Type = request.POST['Type']
 
-        print(request.POST)
 
-        return JsonResponse({"status":"success", "message":"Great Done"})
+            ## Save the Data to our database
+            try:
+
+                # Generate a OTP
+                otp = random.randint(1000, 9999) 
+                print("New SignUp Request:\nOTP Generated: " + str(otp))
+                
+                # Create Accounts
+                if Type == "Buyer":
+                    buyer = Buyer(
+                        full_name=FullName,
+                        email_address=Email,
+                        user_name=User,
+                        password=Password,
+                        otp_code=otp,
+                        verification_status="No"
+                    ) 
+
+                    buyer.save()
+                
+                elif Type == "Seller":
+                    seller = Seller(
+                        full_name=FullName,
+                        email_address=Email,
+                        user_name=User,
+                        password=Password,
+                        otp_code=otp,
+                        verification_status="No"
+                    )
+                    seller.save()
+                
+                else:
+                    return JsonResponse({"status":"error", "message":"Invalid User Type"})
+
+                # Display Message to the User
+                return JsonResponse({"status":"success", "message":"Great Done"})
+            
+            except Exception as e:
+                return JsonResponse({"status":"error", "message":"User existed already"})
+
+    except Exception as E:
+        return JsonResponse({"status":"error", "message":"Invalid Request"})
+
+    return JsonResponse({"status":"error", "message":"Invalid Request"})
+
+# Mark OTP as Verified or NOT
+def markVerified(user, otp):
+    try:
+        if user.otp_code == otp:
+            if user.verification_status == "Yes":
+                return "User is already verified"
+            else:
+                user.verification_status = "Yes"
+                user.save()
+                return "OTP is verified"
+        else:
+            return "Not Correct OTP"
+    except:
+        return "user not found"
+
+# Verify a User OTP from POST Request
+@csrf_exempt
+def verify_otp(request):
+
+    try:
+        # Make Sure it is POST Request
+        if request.method == "POST":
+            # Get All the Data
+            Email = request.POST['Email']
+            Otp = request.POST['OTP']
+            Type = request.POST['Type']
+
+            # Now need to verify the OTP
+            if Type == "Buyer":
+                
+                # Get the Required Buyer
+                user = Buyer.objects.get(email_address=Email)
+
+                # Mark the OTP as verified
+                return JsonResponse({"status":"success", "message": markVerified(user=user, otp=Otp)})
+
+            elif Type == "Seller":
+                
+                # Get the Required Buyer
+                user = Seller.objects.get(email_address=Email)
+
+                # Mark the OTP as verified
+                return JsonResponse({"status":"success", "message": markVerified(user=user, otp=Otp)})
+
+            else:
+                return JsonResponse({"status":"success", "message": "invalid user type"})
+
+
+
+    except Exception as e:
+        return JsonResponse({"status":"error", "message": "User not found"})
 
     return JsonResponse({"status":"error", "message":"Invalid Request"})

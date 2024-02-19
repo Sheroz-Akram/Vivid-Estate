@@ -18,5 +18,6 @@ from . import views
 
 urlpatterns = [
     path("ocr_cnic", view=views.OcrCNIC, name="CNIC OCR"),
-    path("signup", view=views.SignUp, name="Sign Up")
+    path("signup", view=views.SignUp, name="Sign Up"),
+    path("otp_verify", view=views.verify_otp, name="OTP Verification")
 ]

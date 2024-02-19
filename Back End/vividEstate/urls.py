@@ -16,6 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from . import views
+from backendApplication.models import *
+
+admin.site.register(Buyer)
+admin.site.register(Seller)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
