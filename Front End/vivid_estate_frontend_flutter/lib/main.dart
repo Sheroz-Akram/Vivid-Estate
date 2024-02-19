@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vivid_estate_frontend_flutter/Login.dart';
+import 'package:vivid_estate_frontend_flutter/OTP.dart';
 import 'package:vivid_estate_frontend_flutter/SignUp.dart';
+import 'package:vivid_estate_frontend_flutter/User.dart';
 import 'package:vivid_estate_frontend_flutter/Welcome.dart';
 
 void main() {
@@ -23,7 +25,7 @@ class MyApp extends StatelessWidget {
           inputDecorationTheme: InputDecorationTheme(
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.pink, width: 4)))),
+                  borderSide: const BorderSide(color: Colors.pink, width: 4)))),
       home: const MyHomePage(),
       builder: EasyLoading.init(),
     );
@@ -81,17 +83,35 @@ class _MyHomePageState extends State<MyHomePage> {
 
           TextButton(
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => SignUpPage()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            const SignUpPage(userType: "Buyer")));
               },
               child: const Text("Sign Up")),
 
           TextButton(
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => LoginPage()));
+                    MaterialPageRoute(builder: (context) => const LoginPage()));
               },
-              child: const Text("Login Page"))
+              child: const Text("Login Page")),
+
+          TextButton(
+              onPressed: () {
+                var userInfo = const User(
+                    Name: "Sheroz Akram",
+                    Email: "Sheroz.akram@outlook.com",
+                    Username: "Sheroz@123",
+                    Password: "abc@ABC",
+                    Type: "Buyer");
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => OTPPage(userInfo: userInfo)));
+              },
+              child: const Text("OTP Page")),
         ]),
       ),
     ));

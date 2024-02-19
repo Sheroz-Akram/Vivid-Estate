@@ -1,15 +1,17 @@
 import 'dart:convert';
-import 'dart:js';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:vivid_estate_frontend_flutter/Login.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:vivid_estate_frontend_flutter/OTP.dart';
 import 'package:vivid_estate_frontend_flutter/ServerInfo.dart';
+import 'package:vivid_estate_frontend_flutter/User.dart';
 
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+  const SignUpPage({super.key, required this.userType});
+  final String userType;
 
   @override
   State<SignUpPage> createState() => _SignUpPage();
@@ -54,8 +56,15 @@ class _SignUpPage extends State<SignUpPage> {
 
 
   */
-  void sendSignUpRequest(fullName, email, username, password, myContext) async {
-    EasyLoading.show(status: "Loading...");
+  void sendSignUpRequest(
+      fullName, email, username, password, userType, myContext) async {
+    EasyLoading.instance
+      ..userInteractions = false
+      ..loadingStyle = EasyLoadingStyle.dark;
+
+    EasyLoading.show(
+      status: "Loading...",
+    );
 
     // URL to Send Request
     var host = ServerInfo().host;
@@ -66,7 +75,8 @@ class _SignUpPage extends State<SignUpPage> {
         'FullName': fullName,
         'Email': email,
         'User': username,
-        'Password': password
+        'Password': password,
+        'Type': userType
       });
 
       // Get a Response from the Server
@@ -76,7 +86,22 @@ class _SignUpPage extends State<SignUpPage> {
 
         // Valid Request
         if (result['status'] == "success") {
+          // Show Success Message
           EasyLoading.showSuccess(result['message']);
+
+          // Store User Information
+          var userInfo = User(
+              Name: fullName,
+              Email: email,
+              Username: username,
+              Password: password,
+              Type: userType);
+
+          // Move to the OTP Page
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (myContext) => OTPPage(userInfo: userInfo)));
         }
         // Error in request
         else {
@@ -121,8 +146,13 @@ class _SignUpPage extends State<SignUpPage> {
     // Now send request to the server
     else {
       // Send the Request
-      sendSignUpRequest(_full_name_controller.text, _email_controller.text,
-          _user_name_controller.text, _password_controller.text, context);
+      sendSignUpRequest(
+          _full_name_controller.text,
+          _email_controller.text,
+          _user_name_controller.text,
+          _password_controller.text,
+          widget.userType,
+          context);
     }
   }
 
@@ -332,7 +362,8 @@ class _SignUpPage extends State<SignUpPage> {
                           children: <Widget>[
                             const Text(
                                 textAlign: TextAlign.center,
-                                style: TextStyle(color: Color(0xFF006E86)),
+                                style: TextStyle(
+                                    color: Color(0xFF006E86), fontSize: 18.0),
                                 "Already have a account?"),
                             TextButton(
                               onPressed: () {
@@ -349,7 +380,8 @@ class _SignUpPage extends State<SignUpPage> {
                               child: const Text(
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                      color: Color.fromARGB(255, 224, 0, 0)),
+                                      color: Color.fromARGB(255, 224, 0, 0),
+                                      fontSize: 18.0),
                                   "Login"),
                             )
                           ],

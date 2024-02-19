@@ -155,7 +155,8 @@ class _LoginPage extends State<LoginPage> {
                           children: <Widget>[
                             const Text(
                                 textAlign: TextAlign.center,
-                                style: TextStyle(color: Color(0xFF006E86)),
+                                style: TextStyle(
+                                    color: Color(0xFF006E86), fontSize: 18.0),
                                 "Forgot Password?"),
                             TextButton(
                               onPressed: () {
@@ -166,7 +167,8 @@ class _LoginPage extends State<LoginPage> {
                               child: const Text(
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                      color: Color.fromARGB(255, 224, 0, 0)),
+                                      color: Color.fromARGB(255, 224, 0, 0),
+                                      fontSize: 18.0),
                                   "Reset"),
                             )
                           ],

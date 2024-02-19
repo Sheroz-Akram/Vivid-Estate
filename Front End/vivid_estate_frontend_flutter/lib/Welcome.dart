@@ -138,7 +138,9 @@ class WelcomePage extends StatelessWidget {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const SignUpPage()));
+                                builder: (context) => const SignUpPage(
+                                      userType: "Buyer",
+                                    )));
                       },
                       child: Container(
                         width: 200,
@@ -175,7 +177,9 @@ class WelcomePage extends StatelessWidget {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const SignUpPage()));
+                                builder: (context) => const SignUpPage(
+                                      userType: "Seller",
+                                    )));
                       },
                       child: Container(
                         width: 200,

@@ -106,7 +106,7 @@ def SignUp(request):
             except Exception as e:
                 return JsonResponse({"status":"error", "message":"User existed already"})
 
-    except Exception as E:
+    except Exception as e:
         return JsonResponse({"status":"error", "message":"Invalid Request"})
 
     return JsonResponse({"status":"error", "message":"Invalid Request"})
