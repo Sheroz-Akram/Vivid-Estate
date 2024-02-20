@@ -53,7 +53,6 @@ def OcrCNIC(request):
 # Registor a new user to the application
 @csrf_exempt
 def SignUp(request):
-
     try:
         
         if request.method == "POST":
@@ -116,20 +115,20 @@ def markVerified(user, otp):
     try:
         if user.otp_code == otp:
             if user.verification_status == "Yes":
-                return "User is already verified"
+                return {"status":"error", "message": "User is already verified"}
             else:
                 user.verification_status = "Yes"
                 user.save()
-                return "OTP is verified"
+                return {"status":"success", "message": "OTP is verified"}
         else:
-            return "Not Correct OTP"
+            return {"status":"error", "message": "Not Correct OTP"}
     except:
-        return "user not found"
+        return {"status":"error", "message": "user not found"}
 
 # Verify a User OTP from POST Request
 @csrf_exempt
 def verify_otp(request):
-
+    print("NEW OTP VERIFY Request!!!!")
     try:
         # Make Sure it is POST Request
         if request.method == "POST":
@@ -145,7 +144,7 @@ def verify_otp(request):
                 user = Buyer.objects.get(email_address=Email)
 
                 # Mark the OTP as verified
-                return JsonResponse({"status":"success", "message": markVerified(user=user, otp=Otp)})
+                return JsonResponse(markVerified(user=user, otp=Otp))
 
             elif Type == "Seller":
                 
@@ -153,7 +152,7 @@ def verify_otp(request):
                 user = Seller.objects.get(email_address=Email)
 
                 # Mark the OTP as verified
-                return JsonResponse({"status":"success", "message": markVerified(user=user, otp=Otp)})
+                return JsonResponse(markVerified(user=user, otp=Otp))
 
             else:
                 return JsonResponse({"status":"success", "message": "invalid user type"})

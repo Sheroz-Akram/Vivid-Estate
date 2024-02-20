@@ -5,6 +5,7 @@ import 'package:vivid_estate_frontend_flutter/OTP.dart';
 import 'package:vivid_estate_frontend_flutter/SignUp.dart';
 import 'package:vivid_estate_frontend_flutter/User.dart';
 import 'package:vivid_estate_frontend_flutter/Welcome.dart';
+import 'package:vivid_estate_frontend_flutter/cnic.dart';
 
 void main() {
   runApp(const MyApp());
@@ -112,6 +113,21 @@ class _MyHomePageState extends State<MyHomePage> {
                         builder: (context) => OTPPage(userInfo: userInfo)));
               },
               child: const Text("OTP Page")),
+
+          TextButton(
+              onPressed: () {
+                var userInfo = const User(
+                    Name: "Sheroz Akram",
+                    Email: "Sheroz.akram@outlook.com",
+                    Username: "Sheroz@123",
+                    Password: "abc@ABC",
+                    Type: "Buyer");
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CnicPage(userInfo: userInfo)));
+              },
+              child: const Text("CNIC Page")),
         ]),
       ),
     ));
