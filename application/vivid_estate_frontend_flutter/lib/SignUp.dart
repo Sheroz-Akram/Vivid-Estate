@@ -81,7 +81,6 @@ class _SignUpPage extends State<SignUpPage> {
 
       // Get a Response from the Server
       if (response.statusCode == 200) {
-        EasyLoading.showSuccess(response.body.toString());
         var result = jsonDecode(response.body);
 
         // Valid Request

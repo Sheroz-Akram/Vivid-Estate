@@ -15,12 +15,18 @@ import random
 # API to OCR the CNIC card and return the results
 @csrf_exempt
 def OcrCNIC(request):
+    print("NEW CNIC OCR Request!!!!")
     # Check If Request of of POST Type
     if request.method == "POST":
-        print("NEW CNIC OCR Request!!!!")
+        
         try:
             # Get the Image Data
             imageFile = request.FILES['cnicImage']
+
+            # Get the other data files
+            Email = request.POST['Email']
+            Password = request.POST['Password']
+            Type = request.POST['Type']
 
             # Create or get an instance of FileSystemStorage to handle saving
             fs = FileSystemStorage(location=settings.MEDIA_ROOT)
@@ -31,8 +37,12 @@ def OcrCNIC(request):
             file_path = os.path.join(settings.MEDIA_ROOT, filename)
 
             # Perform the OCR Operation
-            result = getCnicDetails(file_path)
-            result['status'] = "sucess"
+            result = {}
+            result['status'] = "success"
+            result['result'] = getCnicDetails(file_path)
+
+            print("OCR Completed!")
+            print(result)
 
             # Delete File After OCR
             fs.delete(fileNewName)
@@ -42,7 +52,8 @@ def OcrCNIC(request):
 
         # Any Error in Operation
         except Exception as e:
-            result['status'] = "failed"
+            result['status'] = "error"
+            result['result'] = {"Take cnic image only or crop."}
             return JsonResponse(result)
 
     #Invalid Request

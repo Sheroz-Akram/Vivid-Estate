@@ -1,8 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:vivid_estate_frontend_flutter/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/User.dart';
 import 'package:image_cropper/image_cropper.dart';
 
@@ -18,6 +22,98 @@ class CnicPage extends StatefulWidget {
 class _CnicPageState extends State<CnicPage> {
   // Store Our CNIC Image in File
   File? cnicImage;
+
+  // Prase the JSON Response data
+  Map<String, String> extractFields(String inputString) {
+    // Remove curly braces
+    String formattedString = inputString.substring(1, inputString.length - 1);
+
+    // Split into key-value pairs
+    List<String> keyValuePairs = formattedString.split(',');
+
+    // Create a map to store results
+    Map<String, String> fields = {};
+
+    for (String pair in keyValuePairs) {
+      var parts = pair.split(':');
+      if (parts.length == 2) {
+        String key = parts[0].trim();
+        String value = parts[1].trim();
+        fields[key] = value;
+      }
+    }
+
+    return fields;
+  }
+
+  // Send Post Reuest to Server with Images
+  void sendImageToServer(String email, String password, String type,
+      BuildContext myContext) async {
+    // Display Loading Screen
+    EasyLoading.instance
+      ..userInteractions = false
+      ..loadingStyle = EasyLoadingStyle.dark;
+
+    EasyLoading.show(
+      status: "Scanning...",
+    );
+    var host = ServerInfo().host;
+    var url = Uri.parse("$host/ocr_cnic");
+
+    try {
+      var imageUpload = await http.MultipartFile.fromPath(
+          'cnicImage', cnicImage?.path ?? "Error");
+      var request = http.MultipartRequest('POST', url);
+
+      // Add the CNIC Image
+      request.files.add(imageUpload);
+
+      // Add Other Fields (consider strong typing)
+      request.fields["Email"] = email;
+      request.fields["Password"] = password;
+      request.fields["Type"] = type;
+
+      // send
+      var response = await request.send();
+
+      // Get a Response from the Server
+      if (response.statusCode == 200) {
+        // listen for response
+        var responseString = response.stream.transform(utf8.decoder).single;
+
+        // Json Decode the Result
+        var result = jsonDecode(await responseString);
+
+        // If the Result is Success
+        if (result['status'] == "success") {
+          var extractedFields = extractFields((result['result']).toString());
+          print(extractedFields['Name']);
+
+          // Display Success
+          EasyLoading.showSuccess(
+              "OCR Success\n Name: ${extractedFields['Name']}\n CNIC: ${extractedFields['CNIC No']} \n Name: ${extractedFields['Date of Birth']}");
+
+          // Now Store this Information
+          print(extractedFields['Name']);
+          print(extractedFields['CNIC No']);
+          print(extractedFields['Father Name']);
+          print(extractedFields['Date of Birth']);
+        }
+
+        // Error in OCR
+        else {
+          EasyLoading.showError(result['result']);
+        }
+      } else {
+        throw Exception('Failed Request');
+      }
+    }
+
+    // Error Connecting to Server
+    catch (e) {
+      EasyLoading.showError('Failure in servce: $e');
+    }
+  }
 
   // Select a image from the prefered source whether camera or gallery
   Future pickImage(ImageSource imageSource, BuildContext myContext) async {
@@ -185,8 +281,21 @@ class _CnicPageState extends State<CnicPage> {
                                 ))),
                             onPressed: () {
                               // Send CNIC to Server for OCR
+                              if (cnicImage != null) {
+                                sendImageToServer(
+                                    widget.userInfo.Email,
+                                    widget.userInfo.Password,
+                                    widget.userInfo.Type,
+                                    context);
+                              }
 
-                              // To Be Implemented
+                              // Display Error
+                              else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            "Please select a image first.")));
+                              }
                             },
                             child: Container(
                               width: 200,
