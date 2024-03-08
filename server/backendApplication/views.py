@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from .modules.ocr import getCnicDetails
+from .modules.mail import send_email
 import uuid
 import os
 from django.core.files.storage import FileSystemStorage
@@ -118,6 +119,9 @@ def SignUp(request):
 
                 user.save()
 
+                # Send OTP Through Mail Service
+                send_email(subject="Verify Email Address - Vivid Estate", body="Verify your email address! Please enter the following otp in Vivid Estate: " + otp, recipients=[Email])
+
                 # Display Message to the User
                 return JsonResponse({"status":"success", "message":"Great Done"})
             
@@ -199,6 +203,9 @@ def resendOTP(request):
                 user.verification_status = "No"
                 user.save()
 
+                # Send OTP Through Mail Service
+                send_email(subject="Resend OTP - Vivid Estate", body="New OTP Generated! Please enter the following otp in Vivid Estate: " + otp, recipients=[Email])
+
                 # Display Message to the User
                 return JsonResponse({"status":"success", "message":"New OTP Send Successfully!"})
             
@@ -250,6 +257,9 @@ def storeCNICData(request):
                 user.cnic_dob = cnicDob
 
                 user.save()
+
+                # Send OTP Through Mail Service
+                send_email(subject="CNIC Data Stored - Vivid Estate", body="Your account is created and under verification. Please wait while we verify and approve you account. It would take some time.", recipients=[Email])
 
                 # Display Message to the User
                 return JsonResponse({"status":"success", "message":"CNIC Data Stored"})
