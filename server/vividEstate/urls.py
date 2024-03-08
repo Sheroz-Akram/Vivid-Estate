@@ -18,8 +18,7 @@ from django.urls import path, include
 from . import views
 from backendApplication.models import *
 
-admin.site.register(Buyer)
-admin.site.register(Seller)
+admin.site.register(ApplicationUser)
 
 
 urlpatterns = [

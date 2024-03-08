@@ -20,13 +20,29 @@ def OcrCNIC(request):
     if request.method == "POST":
         
         try:
+
+            # Store the OCR Result Data
+            result = {}
+
             # Get the Image Data
             imageFile = request.FILES['cnicImage']
 
             # Get the other data files
             Email = request.POST['Email']
             Password = request.POST['Password']
-            Type = request.POST['Type']
+
+            # Get the User
+            try:
+
+                # Find the User with Email Address
+                user = ApplicationUser.objects.get(email_address=Email)
+
+                # Check the User Password
+                if user.password != Password:
+                    return JsonResponse({"status":"error", "message": "Password not correct"})
+            # If User not found        
+            except ApplicationUser.DoesNotExist as e:
+                return JsonResponse({"status":"error", "message": "User not found"})
 
             # Create or get an instance of FileSystemStorage to handle saving
             fs = FileSystemStorage(location=settings.MEDIA_ROOT)
@@ -37,7 +53,6 @@ def OcrCNIC(request):
             file_path = os.path.join(settings.MEDIA_ROOT, filename)
 
             # Perform the OCR Operation
-            result = {}
             result['status'] = "success"
             result['result'] = getCnicDetails(file_path)
 
@@ -81,34 +96,22 @@ def SignUp(request):
 
                 # Generate a OTP
                 otp = random.randint(1000, 9999) 
-                print("New SignUp Request:\nOTP Generated: " + str(otp))
+                print("**New SignUp Request**")
                 
                 # Create Accounts
-                if Type == "Buyer":
-                    buyer = Buyer(
+                user = ApplicationUser(
                         full_name=FullName,
                         email_address=Email,
                         user_name=User,
                         password=Password,
                         otp_code=otp,
-                        verification_status="No"
-                    ) 
+                        verification_status="No",
+                        user_type=Type
+                ) 
 
-                    buyer.save()
-                
-                elif Type == "Seller":
-                    seller = Seller(
-                        full_name=FullName,
-                        email_address=Email,
-                        user_name=User,
-                        password=Password,
-                        otp_code=otp,
-                        verification_status="No"
-                    )
-                    seller.save()
-                
-                else:
-                    return JsonResponse({"status":"error", "message":"Invalid User Type"})
+                print("OTP:"+otp)
+
+                user.save()
 
                 # Display Message to the User
                 return JsonResponse({"status":"success", "message":"Great Done"})
@@ -146,29 +149,14 @@ def verify_otp(request):
             # Get All the Data
             Email = request.POST['Email']
             Otp = request.POST['OTP']
-            Type = request.POST['Type']
 
             # Now need to verify the OTP
-            if Type == "Buyer":
                 
-                # Get the Required Buyer
-                user = Buyer.objects.get(email_address=Email)
+            # Get the Required Buyer
+            user = ApplicationUser.objects.get(email_address=Email)
 
-                # Mark the OTP as verified
-                return JsonResponse(markVerified(user=user, otp=Otp))
-
-            elif Type == "Seller":
-                
-                # Get the Required Buyer
-                user = Seller.objects.get(email_address=Email)
-
-                # Mark the OTP as verified
-                return JsonResponse(markVerified(user=user, otp=Otp))
-
-            else:
-                return JsonResponse({"status":"success", "message": "invalid user type"})
-
-
+            # Mark the OTP as verified
+            return JsonResponse(markVerified(user=user, otp=Otp))
 
     except Exception as e:
         return JsonResponse({"status":"error", "message": "User not found"})
