@@ -9,6 +9,11 @@ class ApplicationUser(models.Model):
     otp_code = models.CharField(max_length=4)
     verification_status = models.CharField(max_length=10)
     user_type = models.CharField(max_length=10)
+    cnic_file = models.CharField(max_length=255)
+    cnic_name = models.CharField(max_length=150)
+    cnic_number = models.CharField(max_length=50)
+    cnic_father_name = models.CharField(max_length=150)
+    cnic_dob = models.CharField(max_length=50)
 
     def __str__(self):
         return "User: " + self.full_name + "    Email: " +self.email_address
