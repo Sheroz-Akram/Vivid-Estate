@@ -8,16 +8,16 @@ import 'package:vivid_estate_frontend_flutter/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/User.dart';
 import 'package:vivid_estate_frontend_flutter/cnic.dart';
 
-class OTPPage extends StatefulWidget {
-  const OTPPage({super.key, required this.userInfo});
+class PasswordResetOTP extends StatefulWidget {
+  const PasswordResetOTP({super.key, required this.userEmailAddress});
 
-  final User userInfo;
+  final String userEmailAddress;
 
   @override
-  State<OTPPage> createState() => _OTPPage();
+  State<PasswordResetOTP> createState() => _PasswordResetOTP();
 }
 
-class _OTPPage extends State<OTPPage> {
+class _PasswordResetOTP extends State<PasswordResetOTP> {
   final _entered_otp = TextEditingController();
   var canBack = true;
 
@@ -26,7 +26,7 @@ class _OTPPage extends State<OTPPage> {
   Send a POST request to the Server
 
   */
-  void sendSignUpRequest(email, otp, type, myContext) async {
+  void sendPasswordResetOTPRequest(email, otp, myContext) async {
     EasyLoading.instance
       ..userInteractions = false
       ..loadingStyle = EasyLoadingStyle.dark;
@@ -40,11 +40,10 @@ class _OTPPage extends State<OTPPage> {
 
     // URL to Send Request
     var host = ServerInfo().host;
-    var url = Uri.parse("$host/otp_verify");
+    var url = Uri.parse("$host/password_reset_otp");
     try {
       // Our Request
-      var response = await http
-          .post(url, body: {'Email': email, 'OTP': otp, "Type": type});
+      var response = await http.post(url, body: {'Email': email, 'OTP': otp});
 
       // Allow User to move back
       setState(() {
@@ -60,81 +59,16 @@ class _OTPPage extends State<OTPPage> {
         if (result['status'] == "success") {
           EasyLoading.showSuccess(result['message']);
 
-          // Move to the CNIC Page
-          Navigator.push(
-              myContext,
-              MaterialPageRoute(
-                  builder: (myContext) => CnicPage(userInfo: widget.userInfo)));
+          // Move to the Password Reset Page
+          var userPassword = result['password'];
+
+          print(userPassword);
         }
         // Error in request
         else {
           EasyLoading.showError(result['message']);
         }
       } else {
-        throw Exception('Failed to load data');
-      }
-    }
-
-    // Error Connecting to Server
-    catch (e) {
-      // Allow User to move back
-      setState(() {
-        canBack = true;
-      });
-      EasyLoading.showError('Failed to connect to the server: $e');
-    }
-  }
-
-  /*
-
-  Send a Request to the Server
-
-
-  */
-  void resendOTP(myContext) async {
-    EasyLoading.instance
-      ..userInteractions = false
-      ..loadingStyle = EasyLoadingStyle.dark;
-
-    setState(() {
-      canBack = false;
-    });
-    EasyLoading.show(
-      status: "Loading...",
-    );
-
-    // URL to Send Request
-    var host = ServerInfo().host;
-    var url = Uri.parse("$host/resend_otp");
-    try {
-      // Our Request
-      var response = await http.post(url, body: {
-        'Email': widget.userInfo.Email,
-        'Password': widget.userInfo.Password,
-      });
-
-      setState(() {
-        canBack = true;
-      });
-
-      // Get a Response from the Server
-      if (response.statusCode == 200) {
-        var result = jsonDecode(response.body);
-
-        // Valid Request
-        if (result['status'] == "success") {
-          // Show Success Message
-          EasyLoading.showSuccess(result['message']);
-        }
-        // Error in request
-        else {
-          EasyLoading.showError(result['message']);
-        }
-      } else {
-        // Allow User to move back
-        setState(() {
-          canBack = true;
-        });
         throw Exception('Failed to load data');
       }
     }
@@ -162,8 +96,7 @@ class _OTPPage extends State<OTPPage> {
 
     // OTP is verified now send to the Server
     else {
-      sendSignUpRequest(
-          widget.userInfo.Email, otp, widget.userInfo.Type, myContext);
+      sendPasswordResetOTPRequest(widget.userEmailAddress, otp, myContext);
     }
   }
 
@@ -213,7 +146,7 @@ class _OTPPage extends State<OTPPage> {
                     const Text(
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Color(0xFF006E86)),
-                        "We have send you One Time Password (OTP) to your email address. Please verify"),
+                        "We have send you One Time Password (OTP) to your email address for password reset. Please verify"),
                   ],
                 ),
               ),
@@ -274,37 +207,6 @@ class _OTPPage extends State<OTPPage> {
                           fontFamily: "Berlin Sans", // Use a standard font
                         )),
                   )),
-
-              /*
-      
-              More Information about OTP and Link To Resend OTP
-      
-              */
-              Center(
-                child: Container(
-                  margin: const EdgeInsets.only(top: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      const Text(
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Color(0xFF006E86)),
-                          "Didn't receive the OTP?"),
-                      TextButton(
-                        onPressed: () {
-                          // Resend the OTP
-                          resendOTP(context);
-                        },
-                        child: const Text(
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Color.fromARGB(255, 224, 0, 0)),
-                            "Resend"),
-                      )
-                    ],
-                  ),
-                ),
-              )
             ],
           )),
     );

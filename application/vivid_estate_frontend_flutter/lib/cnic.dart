@@ -143,6 +143,10 @@ class _CnicPageState extends State<CnicPage> {
 
     // Error Connecting to Server
     catch (e) {
+      // Allow User to move back
+      setState(() {
+        canBack = true;
+      });
       EasyLoading.showError('Failure in servce: $e');
     }
   }

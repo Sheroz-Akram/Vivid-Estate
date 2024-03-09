@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:vivid_estate_frontend_flutter/ForgotPassword.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -160,9 +161,12 @@ class _LoginPage extends State<LoginPage> {
                                 "Forgot Password?"),
                             TextButton(
                               onPressed: () {
-                                // Move to Login Page
-
-                                // To Be Implemented
+                                // Move to the Password Reset Page
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const ForgotPassword()));
                               },
                               child: const Text(
                                   textAlign: TextAlign.center,

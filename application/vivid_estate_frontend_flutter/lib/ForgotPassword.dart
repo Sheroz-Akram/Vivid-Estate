@@ -4,40 +4,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:vivid_estate_frontend_flutter/PasswordResetOTP.dart';
 import 'package:vivid_estate_frontend_flutter/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/User.dart';
 
-class CnicEdit extends StatefulWidget {
-  const CnicEdit({super.key, required this.userInfo, required this.cnicInfo});
-  final User userInfo;
-  final CNIC cnicInfo;
-
+class ForgotPassword extends StatefulWidget {
+  const ForgotPassword({
+    super.key,
+  });
   @override
-  State<CnicEdit> createState() => _CnicEdit();
+  State<ForgotPassword> createState() => _ForgotPassword();
 }
 
-class _CnicEdit extends State<CnicEdit> {
-  final _cnic_name_controller = TextEditingController();
-  final _cnic_number = TextEditingController();
-  final _cnic_father_name = TextEditingController();
-  final _cnic_dob = TextEditingController();
+class _ForgotPassword extends State<ForgotPassword> {
+  final _email_controller = TextEditingController();
 
   var userExit = true;
 
-  // Set the Field Values
-  @override
-  void initState() {
-    super.initState();
-    _cnic_name_controller.text = widget.cnicInfo.cnic_name;
-    _cnic_number.text = widget.cnicInfo.cnic_number;
-    _cnic_father_name.text = widget.cnicInfo.cnic_father_name;
-    _cnic_dob.text = widget.cnicInfo.cnic_dob;
-  }
-
   /*
-  Confirm the CNIC Data
+  Send Password Reset Request to the Server
   */
-  void storeCNICData(name, father, cnic_number, dob, myContext) async {
+  void passwordResetRequest(email, myContext) async {
     EasyLoading.instance
       ..userInteractions = false
       ..loadingStyle = EasyLoadingStyle.dark;
@@ -51,16 +38,11 @@ class _CnicEdit extends State<CnicEdit> {
 
     // URL to Send Request
     var host = ServerInfo().host;
-    var url = Uri.parse("$host/store_cnic");
+    var url = Uri.parse("$host/forgot_password");
     try {
       // Our Request
       var response = await http.post(url, body: {
-        'Email': widget.userInfo.Email,
-        'Password': widget.userInfo.Password,
-        'cnicName': name,
-        "cnicFather": father,
-        'cnicNumber': cnic_number,
-        'cnicDob': dob
+        'Email': email,
       });
 
       setState(() {
@@ -76,9 +58,12 @@ class _CnicEdit extends State<CnicEdit> {
           // Show Success Message
           EasyLoading.showSuccess(result['message']);
 
-          // Account Creation successfull
-
-          // Now Move to Congraculations Page
+          // Password Reset OTP is Send. Now Move to OTP Page
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      PasswordResetOTP(userEmailAddress: email)));
         }
         // Error in request
         else {
@@ -104,33 +89,32 @@ class _CnicEdit extends State<CnicEdit> {
     }
   }
 
+  // Validate Email Address
+  bool isEmailValid(String email) {
+    String pattern =
+        r'^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = RegExp(pattern);
+    return regex.hasMatch(email);
+  }
+
   /*
-
   Validate the input data and send request
-
   */
-  void submitCNICData(BuildContext context) {
+  void submitEmailData(BuildContext context) {
     // Check Email is Valid or Not
-    if (_cnic_name_controller.text == "") {
+    if (_email_controller.text == "") {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Please Enter Card Holder Name")));
-    } else if (_cnic_father_name.text == "") {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please Enter Father Name")));
-    } else if (_cnic_number.text == "") {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please enter CNIC Number")));
-    } else if (_cnic_dob.text == "") {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please enter your dater of Birth")));
+    } else if (!isEmailValid(_email_controller.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Entered email is invalid! Check email")));
     }
 
     // Clear All the checks
     // Now send request to the server
     else {
       // Send the Request
-      storeCNICData(_cnic_name_controller.text, _cnic_father_name.text,
-          _cnic_number.text, _cnic_dob.text, context);
+      passwordResetRequest(_email_controller.text, context);
     }
   }
 
@@ -166,10 +150,11 @@ class _CnicEdit extends State<CnicEdit> {
                     top: 20, left: 50, right: 50, bottom: 20),
                 child: Column(
                   children: <Widget>[
-                    Image.asset("assets/UI/cnicEditImage.png", width: 150),
+                    Image.asset("assets/UI/forgotPasswordImage.png",
+                        width: 150),
 
                     // Page Information
-                    const Text("Verify Details",
+                    const Text("Forgot Password?",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 36.0,
@@ -180,25 +165,25 @@ class _CnicEdit extends State<CnicEdit> {
                     const Text(
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Color(0xFF006E86)),
-                        "Please verify the CNIC details with the scanned data and change if you want"),
+                        "Don't worry we will help you to reset your password. Please provide your email address."),
                   ],
                 ),
               ),
 
-              // Edit CNIC Data
+              // Edit User Info
               Center(
                 child: Container(
                   margin: const EdgeInsets.only(left: 20, right: 20),
                   child: Column(
                     children: <Widget>[
-                      // Enter CNIC Name
+                      // Enter Email Address
                       Container(
                         margin: const EdgeInsets.only(bottom: 20),
                         child: Column(
                           children: <Widget>[
                             const Align(
                               alignment: Alignment.centerLeft,
-                              child: Text("Card Holder Name",
+                              child: Text("Enter Email Address",
                                   style: TextStyle(
                                     fontSize: 18.0,
                                     fontWeight: FontWeight.bold,
@@ -208,84 +193,9 @@ class _CnicEdit extends State<CnicEdit> {
                                   )),
                             ),
                             TextField(
-                              controller: _cnic_name_controller,
-                              decoration: const InputDecoration(
-                                  hintText: "Example Name"),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Enter CNIC Number
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 20),
-                        child: Column(
-                          children: <Widget>[
-                            const Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text("CNIC Number",
-                                  style: TextStyle(
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF5093A1),
-                                    fontFamily:
-                                        "Berlin Sans", // Use a standard font
-                                  )),
-                            ),
-                            TextField(
-                              controller: _cnic_number,
+                              controller: _email_controller,
                               decoration: const InputDecoration(
                                   hintText: "example@example.com"),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Enter Father Name
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 20),
-                        child: Column(
-                          children: <Widget>[
-                            const Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text("Father Name",
-                                  style: TextStyle(
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF5093A1),
-                                    fontFamily:
-                                        "Berlin Sans", // Use a standard font
-                                  )),
-                            ),
-                            TextField(
-                              controller: _cnic_father_name,
-                              decoration:
-                                  const InputDecoration(hintText: "User123"),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Enter Date of Birth
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 20),
-                        child: Column(
-                          children: <Widget>[
-                            const Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text("Date of Birth",
-                                  style: TextStyle(
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF5093A1),
-                                    fontFamily:
-                                        "Berlin Sans", // Use a standard font
-                                  )),
-                            ),
-                            TextField(
-                              controller: _cnic_dob,
-                              decoration: const InputDecoration(
-                                  hintText: "8+ Characters, 1 Capital"),
                             ),
                           ],
                         ),
@@ -306,13 +216,13 @@ class _CnicEdit extends State<CnicEdit> {
                                   borderRadius: BorderRadius.circular(4.0),
                                 ))),
                             onPressed: () {
-                              // Send the CNIC Data
-                              submitCNICData(context);
+                              // Now Send the Password Reset Request
+                              submitEmailData(context);
                             },
                             child: Container(
                               width: 200,
                               padding: const EdgeInsets.all(10),
-                              child: const Text("Complete",
+                              child: const Text("Send OTP",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 18.0,

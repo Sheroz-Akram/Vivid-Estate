@@ -148,6 +148,8 @@ def markVerified(user, otp):
     except:
         return {"status":"error", "message": "user not found"}
 
+
+
 # Verify a User OTP from POST Request
 @csrf_exempt
 def verify_otp(request):
@@ -166,6 +168,35 @@ def verify_otp(request):
 
             # Mark the OTP as verified
             return JsonResponse(markVerified(user=user, otp=Otp))
+
+    except Exception as e:
+        return JsonResponse({"status":"error", "message": "User not found"})
+
+    return JsonResponse({"status":"error", "message":"Invalid Request"})
+
+# Verify a User OTP from POST Request
+@csrf_exempt
+def verifyPasswordResetOTP(request):
+    print("NEW PASSWORD RESET OTP VERIFY Request!!!!")
+    try:
+        # Make Sure it is POST Request
+        if request.method == "POST":
+            # Get All the Data
+            Email = request.POST['Email']
+            Otp = request.POST['OTP']
+
+            # Now need to verify the OTP
+                
+            # Get the Required Buyer
+            user = ApplicationUser.objects.get(email_address=Email)
+
+            result = markVerified(user=user, otp=Otp)
+
+            if result['status'] == "success":
+                result['password'] = user.password
+
+            # Mark the OTP as verified
+            return JsonResponse(result)
 
     except Exception as e:
         return JsonResponse({"status":"error", "message": "User not found"})
@@ -218,6 +249,47 @@ def resendOTP(request):
 
     return JsonResponse({"status":"error", "message":"Invalid Request"})
 
+
+# Generate a New OTP for Existing User To Reset the Password
+@csrf_exempt
+def forgotPassword(request):
+    print("NEW OTP Generation Request")
+
+    try:
+        # Make Sure it is POST Request
+        if request.method == "POST":
+
+            # Get the other data files
+            Email = request.POST['Email']
+
+            # Get the User
+            try:
+                # Find the User with Email Address
+                user = ApplicationUser.objects.get(email_address=Email)
+
+                # Generate a new OTP 
+                otp = str(random.randint(1000, 9999))
+                print("OTP Generated: " + otp)
+
+                # Store the new OTP in Data Base
+                user.otp_code = otp
+                user.verification_status = "No"
+                user.save()
+
+                # Send OTP Through Mail Service
+                send_email(subject="Password Reset OTP - Vivid Estate", body="Password Reset OTP Generated! Please enter the following otp in Vivid Estate: " + otp + " to reset your password.", recipients=[Email])
+
+                # Display Message to the User
+                return JsonResponse({"status":"success", "message":"Reset Password OTP Send Successfully!"})
+            
+            # If User not found        
+            except ApplicationUser.DoesNotExist as e:
+                return JsonResponse({"status":"error", "message": "User not found"})
+
+    except Exception as e:
+        return JsonResponse({"status":"error", "message": "User not found"})
+
+    return JsonResponse({"status":"error", "message":"Invalid Request"})
 
 # Store the CNIC Data for Existing User
 @csrf_exempt

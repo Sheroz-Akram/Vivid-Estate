@@ -21,5 +21,7 @@ urlpatterns = [
     path("signup", view=views.SignUp, name="Sign Up"),
     path("otp_verify", view=views.verify_otp, name="OTP Verification"),
     path("resend_otp", view=views.resendOTP, name="OTP Resend"),
-    path("store_cnic", view=views.storeCNICData, name="CNIC Data Store")
+    path("store_cnic", view=views.storeCNICData, name="CNIC Data Store"),
+    path("forgot_password", view=views.forgotPassword, name="User Forgot Password"),
+    path("password_reset_otp", view=views.verifyPasswordResetOTP, name="Verify Password Reset OTP")
 ]
