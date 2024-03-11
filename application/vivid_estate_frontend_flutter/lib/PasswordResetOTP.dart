@@ -5,8 +5,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:http/http.dart' as http;
 import 'package:vivid_estate_frontend_flutter/ServerInfo.dart';
-import 'package:vivid_estate_frontend_flutter/User.dart';
-import 'package:vivid_estate_frontend_flutter/cnic.dart';
+import 'package:vivid_estate_frontend_flutter/PasswordReset.dart';
 
 class PasswordResetOTP extends StatefulWidget {
   const PasswordResetOTP({super.key, required this.userEmailAddress});
@@ -62,7 +61,12 @@ class _PasswordResetOTP extends State<PasswordResetOTP> {
           // Move to the Password Reset Page
           var userPassword = result['password'];
 
-          print(userPassword);
+          // Now Move to Password Reset Page
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (myContext) =>
+                      ResetPassword(Email: email, Password: userPassword)));
         }
         // Error in request
         else {

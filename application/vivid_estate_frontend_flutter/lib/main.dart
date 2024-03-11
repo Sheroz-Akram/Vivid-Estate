@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vivid_estate_frontend_flutter/Login.dart';
-import 'package:vivid_estate_frontend_flutter/OTP.dart';
 import 'package:vivid_estate_frontend_flutter/SignUp.dart';
-import 'package:vivid_estate_frontend_flutter/User.dart';
 import 'package:vivid_estate_frontend_flutter/Welcome.dart';
-import 'package:vivid_estate_frontend_flutter/cnic.dart';
-import 'package:vivid_estate_frontend_flutter/cnic_edit.dart';
 
 void main() {
   runApp(const MyApp());
@@ -99,60 +95,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     MaterialPageRoute(builder: (context) => const LoginPage()));
               },
               child: const Text("Login Page")),
-
-          TextButton(
-              onPressed: () {
-                var userInfo = const User(
-                    Name: "Sheroz Akram",
-                    Email: "Sheroz.akram@outlook.com",
-                    Username: "Sheroz@123",
-                    Password: "abc@ABC",
-                    Type: "Buyer");
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => OTPPage(userInfo: userInfo)));
-              },
-              child: const Text("OTP Page")),
-
-          TextButton(
-              onPressed: () {
-                var userInfo = const User(
-                    Name: "Sheroz Akram",
-                    Email: "Sheroz.akram@outlook.com",
-                    Username: "Sheroz@123",
-                    Password: "abc@ABC",
-                    Type: "Buyer");
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => CnicPage(userInfo: userInfo)));
-              },
-              child: const Text("CNIC Page")),
-
-          TextButton(
-              onPressed: () {
-                var userInfo = const User(
-                    Name: "Sheroz Akram",
-                    Email: "Sheroz.akram@outlook.com",
-                    Username: "Sheroz@123",
-                    Password: "abc@ABC",
-                    Type: "Buyer");
-
-                var cnicInfo = const CNIC(
-                    cnic_number: "12234234",
-                    cnic_father_name: "Ali",
-                    cnic_name: "Hamza",
-                    cnic_dob: "1/2/2003");
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => CnicEdit(
-                              userInfo: userInfo,
-                              cnicInfo: cnicInfo,
-                            )));
-              },
-              child: const Text("CNIC Edit")),
         ]),
       ),
     ));

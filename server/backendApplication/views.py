@@ -250,6 +250,46 @@ def resendOTP(request):
     return JsonResponse({"status":"error", "message":"Invalid Request"})
 
 
+# Reset a User Password with a new password
+@csrf_exempt
+def passwordReset(request):
+    print("NEW PASSWORD RESET REQUEST")
+
+    try:
+        # Make Sure it is POST Request
+        if request.method == "POST":
+
+            # Get the other data files
+            Email = request.POST['Email']
+            Password = request.POST['Password']
+            NewPassword = request.POST['NewPassword']
+
+            # Get the User
+            try:
+                # Find the User with Email Address
+                user = ApplicationUser.objects.get(email_address=Email)
+
+                # Check the User Password
+                if user.password != Password:
+                    return JsonResponse({"status":"error", "message": "Password not correct"})
+
+                # Store the New User Password as Password
+                user.password = NewPassword
+                user.save()
+
+                # Display Message to the User
+                return JsonResponse({"status":"success", "message":"User Password is reset. Now Login"})
+            
+            # If User not found        
+            except ApplicationUser.DoesNotExist as e:
+                return JsonResponse({"status":"error", "message": "User not found"})
+
+    except Exception as e:
+        return JsonResponse({"status":"error", "message": "User not found"})
+
+    return JsonResponse({"status":"error", "message":"Invalid Request"})
+
+
 # Generate a New OTP for Existing User To Reset the Password
 @csrf_exempt
 def forgotPassword(request):
