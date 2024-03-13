@@ -4,41 +4,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:vivid_estate_frontend_flutter/Congrats.dart';
-import 'package:vivid_estate_frontend_flutter/ServerInfo.dart';
-import 'package:vivid_estate_frontend_flutter/User.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/Congrats.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 
-class CnicEdit extends StatefulWidget {
-  const CnicEdit({super.key, required this.userInfo, required this.cnicInfo});
-  final User userInfo;
-  final CNIC cnicInfo;
-
+class ResetPassword extends StatefulWidget {
+  const ResetPassword({super.key, required this.Email, required this.Password});
+  final String Email;
+  final String Password;
   @override
-  State<CnicEdit> createState() => _CnicEdit();
+  State<ResetPassword> createState() => _ResetPassword();
 }
 
-class _CnicEdit extends State<CnicEdit> {
-  final _cnic_name_controller = TextEditingController();
-  final _cnic_number = TextEditingController();
-  final _cnic_father_name = TextEditingController();
-  final _cnic_dob = TextEditingController();
+class _ResetPassword extends State<ResetPassword> {
+  final _password_controller = TextEditingController();
+  final _confirm_password_controller = TextEditingController();
 
   var userExit = true;
 
-  // Set the Field Values
-  @override
-  void initState() {
-    super.initState();
-    _cnic_name_controller.text = widget.cnicInfo.cnic_name;
-    _cnic_number.text = widget.cnicInfo.cnic_number;
-    _cnic_father_name.text = widget.cnicInfo.cnic_father_name;
-    _cnic_dob.text = widget.cnicInfo.cnic_dob;
-  }
-
   /*
-  Confirm the CNIC Data
+  Send Password Reset Request to the Server
   */
-  void storeCNICData(name, father, cnic_number, dob, myContext) async {
+  void passwordResetRequest(password, confirmPassword, myContext) async {
     EasyLoading.instance
       ..userInteractions = false
       ..loadingStyle = EasyLoadingStyle.dark;
@@ -52,16 +38,13 @@ class _CnicEdit extends State<CnicEdit> {
 
     // URL to Send Request
     var host = ServerInfo().host;
-    var url = Uri.parse("$host/store_cnic");
+    var url = Uri.parse("$host/reset_password");
     try {
       // Our Request
       var response = await http.post(url, body: {
-        'Email': widget.userInfo.Email,
-        'Password': widget.userInfo.Password,
-        'cnicName': name,
-        "cnicFather": father,
-        'cnicNumber': cnic_number,
-        'cnicDob': dob
+        'Email': widget.Email,
+        'Password': widget.Password,
+        'NewPassword': password,
       });
 
       setState(() {
@@ -77,15 +60,15 @@ class _CnicEdit extends State<CnicEdit> {
           // Show Success Message
           EasyLoading.showSuccess(result['message']);
 
-          // Account Creation successfull
+          // Password Reset Successfull
           Navigator.push(
               myContext,
               MaterialPageRoute(
                   builder: (myContext) => const CongratulationsPage(
-                      title: "Your Account is Created!",
+                      title: "Your Password is reset!",
                       message:
-                          "Please continue and wait for your account verification. We will email you when your account verified then login. Thanks!",
-                      noBacks: 5)));
+                          "Please continue and login to your account with your email and new password. Thanks!",
+                      noBacks: 4)));
         }
         // Error in request
         else {
@@ -111,33 +94,47 @@ class _CnicEdit extends State<CnicEdit> {
     }
   }
 
+  // Make Sure Password is Strong
+  bool isPasswordStrong(String password) {
+    // Length Requirement
+    if (password.length < 8) {
+      return false;
+    }
+
+    // Capital Letter Requirement
+    bool hasCapital = false;
+    for (int i = 0; i < password.length; i++) {
+      if (password.codeUnitAt(i) >= 65 && password.codeUnitAt(i) <= 90) {
+        hasCapital = true;
+        break;
+      }
+    }
+
+    return hasCapital;
+  }
+
   /*
-
   Validate the input data and send request
-
   */
-  void submitCNICData(BuildContext context) {
+  void submitPasswordData(BuildContext context) {
     // Check Email is Valid or Not
-    if (_cnic_name_controller.text == "") {
+    if (_password_controller.text == "") {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Please Enter Card Holder Name")));
-    } else if (_cnic_father_name.text == "") {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please Enter Father Name")));
-    } else if (_cnic_number.text == "") {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please enter CNIC Number")));
-    } else if (_cnic_dob.text == "") {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please enter your dater of Birth")));
+    } else if (!isPasswordStrong(_password_controller.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Password is weak. Enter Strong Password")));
+    } else if (_password_controller.text != _confirm_password_controller.text) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Please enter as password for confirmation")));
     }
 
     // Clear All the checks
     // Now send request to the server
     else {
       // Send the Request
-      storeCNICData(_cnic_name_controller.text, _cnic_father_name.text,
-          _cnic_number.text, _cnic_dob.text, context);
+      passwordResetRequest(_password_controller.text,
+          _confirm_password_controller.text, context);
     }
   }
 
@@ -173,10 +170,10 @@ class _CnicEdit extends State<CnicEdit> {
                     top: 20, left: 50, right: 50, bottom: 20),
                 child: Column(
                   children: <Widget>[
-                    Image.asset("assets/UI/cnicEditImage.png", width: 150),
+                    Image.asset("assets/UI/resetPasswordImage.png", width: 150),
 
                     // Page Information
-                    const Text("Verify Details",
+                    const Text("Reset Password",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 36.0,
@@ -187,25 +184,25 @@ class _CnicEdit extends State<CnicEdit> {
                     const Text(
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Color(0xFF006E86)),
-                        "Please verify the CNIC details with the scanned data and change if you want"),
+                        "Please enter your new password that you want to set as your account password."),
                   ],
                 ),
               ),
 
-              // Edit CNIC Data
+              // Edit User Info
               Center(
                 child: Container(
                   margin: const EdgeInsets.only(left: 20, right: 20),
                   child: Column(
                     children: <Widget>[
-                      // Enter CNIC Name
+                      // Enter New Password
                       Container(
                         margin: const EdgeInsets.only(bottom: 20),
                         child: Column(
                           children: <Widget>[
                             const Align(
                               alignment: Alignment.centerLeft,
-                              child: Text("Card Holder Name",
+                              child: Text("Enter new password",
                                   style: TextStyle(
                                     fontSize: 18.0,
                                     fontWeight: FontWeight.bold,
@@ -215,82 +212,8 @@ class _CnicEdit extends State<CnicEdit> {
                                   )),
                             ),
                             TextField(
-                              controller: _cnic_name_controller,
-                              decoration: const InputDecoration(
-                                  hintText: "Example Name"),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Enter CNIC Number
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 20),
-                        child: Column(
-                          children: <Widget>[
-                            const Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text("CNIC Number",
-                                  style: TextStyle(
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF5093A1),
-                                    fontFamily:
-                                        "Berlin Sans", // Use a standard font
-                                  )),
-                            ),
-                            TextField(
-                              controller: _cnic_number,
-                              decoration: const InputDecoration(
-                                  hintText: "example@example.com"),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Enter Father Name
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 20),
-                        child: Column(
-                          children: <Widget>[
-                            const Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text("Father Name",
-                                  style: TextStyle(
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF5093A1),
-                                    fontFamily:
-                                        "Berlin Sans", // Use a standard font
-                                  )),
-                            ),
-                            TextField(
-                              controller: _cnic_father_name,
-                              decoration:
-                                  const InputDecoration(hintText: "User123"),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Enter Date of Birth
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 20),
-                        child: Column(
-                          children: <Widget>[
-                            const Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text("Date of Birth",
-                                  style: TextStyle(
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF5093A1),
-                                    fontFamily:
-                                        "Berlin Sans", // Use a standard font
-                                  )),
-                            ),
-                            TextField(
-                              controller: _cnic_dob,
+                              obscureText: true,
+                              controller: _password_controller,
                               decoration: const InputDecoration(
                                   hintText: "8+ Characters, 1 Capital"),
                             ),
@@ -298,6 +221,31 @@ class _CnicEdit extends State<CnicEdit> {
                         ),
                       ),
 
+                      // Confirm new Password
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 20),
+                        child: Column(
+                          children: <Widget>[
+                            const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text("Confirm Password",
+                                  style: TextStyle(
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF5093A1),
+                                    fontFamily:
+                                        "Berlin Sans", // Use a standard font
+                                  )),
+                            ),
+                            TextField(
+                              obscureText: true,
+                              controller: _confirm_password_controller,
+                              decoration: const InputDecoration(
+                                  hintText: "same as above"),
+                            ),
+                          ],
+                        ),
+                      ),
                       Container(
                         margin: const EdgeInsets.only(top: 20, bottom: 20),
                         child: TextButton(
@@ -313,13 +261,13 @@ class _CnicEdit extends State<CnicEdit> {
                                   borderRadius: BorderRadius.circular(4.0),
                                 ))),
                             onPressed: () {
-                              // Send the CNIC Data
-                              submitCNICData(context);
+                              // Now Send the Password Reset Request
+                              submitPasswordData(context);
                             },
                             child: Container(
                               width: 200,
                               padding: const EdgeInsets.all(10),
-                              child: const Text("Complete",
+                              child: const Text("Save",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 18.0,

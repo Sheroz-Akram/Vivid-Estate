@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:http/http.dart' as http;
-import 'package:vivid_estate_frontend_flutter/ServerInfo.dart';
-import 'package:vivid_estate_frontend_flutter/PasswordReset.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/PasswordReset.dart';
 
 class PasswordResetOTP extends StatefulWidget {
   const PasswordResetOTP({super.key, required this.userEmailAddress});

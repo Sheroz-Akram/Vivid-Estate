@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
-import 'package:vivid_estate_frontend_flutter/Login.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/Login.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:vivid_estate_frontend_flutter/OTP.dart';
-import 'package:vivid_estate_frontend_flutter/ServerInfo.dart';
-import 'package:vivid_estate_frontend_flutter/User.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/OTP.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/User.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key, required this.userType});

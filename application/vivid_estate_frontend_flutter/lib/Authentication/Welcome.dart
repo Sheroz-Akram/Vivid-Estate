@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:vivid_estate_frontend_flutter/Login.dart';
-import 'package:vivid_estate_frontend_flutter/SignUp.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/Login.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/SignUp.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});

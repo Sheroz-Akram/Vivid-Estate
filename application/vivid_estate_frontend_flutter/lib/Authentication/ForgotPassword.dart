@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:vivid_estate_frontend_flutter/PasswordResetOTP.dart';
-import 'package:vivid_estate_frontend_flutter/ServerInfo.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/PasswordResetOTP.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({

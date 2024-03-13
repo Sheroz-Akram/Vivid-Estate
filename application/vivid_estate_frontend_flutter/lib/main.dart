@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:vivid_estate_frontend_flutter/Login.dart';
-import 'package:vivid_estate_frontend_flutter/SignUp.dart';
-import 'package:vivid_estate_frontend_flutter/Welcome.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/Welcome.dart';
+import 'package:vivid_estate_frontend_flutter/BuyerMain.dart';
+import 'package:vivid_estate_frontend_flutter/SellerMain.dart';
 
 void main() {
   runApp(const MyApp());
@@ -38,6 +39,25 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  void LoadHomePage(BuildContext myContext) async {
+    var prefs = await SharedPreferences.getInstance();
+    var isLogin = prefs.getBool("isLogin");
+    var userEmail = prefs.getString("userEmail");
+    var privateKey = prefs.getString("privateKey");
+    var userType = prefs.getString("userType");
+
+    // Move to the Next Page. Depending Upon User Type
+    if (isLogin ?? false == true) {
+      if (userType == "Buyer") {
+        Navigator.push(
+            myContext, MaterialPageRoute(builder: (myContext) => BuyerMain()));
+      } else {
+        Navigator.push(
+            myContext, MaterialPageRoute(builder: (myContext) => SellerMain()));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,20 +101,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
           TextButton(
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            const SignUpPage(userType: "Buyer")));
+                LoadHomePage(context);
               },
-              child: const Text("Sign Up")),
-
-          TextButton(
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()));
-              },
-              child: const Text("Login Page")),
+              child: const Text("Home")),
         ]),
       ),
     ));

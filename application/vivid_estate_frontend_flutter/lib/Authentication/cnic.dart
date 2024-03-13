@@ -6,10 +6,10 @@ import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:vivid_estate_frontend_flutter/ServerInfo.dart';
-import 'package:vivid_estate_frontend_flutter/User.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/User.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'package:vivid_estate_frontend_flutter/cnic_edit.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/cnic_edit.dart';
 
 class CnicPage extends StatefulWidget {
   const CnicPage({super.key, required this.userInfo});

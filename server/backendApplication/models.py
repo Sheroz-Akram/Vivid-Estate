@@ -2,6 +2,7 @@ from django.db import models
 
 # Create your models here.
 class ApplicationUser(models.Model):
+    private_key = models.CharField(max_length=60)
     full_name = models.CharField(max_length=150)
     email_address = models.EmailField(unique=True)
     user_name = models.CharField(unique=True, max_length=100)

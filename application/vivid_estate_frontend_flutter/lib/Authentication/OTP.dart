@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:http/http.dart' as http;
-import 'package:vivid_estate_frontend_flutter/ServerInfo.dart';
-import 'package:vivid_estate_frontend_flutter/User.dart';
-import 'package:vivid_estate_frontend_flutter/cnic.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/User.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/cnic.dart';
 
 class OTPPage extends StatefulWidget {
   const OTPPage({super.key, required this.userInfo});

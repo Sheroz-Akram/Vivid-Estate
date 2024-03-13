@@ -9,6 +9,7 @@ import os
 from django.core.files.storage import FileSystemStorage
 from .models import *
 import random
+import string
 
 
 # Create your views here.
@@ -80,7 +81,11 @@ def OcrCNIC(request):
     #Invalid Request
     return HttpResponse("Invalid Request..")
 
-
+# Generate 50 Characters Random Private Key
+def generate_random_string(length):
+  characters = string.ascii_letters + string.digits + string.punctuation
+  result = ''.join(random.choice(characters) for i in range(length))
+  return result
 
 # Registor a new user to the application
 @csrf_exempt
@@ -103,9 +108,13 @@ def SignUp(request):
                 # Generate a OTP
                 otp = str(random.randint(1000, 9999))
                 print("**New SignUp Request**")
+
+                # Random Private Key
+                privateKey = generate_random_string(50)
                 
                 # Create Accounts
                 user = ApplicationUser(
+                        private_key=privateKey,
                         full_name=FullName,
                         email_address=Email,
                         user_name=User,
@@ -279,6 +288,45 @@ def passwordReset(request):
 
                 # Display Message to the User
                 return JsonResponse({"status":"success", "message":"User Password is reset. Now Login"})
+            
+            # If User not found        
+            except ApplicationUser.DoesNotExist as e:
+                return JsonResponse({"status":"error", "message": "User not found"})
+
+    except Exception as e:
+        return JsonResponse({"status":"error", "message": "User not found"})
+
+    return JsonResponse({"status":"error", "message":"Invalid Request"})
+
+
+# Login to user account
+@csrf_exempt
+def loginUser(request):
+    print("NEW USER LOGIN REQUEST")
+
+    try:
+        # Make Sure it is POST Request
+        if request.method == "POST":
+
+            # Get the other data files
+            Email = request.POST['Email']
+            Password = request.POST['Password']
+
+            # Get the User
+            try:
+                # Find the User with Email Address
+                user = ApplicationUser.objects.get(email_address=Email)
+
+                # Check the User Password
+                if user.password != Password:
+                    return JsonResponse({"status":"error", "message": "Password not correct"})
+
+                # Store the New User Password as Password
+                user.private_key = generate_random_string(50)
+                user.save()
+
+                # Display Message to the User
+                return JsonResponse({"status":"success", "message":"Login is successfull!", "privateKey" : user.private_key, "userType" : user.user_type})
             
             # If User not found        
             except ApplicationUser.DoesNotExist as e:
