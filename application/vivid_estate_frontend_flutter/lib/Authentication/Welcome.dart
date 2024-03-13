@@ -193,7 +193,6 @@ class WelcomePage extends StatelessWidget {
                               fontFamily: "Berlin Sans", // Use a standard font
                             )),
                       )),
-
                   Center(
                     child: Container(
                       alignment: Alignment.bottomCenter,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vivid_estate_frontend_flutter/BuyerScreens/BuyerHome.dart';
 
 class BuyerMain extends StatefulWidget {
   const BuyerMain({super.key});
@@ -10,8 +11,7 @@ class BuyerMain extends StatefulWidget {
 class _BuyerMain extends State<BuyerMain> {
   int _selectedIndex = 0;
   static const List<Widget> _widgetOptions = <Widget>[
-    Text('Home Page',
-        style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+    BuyerHome(),
     Text('Chat Page',
         style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
     Text('Favourite Page',

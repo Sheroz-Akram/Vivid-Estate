@@ -39,22 +39,37 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  @override
+  void initState() {
+    super.initState();
+    LoadHomePage(context);
+  }
+
+  // Add Delay of 2 Seconds
+  Future<void> myDelayedTask() async {
+    await Future.delayed(Duration(seconds: 2));
+  }
+
+  // Loading the Application depending upon user login status
   void LoadHomePage(BuildContext myContext) async {
     var prefs = await SharedPreferences.getInstance();
     var isLogin = prefs.getBool("isLogin");
-    var userEmail = prefs.getString("userEmail");
-    var privateKey = prefs.getString("privateKey");
     var userType = prefs.getString("userType");
 
     // Move to the Next Page. Depending Upon User Type
-    if (isLogin ?? false == true) {
+    await myDelayedTask();
+    if (isLogin == true) {
       if (userType == "Buyer") {
-        Navigator.push(
+        Navigator.pushReplacement(
             myContext, MaterialPageRoute(builder: (myContext) => BuyerMain()));
       } else {
-        Navigator.push(
+        Navigator.pushReplacement(
             myContext, MaterialPageRoute(builder: (myContext) => SellerMain()));
       }
+    } else {
+      // If User not Login then move to Welcome Page
+      Navigator.pushReplacement(
+          myContext, MaterialPageRoute(builder: (myContext) => WelcomePage()));
     }
   }
 
@@ -92,18 +107,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 fontFamily: "Berlin Sans", // Use a standard font
               )),
 
-          TextButton(
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => WelcomePage()));
-              },
-              child: const Text("Welcome Page")),
-
-          TextButton(
-              onPressed: () {
-                LoadHomePage(context);
-              },
-              child: const Text("Home")),
+          // Loading Gif File
+          Image.asset(
+            "assets/UI/loading.gif",
+            width: 200,
+          ),
         ]),
       ),
     ));

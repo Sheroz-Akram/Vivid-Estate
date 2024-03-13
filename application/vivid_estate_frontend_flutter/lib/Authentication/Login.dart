@@ -34,6 +34,7 @@ class _LoginPage extends State<LoginPage> {
 
     // Move to the Next Page. Depending Upon User Type
     Navigator.pop(myContext);
+    Navigator.pop(myContext);
     if (userType == "Buyer") {
       Navigator.push(
           myContext, MaterialPageRoute(builder: (myContext) => BuyerMain()));
