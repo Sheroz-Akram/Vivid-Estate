@@ -31,8 +31,10 @@ class _BuyerMain extends State<BuyerMain> {
     return Scaffold(
 
         // Our Main Page
-        body: Center(
-          child: _widgetOptions.elementAt(_selectedIndex),
+        body: SafeArea(
+          child: Center(
+            child: _widgetOptions.elementAt(_selectedIndex),
+          ),
         ),
         // Navigation bar
         bottomNavigationBar: BottomNavigationBar(

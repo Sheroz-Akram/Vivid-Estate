@@ -18,7 +18,7 @@ class BuyerHome extends StatelessWidget {
               decoration: const BoxDecoration(
                   image: DecorationImage(
                       image:
-                          AssetImage("assets/BuyerImages/headerBackground.jpg"),
+                          AssetImage("assets/BuyerImages/headerBackground.png"),
                       fit: BoxFit.fill)),
               child: Column(
                 children: [
@@ -27,6 +27,7 @@ class BuyerHome extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Container(
+                          margin: const EdgeInsets.only(top: 20),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(10.0),
@@ -52,7 +53,7 @@ class BuyerHome extends StatelessWidget {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                         child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -62,7 +63,8 @@ class BuyerHome extends StatelessWidget {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => FilterPage()));
+                                          builder: (context) =>
+                                              const FilterPage()));
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
@@ -175,7 +177,7 @@ class BuyerHome extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Container(
+                        SizedBox(
                           height: 200.0,
                           child: ListView(
                             scrollDirection: Axis.horizontal,
@@ -229,7 +231,7 @@ class BuyerHome extends StatelessWidget {
                                               ],
                                             ),
                                             // Property location
-                                            Text(
+                                            const Text(
                                               'DHA 9 Town, Lahore',
                                               style: TextStyle(
                                                 fontSize: 16.0,
