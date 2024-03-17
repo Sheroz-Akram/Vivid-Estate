@@ -2,12 +2,12 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-from .modules.ocr import getCnicDetails
-from .modules.mail import send_email
+from ..modules.ocr import getCnicDetails
+from ..modules.mail import send_email
 import uuid
 import os
 from django.core.files.storage import FileSystemStorage
-from .models import *
+from ..models import *
 import random
 import string
 
@@ -87,6 +87,7 @@ def generate_random_string(length):
   result = ''.join(random.choice(characters) for i in range(length))
   return result
 
+
 # Registor a new user to the application
 @csrf_exempt
 def SignUp(request):
@@ -115,6 +116,7 @@ def SignUp(request):
                 # Create Accounts
                 user = ApplicationUser(
                         private_key=privateKey,
+                        profile_pic="Default.jpg",
                         full_name=FullName,
                         email_address=Email,
                         user_name=User,

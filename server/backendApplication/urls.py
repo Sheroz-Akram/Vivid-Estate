@@ -14,16 +14,24 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path, include
-from . import views
+from .Views import AccountViews
+from .Views import ChatViews
 
 urlpatterns = [
-    path("ocr_cnic", view=views.OcrCNIC, name="CNIC OCR"),
-    path("login", view=views.loginUser, name="Login"),
-    path("signup", view=views.SignUp, name="Sign Up"),
-    path("otp_verify", view=views.verify_otp, name="OTP Verification"),
-    path("resend_otp", view=views.resendOTP, name="OTP Resend"),
-    path("store_cnic", view=views.storeCNICData, name="CNIC Data Store"),
-    path("forgot_password", view=views.forgotPassword, name="User Forgot Password"),
-    path("password_reset_otp", view=views.verifyPasswordResetOTP, name="Verify Password Reset OTP"),
-    path("reset_password", view=views.passwordReset, name="Reset Password"),
+
+    # Account Management End Points
+    path("ocr_cnic", view=AccountViews.OcrCNIC, name="CNIC OCR"),
+    path("login", view=AccountViews.loginUser, name="Login"),
+    path("signup", view=AccountViews.SignUp, name="Sign Up"),
+    path("otp_verify", view=AccountViews.verify_otp, name="OTP Verification"),
+    path("resend_otp", view=AccountViews.resendOTP, name="OTP Resend"),
+    path("store_cnic", view=AccountViews.storeCNICData, name="CNIC Data Store"),
+    path("forgot_password", view=AccountViews.forgotPassword, name="User Forgot Password"),
+    path("password_reset_otp", view=AccountViews.verifyPasswordResetOTP, name="Verify Password Reset OTP"),
+    path("reset_password", view=AccountViews.passwordReset, name="Reset Password"),
+
+    # Chat API EndPoints
+    path("initiate_chat", view=ChatViews.InitiateChat, name="Initiate Chat"),
+    path("send_message", view=ChatViews.sendMessage, name="Send Message"),
+    path("get_all_chats", view=ChatViews.get_all_user_chat, name="All Chats Data")
 ]

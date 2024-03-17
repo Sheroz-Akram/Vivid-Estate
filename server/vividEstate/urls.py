@@ -19,6 +19,8 @@ from . import views
 from backendApplication.models import *
 
 admin.site.register(ApplicationUser)
+admin.site.register(Chat)
+admin.site.register(ChatMessage)
 
 
 urlpatterns = [
