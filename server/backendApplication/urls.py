@@ -33,5 +33,7 @@ urlpatterns = [
     # Chat API EndPoints
     path("initiate_chat", view=ChatViews.InitiateChat, name="Initiate Chat"),
     path("send_message", view=ChatViews.sendMessage, name="Send Message"),
-    path("get_all_chats", view=ChatViews.get_all_user_chat, name="All Chats Data")
+    path("get_all_chats", view=ChatViews.get_all_user_chat, name="All Chats Data"),
+    path("get_all_messages", view=ChatViews.get_all_chat_messages, name="Get Chat Messages"),
+    path("get_all_unview_messages", view=ChatViews.get_all_unview_messages, name="Get Unview Messages")
 ]

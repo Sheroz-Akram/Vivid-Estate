@@ -25,7 +25,9 @@ class Chat(models.Model):
     Buyer = models.ForeignKey(ApplicationUser, on_delete=models.CASCADE, related_name="chat_as_buyer")
     Seller = models.ForeignKey(ApplicationUser, on_delete=models.CASCADE, related_name="chat_as_seller")
     LastMessage = models.CharField(max_length=255)
-    modified = models.DateTimeField(auto_now=True) 
+    modified = models.DateTimeField(auto_now=True)
+    unviewCount = models.IntegerField()
+    unviewPerson = models.ForeignKey(ApplicationUser, on_delete=models.CASCADE)
 
     def __str__(self):
         return "Buyer: " + self.Buyer.email_address + "    Seller: " +self.Seller.email_address
@@ -35,6 +37,7 @@ class ChatMessage(models.Model):
     ChatRoom = models.ForeignKey(Chat, on_delete=models.CASCADE)
     Sender = models.ForeignKey(ApplicationUser, on_delete=models.CASCADE)
     Message = models.CharField(max_length=255)
+    Status = models.CharField(max_length=20)
     timestamp = models.DateTimeField(auto_now_add=True) 
 
     def __str__(self):

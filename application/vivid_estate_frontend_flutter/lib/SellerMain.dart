@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vivid_estate_frontend_flutter/Chat/ChatHome.dart';
 
 class SellerMain extends StatefulWidget {
   const SellerMain({super.key});
@@ -12,8 +13,7 @@ class _SellerMain extends State<SellerMain> {
   static const List<Widget> _widgetOptions = <Widget>[
     Text('Dashboard Page',
         style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
-    Text('Chat Page',
-        style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+    ChatHome(),
     Text('Ads Page',
         style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
     Text('Profile Page',

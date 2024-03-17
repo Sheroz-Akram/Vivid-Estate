@@ -52,6 +52,9 @@ class _Send extends State<Send> {
                         style:
                             const TextStyle(fontSize: 13, color: Colors.black),
                       ),
+                      const SizedBox(
+                        width: 4,
+                      ),
                       Icon(
                         widget.status.toLowerCase() == "viewed"
                             ? Icons.done_all

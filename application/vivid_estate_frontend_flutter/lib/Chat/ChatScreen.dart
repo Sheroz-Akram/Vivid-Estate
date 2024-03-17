@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -23,6 +24,181 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreen extends State<ChatScreen> {
+  // Store all the Messages
+  var messages = [];
+  final _send_controller = TextEditingController();
+  final _scoll_controller = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    getAllMessages(context);
+
+    scrollToBottom();
+
+    // Get New Messages
+    Timer.periodic(const Duration(seconds: 2), (timer) {
+      getUnviewMessages(context);
+    });
+  }
+
+  void scrollToBottom() {
+    Timer(const Duration(seconds: 1), () {
+      _scoll_controller.animateTo(
+        _scoll_controller.position.maxScrollExtent,
+        duration:
+            const Duration(milliseconds: 500), // Adjust animation duration
+        curve: Curves.easeOut, // Adjust animation curve
+      );
+    });
+  }
+
+  // Get all the Chat Messsages
+  void getAllMessages(myContext) async {
+    // Get the User Data
+    var prefs = await SharedPreferences.getInstance();
+    var userEmail = prefs.getString("userEmail");
+    var userPrivateKey = prefs.getString("privateKey");
+    // URL to Send Request
+    var host = ServerInfo().host;
+    var url = Uri.parse("$host/get_all_messages");
+    try {
+      // Our Request
+      var response = await http.post(url, body: {
+        'Email': userEmail,
+        'PrivateKey': userPrivateKey,
+        'ChatID': (widget.ChatID).toString()
+      });
+
+      // Get a Response from the Server
+      if (response.statusCode == 200) {
+        var result = jsonDecode(response.body);
+
+        // Valid Request
+        if (result['status'] == "success") {
+          var data = result['message'];
+          for (var i = 0; i < data.length; i++) {
+            setState(() {
+              messages = data;
+              _send_controller.text = "";
+            });
+          }
+          scrollToBottom();
+        }
+      } else {}
+    }
+
+    // Error Connecting to Server
+    catch (e) {
+      print(e);
+    }
+  }
+
+  // Send Message to the Other User
+  void getUnviewMessages(myContext) async {
+    // Get the User Data
+    var prefs = await SharedPreferences.getInstance();
+    var userEmail = prefs.getString("userEmail");
+    var userPrivateKey = prefs.getString("privateKey");
+    // URL to Send Request
+    var host = ServerInfo().host;
+    var url = Uri.parse("$host/get_all_unview_messages");
+
+    try {
+      // Our Request
+      var response = await http.post(url, body: {
+        'Email': userEmail,
+        'PrivateKey': userPrivateKey,
+        'ChatID': (widget.ChatID).toString(),
+      });
+
+      // Get a Response from the Server
+      if (response.statusCode == 200) {
+        var result = jsonDecode(response.body);
+
+        // Valid Request
+        if (result['status'] == "success") {
+          var data = result['message'];
+          if (data.length > 0) {
+            var i = messages.length - 1;
+            while (messages[i]['Status'] == "Send") {
+              messages[i]['Status'] = "Viewed";
+              i--;
+            }
+          }
+          for (var i = 0; i < data.length; i++) {
+            setState(() {
+              messages.add({
+                "Status": data[i]['Status'],
+                "Message": data[i]['Message'],
+                "Time": data[i]['Time'],
+                "Type": data[i]['Type']
+              });
+            });
+          }
+          scrollToBottom();
+        }
+      } else {}
+    }
+
+    // Error Connecting to Server
+    catch (e) {
+      print(e);
+    }
+  }
+
+  // Send Message to the Other User
+  void sendMessage(myContext) async {
+    // Get the User Data
+    var prefs = await SharedPreferences.getInstance();
+    var userEmail = prefs.getString("userEmail");
+    var userPrivateKey = prefs.getString("privateKey");
+    // URL to Send Request
+    var host = ServerInfo().host;
+    var url = Uri.parse("$host/send_message");
+
+    // Check if Message not empty
+    if (_send_controller.text == "") {
+      ScaffoldMessenger.of(myContext).showSnackBar(
+          const SnackBar(content: Text("Please Type as Message")));
+      return;
+    }
+
+    try {
+      // Our Request
+      var response = await http.post(url, body: {
+        'Email': userEmail,
+        'PrivateKey': userPrivateKey,
+        'ChatID': (widget.ChatID).toString(),
+        'Message': _send_controller.text
+      });
+
+      // Get a Response from the Server
+      if (response.statusCode == 200) {
+        var result = jsonDecode(response.body);
+
+        // Valid Request
+        if (result['status'] == "success") {
+          setState(() {
+            messages.add({
+              "Status": "Send",
+              "Message": _send_controller.text,
+              "Time": "now",
+              "Type": "Send"
+            });
+            _send_controller.text = "";
+          });
+          scrollToBottom();
+        }
+      } else {}
+    }
+
+    // Error Connecting to Server
+    catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -87,90 +263,18 @@ class _ChatScreen extends State<ChatScreen> {
             children: [
               Container(
                 margin: const EdgeInsets.only(bottom: 80),
-                child: ListView(
-                  shrinkWrap: true,
-                  children: const [
-                    Reply(message: "How are you!", time: "12:90"),
-                    Send(
-                        message: "This is a Message",
-                        time: "12:00",
-                        status: "Send"),
-                    Reply(message: "How are you!", time: "12:90"),
-                    Send(
-                        message: "This is a Message",
-                        time: "12:00",
-                        status: "Send"),
-                    Reply(message: "How are you!", time: "12:90"),
-                    Send(
-                        message: "This is a Message",
-                        time: "12:00",
-                        status: "Send"),
-                    Reply(message: "How are you!", time: "12:90"),
-                    Send(
-                        message: "This is a Message",
-                        time: "12:00",
-                        status: "Send"),
-                    Reply(message: "How are you!", time: "12:90"),
-                    Send(
-                        message: "This is a Message",
-                        time: "12:00",
-                        status: "Send"),
-                    Reply(message: "How are you!", time: "12:90"),
-                    Send(
-                        message: "This is a Message",
-                        time: "12:00",
-                        status: "Send"),
-                    Reply(message: "How are you!", time: "12:90"),
-                    Send(
-                        message: "This is a Message",
-                        time: "12:00",
-                        status: "Send"),
-                    Reply(message: "How are you!", time: "12:90"),
-                    Send(
-                        message: "This is a Message",
-                        time: "12:00",
-                        status: "Send"),
-                    Reply(message: "How are you!", time: "12:90"),
-                    Send(
-                        message: "This is a Message",
-                        time: "12:00",
-                        status: "Send"),
-                    Reply(message: "How are you!", time: "12:90"),
-                    Send(
-                        message: "This is a Message",
-                        time: "12:00",
-                        status: "Send"),
-                    Reply(message: "How are you!", time: "12:90"),
-                    Send(
-                        message: "This is a Message",
-                        time: "12:00",
-                        status: "Send"),
-                    Reply(message: "How are you!", time: "12:90"),
-                    Send(
-                        message: "This is a Message",
-                        time: "12:00",
-                        status: "Send"),
-                    Reply(message: "How are you!", time: "12:90"),
-                    Send(
-                        message: "This is a Message",
-                        time: "12:00",
-                        status: "Send"),
-                    Reply(message: "How are you!", time: "12:90"),
-                    Send(
-                        message: "This is a Message",
-                        time: "12:00",
-                        status: "Send"),
-                    Reply(message: "How are you!", time: "12:90"),
-                    Send(
-                        message: "This is a Message",
-                        time: "12:00",
-                        status: "Send"),
-                    Reply(message: "How are you!", time: "12:90"),
-                    Send(
-                        message: "This is a Message",
-                        time: "12:00",
-                        status: "Send")
-                  ],
+                child: ListView.builder(
+                  controller: _scoll_controller,
+                  itemBuilder: (context, index) =>
+                      messages[index]['Type'] == "Reply"
+                          ? Reply(
+                              message: messages[index]['Message'],
+                              time: messages[index]['Time'])
+                          : Send(
+                              message: messages[index]['Message'],
+                              time: messages[index]['Time'],
+                              status: messages[index]['Status']),
+                  itemCount: messages.length,
                 ),
               ),
               Align(
@@ -188,6 +292,7 @@ class _ChatScreen extends State<ChatScreen> {
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.80,
                       child: TextFormField(
+                        controller: _send_controller,
                         keyboardType: TextInputType.multiline,
                         decoration: InputDecoration(
                             suffixIcon: IconButton(
@@ -195,7 +300,10 @@ class _ChatScreen extends State<ChatScreen> {
                                 Icons.send_sharp,
                                 color: Colors.blue,
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                // Send a message to the User
+                                sendMessage(context);
+                              },
                             ),
                             hintText: "Type a message",
                             contentPadding: const EdgeInsets.all(5),

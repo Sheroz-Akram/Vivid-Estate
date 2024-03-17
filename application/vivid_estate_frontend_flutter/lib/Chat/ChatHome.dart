@@ -19,6 +19,7 @@ class _ChatHome extends State<ChatHome> {
   var img = [];
   var times = [];
   var chatID = [];
+  var countMessages = [];
 
   @override
   void initState() {
@@ -55,6 +56,7 @@ class _ChatHome extends State<ChatHome> {
                   "${ServerInfo().host}/static/" + data[i]['profilePicture']);
               times.add(data[i]['time']);
               chatID.add(data[i]['chatID']);
+              countMessages.add(data[i]['count']);
             });
           }
         }
@@ -69,7 +71,6 @@ class _ChatHome extends State<ChatHome> {
 
   @override
   Widget build(BuildContext context) {
-    var countMessages = ["3", "15", "3"];
     return Scaffold(
       appBar: AppBar(
         // TRY THIS: Try changing the color here to a specific color (to
@@ -147,17 +148,19 @@ class _ChatHome extends State<ChatHome> {
                         style: const TextStyle(
                             fontSize: 12, fontWeight: FontWeight.bold),
                       ),
-                      CircleAvatar(
-                        radius: 8,
-                        backgroundColor: Colors.green,
-                        child: Text(
-                          countMessages[index],
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 8,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
+                      countMessages[index] != 0
+                          ? CircleAvatar(
+                              radius: 8,
+                              backgroundColor: Colors.green,
+                              child: Text(
+                                (countMessages[index]).toString(),
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 8,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            )
+                          : const Text("")
                     ],
                   ),
                 ),
