@@ -210,7 +210,7 @@ class _ChatScreen extends State<ChatScreen> {
         backgroundColor: Colors.white,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        leadingWidth: 120,
+        leadingWidth: MediaQuery.of(context).size.width * 0.50,
         actions: <Widget>[
           PopupMenuButton<String>(itemBuilder: (BuildContext context) {
             return [
@@ -232,25 +232,31 @@ class _ChatScreen extends State<ChatScreen> {
               },
             ),
             SizedBox(
-              height: 60,
-              width: 60,
+              height: 40,
+              width: 40,
               child: CircleAvatar(
                 backgroundImage: NetworkImage(widget.ProfilePicture),
               ),
             ),
-          ],
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.title,
-              style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+            const SizedBox(
+              width: 20,
             ),
-            Text(
-              "Last seen ${widget.lastScene}",
-              textAlign: TextAlign.left,
-              style: const TextStyle(color: Colors.grey, fontSize: 13),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  widget.title,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  "Last seen ${widget.lastScene}",
+                  textAlign: TextAlign.left,
+                  style: const TextStyle(color: Colors.grey, fontSize: 13),
+                ),
+              ],
             ),
           ],
         ),

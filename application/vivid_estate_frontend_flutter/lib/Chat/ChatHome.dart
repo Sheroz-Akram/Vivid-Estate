@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -25,6 +26,11 @@ class _ChatHome extends State<ChatHome> {
   void initState() {
     super.initState();
     getAllChats(context);
+
+    // Get New Messages
+    Timer.periodic(const Duration(seconds: 2), (timer) {
+      getAllChats(context);
+    });
   }
 
   void getAllChats(myContext) async {
@@ -48,16 +54,28 @@ class _ChatHome extends State<ChatHome> {
         // Valid Request
         if (result['status'] == "success") {
           var data = result['message'];
-          for (var i = 0; i < data.length; i++) {
-            setState(() {
-              names.add(data[i]['fullName']);
-              messages.add(data[i]['lastMessage']);
-              img.add(
-                  "${ServerInfo().host}/static/" + data[i]['profilePicture']);
-              times.add(data[i]['time']);
-              chatID.add(data[i]['chatID']);
-              countMessages.add(data[i]['count']);
-            });
+          if (data.length > names.length) {
+            for (var i = names.length; i < data.length; i++) {
+              setState(() {
+                names.add(data[i]['fullName']);
+                messages.add(data[i]['lastMessage']);
+                img.add(
+                    "${ServerInfo().host}/static/" + data[i]['profilePicture']);
+                times.add(data[i]['time']);
+                chatID.add(data[i]['chatID']);
+                countMessages.add(data[i]['count']);
+              });
+            }
+          } else {
+            for (var i = 0; i < data.length; i++) {
+              setState(() {
+                names[i] = data[i]['fullName'];
+                messages[i] = data[i]['lastMessage'];
+                times[i] = data[i]['time'];
+                chatID[i] = data[i]['chatID'];
+                countMessages[i] = data[i]['count'];
+              });
+            }
           }
         }
       } else {}
@@ -89,7 +107,7 @@ class _ChatHome extends State<ChatHome> {
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.notifications_rounded,
-                size: 40, color: Colors.blue),
+                size: 40, color: Color(0xFF006E86)),
             onPressed: () {
               print("notification");
             },

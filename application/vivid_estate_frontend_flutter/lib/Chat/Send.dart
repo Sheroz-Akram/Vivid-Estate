@@ -27,7 +27,7 @@ class _Send extends State<Send> {
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-            color: Colors.blue,
+            color: const Color(0xFF006E86),
             child: Stack(
               children: [
                 Padding(
@@ -49,17 +49,18 @@ class _Send extends State<Send> {
                     children: [
                       Text(
                         widget.time,
-                        style:
-                            const TextStyle(fontSize: 13, color: Colors.black),
+                        style: const TextStyle(
+                            fontSize: 13, color: Colors.white54),
                       ),
                       const SizedBox(
-                        width: 4,
+                        width: 8,
                       ),
                       Icon(
                         widget.status.toLowerCase() == "viewed"
                             ? Icons.done_all
                             : Icons.done,
                         size: 20,
+                        color: Colors.white54,
                       ),
                     ],
                   ),

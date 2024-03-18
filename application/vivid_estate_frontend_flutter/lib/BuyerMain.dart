@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerScreens/BuyerHome.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/ChatHome.dart';
+import 'package:vivid_estate_frontend_flutter/Profile/ProfileHome.dart';
 
 class BuyerMain extends StatefulWidget {
   const BuyerMain({super.key});
@@ -16,8 +17,7 @@ class _BuyerMain extends State<BuyerMain> {
     ChatHome(),
     Text('Favourite Page',
         style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
-    Text('Profile Page',
-        style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+    ProfileHome(title: "Title"),
   ];
 
   void _onItemTapped(int index) {

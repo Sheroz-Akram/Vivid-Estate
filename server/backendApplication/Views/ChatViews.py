@@ -153,7 +153,7 @@ def get_all_user_chat(request):
                             unviews = 0
                         else:
                             unviews = chatData.unviewCount
-                        responseData.append({"fullName":chatData.Buyer.full_name, "profilePicture": chatData.Seller.profile_pic ,"email":chatData.Buyer.email_address,"lastMessage":chatData.LastMessage , "time": chatData.modified.strftime("%H:%M %p"), "chatID": chatData.id, "count": unviews})
+                        responseData.append({"fullName":chatData.Buyer.full_name, "profilePicture": chatData.Buyer.profile_pic ,"email":chatData.Buyer.email_address,"lastMessage":chatData.LastMessage , "time": chatData.modified.strftime("%H:%M %p"), "chatID": chatData.id, "count": unviews})
 
                 # Display Message to the User
                 return JsonResponse({"status":"success", "message": responseData})
