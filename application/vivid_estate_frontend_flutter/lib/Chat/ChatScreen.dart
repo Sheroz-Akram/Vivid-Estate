@@ -210,7 +210,7 @@ class _ChatScreen extends State<ChatScreen> {
         backgroundColor: Colors.white,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        leadingWidth: MediaQuery.of(context).size.width * 0.50,
+        leadingWidth: MediaQuery.of(context).size.width * 0.90,
         actions: <Widget>[
           PopupMenuButton<String>(itemBuilder: (BuildContext context) {
             return [

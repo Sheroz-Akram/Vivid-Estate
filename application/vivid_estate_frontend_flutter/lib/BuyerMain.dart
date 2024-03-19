@@ -17,7 +17,7 @@ class _BuyerMain extends State<BuyerMain> {
     ChatHome(),
     Text('Favourite Page',
         style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
-    ProfileHome(title: "Title"),
+    ProfileHome(),
   ];
 
   void _onItemTapped(int index) {

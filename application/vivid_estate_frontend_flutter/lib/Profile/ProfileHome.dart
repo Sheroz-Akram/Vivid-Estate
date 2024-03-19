@@ -1,276 +1,228 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/ForgotPassword.dart';
+import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
+import 'package:vivid_estate_frontend_flutter/Report/ReportIssue.dart';
 
 class ProfileHome extends StatefulWidget {
-  const ProfileHome({super.key, required this.title});
-
-  final String title;
-
+  const ProfileHome({super.key});
   @override
-  State<ProfileHome> createState() => _ProfileHomeState();
+  State<ProfileHome> createState() => _ProfileHome();
 }
 
-class _ProfileHomeState extends State<ProfileHome> {
+class _ProfileHome extends State<ProfileHome> {
   @override
   Widget build(BuildContext context) {
+    // This method is rerun every time setState is called, for instance as done
+    // by the _incrementCounter method above.
+    //
+    // The Flutter framework has been optimized to make rerunning build methods
+    // fast, so that you can just rebuild anything that needs updating rather
+    // than having to individually change instances of widgets.
+
     return Scaffold(
-        appBar: AppBar(
-            backgroundColor: Colors.white,
-            leadingWidth: 80,
-            leading: const SizedBox(
-              height: 70,
-              width: 70,
-              child: CircleAvatar(
-                backgroundImage: AssetImage("assets/images/sheroz.jpg"),
+      body: SingleChildScrollView(
+        child: Column(children: [
+          const ListTile(
+            leading: CircleAvatar(
+                backgroundImage: AssetImage("assets/images/sheroz.jpg")),
+            title: Text(
+              "Sheroz Akram",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(
+              "@sheroz01",
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey),
+            ),
+          ),
+          Container(
+              margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 15),
+              height: MediaQuery.of(context).size.height * 0.05,
+              width: MediaQuery.of(context).size.width,
+              child: const Text(
+                "Account & Settings ",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              )),
+          Container(
+            padding: const EdgeInsets.only(
+                top: 10.0, left: 10.0, right: 10.0, bottom: 10.0),
+            decoration: BoxDecoration(
+              color: const Color(0XFFE2E2E2),
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 15),
+            height: 200,
+            width: MediaQuery.of(context).size.width,
+            child: Expanded(
+              child: ListView(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          child: ListTile(
+                            onTap: () => {print("Edit Profile")},
+                            leading: const Icon(
+                              Icons.account_circle,
+                              size: 30,
+                            ),
+                            title: const Text("Edit Profile",
+                                style: TextStyle(fontSize: 22)),
+                            trailing: const InkWell(
+                                child: Icon(Icons.arrow_forward_ios)),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(left: 20, right: 20),
+                    child: const Divider(
+                      thickness: 0.4,
+                      color: Colors.black,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          child: ListTile(
+                            onTap: () {
+                              // Move use to reset use password page
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ForgotPassword()));
+                            },
+                            leading: const Icon(
+                              Icons.lock_reset_rounded,
+                              size: 30,
+                            ),
+                            title: const Text(
+                              "Reset Password",
+                              style: TextStyle(fontSize: 22),
+                            ),
+                            trailing: const InkWell(
+                              child: Icon(Icons.arrow_forward_ios),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(left: 20, right: 20),
+                    child: const Divider(
+                      thickness: 0.4,
+                      color: Colors.black,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          child: ListTile(
+                            onTap: () => {
+                              // Move to the Report Issue Screen
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ReportIssue()))
+                            },
+                            leading: const Icon(
+                              Icons.flag_outlined,
+                              size: 30,
+                            ),
+                            title: const Text(
+                              "Report Problem",
+                              style: TextStyle(fontSize: 22),
+                            ),
+                            trailing: const InkWell(
+                              child: Icon(Icons.arrow_forward_ios),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ],
               ),
             ),
-            title: const Column(children: [
-              Text(
-                "Sheroz Akram",
-                style: TextStyle(
-                    fontSize: 30,
-                    fontFamily: "font1",
-                    fontWeight: FontWeight.bold),
-              ),
-              Text(
-                "@Sheroz01",
-                style: TextStyle(
-                    fontSize: 18, fontFamily: "font1", color: Colors.grey),
-              )
-            ])),
-        body: Padding(
-          padding: const EdgeInsets.only(top: 50.0, left: 50.0, right: 50.0),
-          child: Column(
+          ),
+          Row(
             children: [
-              const Text(
-                "Accounts & Settings",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontFamily: "font2",
-                    fontSize: 25),
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              Container(
-                height: MediaQuery.of(context).size.height * 0.4,
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.0),
-                  color: Colors.grey,
-                ),
-                child: const Column(
-                  children: [
-                    Padding(
-                      padding:
-                          EdgeInsets.only(top: 20.0, left: 30.0, right: 30),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Icon(
-                              Icons.account_circle_rounded,
-                              size: 50,
-                            ),
-                            SizedBox(
-                              width: 60,
-                            ),
-                            Text(
-                              "Edit Profile",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(
-                              width: 60,
-                            ),
-                            Icon(Icons.arrow_forward_ios),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 2.0, left: 30.0, right: 30),
-                      child: Divider(
-                        thickness: 1,
-                        color: Colors.black,
-                      ),
-                    ),
-                    Padding(
-                      padding:
-                          EdgeInsets.only(top: 20.0, left: 30.0, right: 30),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Icon(
-                              Icons.lock_reset_rounded,
-                              size: 50,
-                            ),
-                            SizedBox(
-                              width: 40,
-                            ),
-                            Text(
-                              "Reset Password",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(
-                              width: 40,
-                            ),
-                            Icon(Icons.arrow_forward_ios),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 2.0, left: 30.0, right: 30),
-                      child: Divider(
-                        thickness: 1,
-                        color: Colors.black,
-                      ),
-                    ),
-                    Padding(
-                      padding:
-                          EdgeInsets.only(top: 20.0, left: 30.0, right: 30),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Icon(
-                              Icons.flag_circle,
-                              size: 50,
-                            ),
-                            SizedBox(
-                              width: 30,
-                            ),
-                            Text(
-                              "Report A Problem",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(
-                              width: 30,
-                            ),
-                            Icon(Icons.arrow_forward_ios),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 30.0),
+              Expanded(
                 child: Container(
-                  height: MediaQuery.of(context).size.height * 0.1,
-                  width: MediaQuery.of(context).size.width,
+                  padding: const EdgeInsets.only(
+                      top: 10.0, left: 10.0, right: 10.0, bottom: 10.0),
                   decoration: BoxDecoration(
+                    color: const Color(0XFFE2E2E2),
                     borderRadius: BorderRadius.circular(10.0),
-                    color: Colors.grey,
                   ),
-                  child: const SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding:
-                              EdgeInsets.only(top: 0, left: 30.0, right: 30),
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Icon(
-                                    Icons.logout_sharp,
-                                    size: 50,
-                                  ),
-                                  SizedBox(
-                                    width: 80,
-                                  ),
-                                  Text(
-                                    "Logout",
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  SizedBox(
-                                    width: 80,
-                                  ),
-                                  Icon(Icons.arrow_forward_ios),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                  margin:
+                      const EdgeInsets.only(left: 20.0, right: 20.0, top: 30),
+                  width: MediaQuery.of(context).size.width,
+                  height: 67,
+                  child: ListTile(
+                    onTap: () => {
+                      // Display Dialog Box
+                      showLogoutDialog(context)
+                    },
+                    leading: const Icon(
+                      Icons.logout_sharp,
+                      size: 30,
+                    ),
+                    title: const Text(
+                      "Logout",
+                      style: TextStyle(fontSize: 22),
+                    ),
+                    trailing: const InkWell(
+                      child: Icon(Icons.arrow_forward_ios),
                     ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 10.0),
-                child: Container(
-                  height: MediaQuery.of(context).size.height * 0.1,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10.0),
-                    color: Colors.red,
-                  ),
-                  child: const SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(left: 30.0, right: 30),
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Icon(
-                                  Icons.delete_forever,
-                                  size: 50,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(
-                                  width: 40,
-                                ),
-                                Text(
-                                  "Delete Account",
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                ),
-                                SizedBox(
-                                  width: 40,
-                                ),
-                                Icon(
-                                  Icons.arrow_forward_ios,
-                                  color: Colors.white,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              )
             ],
           ),
-        ));
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.only(
+                      top: 10.0, left: 10.0, right: 10.0, bottom: 10.0),
+                  decoration: BoxDecoration(
+                    color: const Color(0XFFA30000),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  margin:
+                      const EdgeInsets.only(left: 20.0, right: 20.0, top: 15),
+                  width: MediaQuery.of(context).size.width,
+                  height: 67,
+                  child: ListTile(
+                    onTap: () => {print("Delete Account")},
+                    leading: const Icon(Icons.delete_forever,
+                        size: 30, color: Colors.white),
+                    title: const Text(
+                      "Delete Account",
+                      style: TextStyle(fontSize: 22, color: Colors.white),
+                    ),
+                    trailing: const InkWell(
+                      child: Icon(Icons.arrow_forward_ios, color: Colors.white),
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ]),
+      ),
+    );
   }
 }

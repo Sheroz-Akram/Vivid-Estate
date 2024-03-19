@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Vivid Estate',
-      debugShowCheckedModeBanner: true,
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF006E86)),
           useMaterial3: true,
@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // Add Delay of 2 Seconds
   Future<void> myDelayedTask() async {
-    await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 2));
   }
 
   // Loading the Application depending upon user login status
@@ -60,16 +60,16 @@ class _MyHomePageState extends State<MyHomePage> {
     await myDelayedTask();
     if (isLogin == true) {
       if (userType == "Buyer") {
-        Navigator.pushReplacement(
-            myContext, MaterialPageRoute(builder: (myContext) => BuyerMain()));
+        Navigator.pushReplacement(myContext,
+            MaterialPageRoute(builder: (myContext) => const BuyerMain()));
       } else {
-        Navigator.pushReplacement(
-            myContext, MaterialPageRoute(builder: (myContext) => SellerMain()));
+        Navigator.pushReplacement(myContext,
+            MaterialPageRoute(builder: (myContext) => const SellerMain()));
       }
     } else {
       // If User not Login then move to Welcome Page
-      Navigator.pushReplacement(
-          myContext, MaterialPageRoute(builder: (myContext) => WelcomePage()));
+      Navigator.pushReplacement(myContext,
+          MaterialPageRoute(builder: (myContext) => const WelcomePage()));
     }
   }
 
