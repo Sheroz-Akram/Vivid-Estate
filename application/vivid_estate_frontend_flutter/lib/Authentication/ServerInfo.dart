@@ -41,7 +41,7 @@ class ServerInfo {
     // Error Connecting to Server
     catch (e) {
       // Display the Exception Error
-      print(e);
+      print("Network Error: $e");
     }
   }
 }

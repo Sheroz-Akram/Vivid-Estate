@@ -151,7 +151,7 @@ class _ProfileHome extends State<ProfileHome> {
               borderRadius: BorderRadius.circular(10.0),
             ),
             margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 15),
-            height: 225,
+            height: 210,
             width: MediaQuery.of(context).size.width,
             child: Expanded(
               child: ListView(
@@ -161,6 +161,7 @@ class _ProfileHome extends State<ProfileHome> {
                       Expanded(
                         child: SizedBox(
                           width: MediaQuery.of(context).size.width,
+                          height: 50,
                           child: ListTile(
                             onTap: () => {print("Edit Profile")},
                             leading: const Icon(
@@ -188,6 +189,7 @@ class _ProfileHome extends State<ProfileHome> {
                       Expanded(
                         child: SizedBox(
                           width: MediaQuery.of(context).size.width,
+                          height: 50,
                           child: ListTile(
                             onTap: () {
                               // Move use to reset use password page
@@ -225,6 +227,7 @@ class _ProfileHome extends State<ProfileHome> {
                       Expanded(
                         child: SizedBox(
                           width: MediaQuery.of(context).size.width,
+                          height: 50,
                           child: ListTile(
                             onTap: () => {
                               // Move to the Report Issue Screen

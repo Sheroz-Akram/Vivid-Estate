@@ -33,4 +33,5 @@ def submitIssueReport(request):
 
     # Something wrong just happen the process
     except Exception as e:
-        return httpErrorJsonResponse("Error in the server or an invalid request" + str(e))
+        print(str(e))
+        return httpErrorJsonResponse("Error in the server or an invalid request")

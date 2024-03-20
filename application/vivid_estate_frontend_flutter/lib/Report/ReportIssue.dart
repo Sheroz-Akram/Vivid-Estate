@@ -34,9 +34,11 @@ class _ReportIssueState extends State<ReportIssue> {
     }
 
     // Now we send our Issue report to our Server
-    var userSendData = server.getAuthData();
-    server.sendPostRequest(userContext, "submit_report", userSendData,
-        (result) {
+    var userSendData = await server.getAuthData();
+    userSendData['IssueType'] = issueType;
+    userSendData['IssueDate'] = reportDate;
+    userSendData['IssueDetails'] = issueDetails.text;
+    server.sendPostRequest(userContext, "submit_issue", userSendData, (result) {
       if (result['status'] == "success") {
         Navigator.pop(userContext);
       }
