@@ -1,6 +1,6 @@
 from django.db import models
 
-# Create your models here.
+# User model that store the data of both Buyer and Seller
 class ApplicationUser(models.Model):
     private_key = models.CharField(max_length=60)
     profile_pic = models.CharField(max_length=255)
@@ -18,7 +18,7 @@ class ApplicationUser(models.Model):
     cnic_dob = models.CharField(max_length=50)
 
     def __str__(self):
-        return "User: " + self.full_name + "    Email: " +self.email_address
+        return "ID: " + str(self.id) + ":>\tUser: " + self.full_name
 
 # Chat Room with Buyer and Seller
 class Chat(models.Model):
@@ -30,7 +30,7 @@ class Chat(models.Model):
     unviewPerson = models.ForeignKey(ApplicationUser, on_delete=models.CASCADE)
 
     def __str__(self):
-        return "Buyer: " + self.Buyer.email_address + "    Seller: " +self.Seller.email_address
+        return "ID: " + str(self.id) + ":>\tBuyer: " + self.Buyer.full_name + "\t<---->\tSeller: " +self.Seller.full_name
 
 # Messages within Chat Room
 class ChatMessage(models.Model):
@@ -41,4 +41,4 @@ class ChatMessage(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True) 
 
     def __str__(self):
-        return "Sender: " + self.Sender.email_address + "    Message: " +self.Message
+        return "ID: " + str(self.id) + ":>\tSender: " + self.Sender.full_name

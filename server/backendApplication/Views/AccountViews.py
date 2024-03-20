@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from ..modules.ocr import getCnicDetails
 from ..modules.mail import send_email
+from ..modules.helper import *
 import uuid
 import os
 from django.core.files.storage import FileSystemStorage
@@ -434,4 +435,36 @@ def storeCNICData(request):
         return JsonResponse({"status":"error", "message": "User not found"})
 
     return JsonResponse({"status":"error", "message":"Invalid Request"})
+
+# Delete the User Account
+@csrf_exempt
+def deleteAccount(request):
+
+    # Check the User Authentications
+    authResult = checkUserLogin(request=request)
+    if authResult[0] == False:
+        return httpErrorJsonResponse(authResult[1])
+    
+    # Now we Get the User
+    user = authResult[1]
+
+    # Now we check user Password and Delete his account
+    try:
+
+        # Get Password from POST
+        UserPassword = request.POST['Password']
+
+        # Now Verify the User Password
+        if UserPassword != user.password:
+            return httpErrorJsonResponse("Given user password not correct. Please enter correct password.")
+
+        # Now our user password is verified. Now we delete the user account
+        user.delete()
+
+        # Give the User a success reponse
+        return httpSuccessJsonResponse("User account is deleted successfully!")
+
+    # Something wrong just happen the process
+    except Exception as e:
+        return httpErrorJsonResponse("Error in the server or an invalid request")
 

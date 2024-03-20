@@ -29,6 +29,7 @@ urlpatterns = [
     path("forgot_password", view=AccountViews.forgotPassword, name="User Forgot Password"),
     path("password_reset_otp", view=AccountViews.verifyPasswordResetOTP, name="Verify Password Reset OTP"),
     path("reset_password", view=AccountViews.passwordReset, name="Reset Password"),
+    path("delete_account", view=AccountViews.deleteAccount, name="Delete User Account"),
 
     # Chat API EndPoints
     path("initiate_chat", view=ChatViews.InitiateChat, name="Initiate Chat"),
