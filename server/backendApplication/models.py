@@ -42,3 +42,22 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return "ID: " + str(self.id) + ":>\tSender: " + self.Sender.full_name
+
+# Choices given to the admin for the issue status
+IssueChoices = (
+    ("Unseen", "Unseen"),
+    ("Pending", "Pending"),
+    ("Resolved", "Resolved")
+)
+
+# Issues which are reported by the user
+class Issue(models.Model):
+    IssueType = models.CharField(max_length=50)
+    IssueDate = models.CharField(max_length=50)
+    IssueDetails = models.TextField()
+    SubmitBy = models.ForeignKey(ApplicationUser, on_delete=models.CASCADE)
+    ResolveStatus = models.CharField(max_length=20, choices=IssueChoices, default="Unseen")
+    timestamp = models.DateTimeField(auto_now_add=True) 
+
+    def __str__(self):
+        return "ID: " + str(self.id) + ":>\tUser: " + self.SubmitBy.full_name + "\t|\tStatus: " + self.ResolveStatus 

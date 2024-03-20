@@ -16,6 +16,7 @@ Including another URLconf
 from django.urls import path, include
 from .Views import AccountViews
 from .Views import ChatViews
+from .Views import IssueReport
 
 urlpatterns = [
 
@@ -38,5 +39,8 @@ urlpatterns = [
     path("get_all_chats", view=ChatViews.get_all_user_chat, name="All Chats Data"),
     path("get_all_messages", view=ChatViews.get_all_chat_messages, name="Get Chat Messages"),
     path("get_all_unview_messages", view=ChatViews.get_all_unview_messages, name="Get Unview Messages"),
-    path("delete_chat", view=ChatViews.deleteUserChat, name="Delete User Chat")
+    path("delete_chat", view=ChatViews.deleteUserChat, name="Delete User Chat"),
+
+    # User Issue & Reports
+    path("submit_issue", view=IssueReport.submitIssueReport, name="User Issue Submit"),
 ]
