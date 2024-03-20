@@ -1,11 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/Reply.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/Send.dart';
+import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen(
@@ -28,13 +26,15 @@ class _ChatScreen extends State<ChatScreen> {
   var messages = [];
   final _send_controller = TextEditingController();
   final _scoll_controller = ScrollController();
+  var server = ServerInfo();
 
   @override
   void initState() {
     super.initState();
     getAllMessages(context);
 
-    scrollToBottom();
+    // Scoll to the Bottom
+    scrollToBottom(_scoll_controller);
 
     // Get New Messages
     Timer.periodic(const Duration(seconds: 2), (timer) {
@@ -42,121 +42,66 @@ class _ChatScreen extends State<ChatScreen> {
     });
   }
 
-  void scrollToBottom() {
-    Timer(const Duration(seconds: 1), () {
-      _scoll_controller.animateTo(
-        _scoll_controller.position.maxScrollExtent,
-        duration:
-            const Duration(milliseconds: 500), // Adjust animation duration
-        curve: Curves.easeOut, // Adjust animation curve
-      );
-    });
-  }
-
   // Get all the Chat Messsages
   void getAllMessages(myContext) async {
-    // Get the User Data
-    var prefs = await SharedPreferences.getInstance();
-    var userEmail = prefs.getString("userEmail");
-    var userPrivateKey = prefs.getString("privateKey");
-    // URL to Send Request
-    var host = ServerInfo().host;
-    var url = Uri.parse("$host/get_all_messages");
-    try {
-      // Our Request
-      var response = await http.post(url, body: {
-        'Email': userEmail,
-        'PrivateKey': userPrivateKey,
-        'ChatID': (widget.ChatID).toString()
-      });
+    // Get Our Auth Data
+    var authData = await server.getAuthData();
+    authData['ChatID'] = (widget.ChatID).toString();
 
-      // Get a Response from the Server
-      if (response.statusCode == 200) {
-        var result = jsonDecode(response.body);
-
-        // Valid Request
-        if (result['status'] == "success") {
-          var data = result['message'];
-          for (var i = 0; i < data.length; i++) {
-            setState(() {
-              messages = data;
-              _send_controller.text = "";
-            });
-          }
-          scrollToBottom();
+    // Send Data to Our Server
+    server.sendPostRequest(myContext, "get_all_messages", authData, (result) {
+      // Valid Request
+      if (result['status'] == "success") {
+        var data = result['message'];
+        for (var i = 0; i < data.length; i++) {
+          setState(() {
+            messages = data;
+            _send_controller.text = "";
+          });
         }
-      } else {}
-    }
-
-    // Error Connecting to Server
-    catch (e) {
-      print(e);
-    }
+        // Scoll to the Bottom
+        scrollToBottom(_scoll_controller);
+      }
+    });
   }
 
   // Send Message to the Other User
   void getUnviewMessages(myContext) async {
-    // Get the User Data
-    var prefs = await SharedPreferences.getInstance();
-    var userEmail = prefs.getString("userEmail");
-    var userPrivateKey = prefs.getString("privateKey");
-    // URL to Send Request
-    var host = ServerInfo().host;
-    var url = Uri.parse("$host/get_all_unview_messages");
+    // Get Our Auth Data
+    var authData = await server.getAuthData();
+    authData['ChatID'] = (widget.ChatID).toString();
 
-    try {
-      // Our Request
-      var response = await http.post(url, body: {
-        'Email': userEmail,
-        'PrivateKey': userPrivateKey,
-        'ChatID': (widget.ChatID).toString(),
-      });
-
-      // Get a Response from the Server
-      if (response.statusCode == 200) {
-        var result = jsonDecode(response.body);
-
-        // Valid Request
-        if (result['status'] == "success") {
-          var data = result['message'];
-          if (data.length > 0) {
-            var i = messages.length - 1;
-            while (messages[i]['Status'] == "Send") {
-              messages[i]['Status'] = "Viewed";
-              i--;
-            }
+    // Send Data to Our Server
+    server.sendPostRequest(myContext, "get_all_unview_messages", authData,
+        (result) {
+      // Valid Request
+      if (result['status'] == "success") {
+        var data = result['message'];
+        if (data.length > 0) {
+          var i = messages.length - 1;
+          while (messages[i]['Status'] == "Send") {
+            messages[i]['Status'] = "Viewed";
+            i--;
           }
-          for (var i = 0; i < data.length; i++) {
-            setState(() {
-              messages.add({
-                "Status": data[i]['Status'],
-                "Message": data[i]['Message'],
-                "Time": data[i]['Time'],
-                "Type": data[i]['Type']
-              });
-            });
-          }
-          scrollToBottom();
         }
-      } else {}
-    }
-
-    // Error Connecting to Server
-    catch (e) {
-      print(e);
-    }
+        for (var i = 0; i < data.length; i++) {
+          setState(() {
+            messages.add({
+              "Status": data[i]['Status'],
+              "Message": data[i]['Message'],
+              "Time": data[i]['Time'],
+              "Type": data[i]['Type']
+            });
+          });
+        }
+        // Scoll to the Bottom
+        scrollToBottom(_scoll_controller);
+      }
+    });
   }
 
   // Send Message to the Other User
   void sendMessage(myContext) async {
-    // Get the User Data
-    var prefs = await SharedPreferences.getInstance();
-    var userEmail = prefs.getString("userEmail");
-    var userPrivateKey = prefs.getString("privateKey");
-    // URL to Send Request
-    var host = ServerInfo().host;
-    var url = Uri.parse("$host/send_message");
-
     // Check if Message not empty
     if (_send_controller.text == "") {
       ScaffoldMessenger.of(myContext).showSnackBar(
@@ -164,39 +109,28 @@ class _ChatScreen extends State<ChatScreen> {
       return;
     }
 
-    try {
-      // Our Request
-      var response = await http.post(url, body: {
-        'Email': userEmail,
-        'PrivateKey': userPrivateKey,
-        'ChatID': (widget.ChatID).toString(),
-        'Message': _send_controller.text
-      });
+    // Get Our Auth Data
+    var authData = await server.getAuthData();
+    authData['ChatID'] = (widget.ChatID).toString();
+    authData['Message'] = _send_controller.text;
 
-      // Get a Response from the Server
-      if (response.statusCode == 200) {
-        var result = jsonDecode(response.body);
-
-        // Valid Request
-        if (result['status'] == "success") {
-          setState(() {
-            messages.add({
-              "Status": "Send",
-              "Message": _send_controller.text,
-              "Time": "now",
-              "Type": "Send"
-            });
-            _send_controller.text = "";
+    // Send Data to Our Server
+    server.sendPostRequest(myContext, "send_message", authData, (result) {
+      // Valid Request
+      if (result['status'] == "success") {
+        setState(() {
+          messages.add({
+            "Status": "Send",
+            "Message": _send_controller.text,
+            "Time": "now",
+            "Type": "Send"
           });
-          scrollToBottom();
-        }
-      } else {}
-    }
-
-    // Error Connecting to Server
-    catch (e) {
-      print(e);
-    }
+          _send_controller.text = "";
+        });
+        // Scoll to the Bottom
+        scrollToBottom(_scoll_controller);
+      }
+    });
   }
 
   @override
@@ -214,9 +148,14 @@ class _ChatScreen extends State<ChatScreen> {
         actions: <Widget>[
           PopupMenuButton<String>(itemBuilder: (BuildContext context) {
             return [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: "1",
-                child: Text("Delete Chat"),
+                child: InkWell(
+                  onTap: () {
+                    print("Delete Chat");
+                  },
+                  child: const Text("Delete Chat"),
+                ),
               )
             ];
           })
@@ -226,7 +165,7 @@ class _ChatScreen extends State<ChatScreen> {
           children: [
             IconButton(
               icon: const Icon(Icons.arrow_back_ios_sharp,
-                  size: 30, color: Colors.blue),
+                  size: 30, color: Color(0xFF006E86)),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -293,7 +232,7 @@ class _ChatScreen extends State<ChatScreen> {
                       },
                       icon: const Icon(Icons.attach_file_sharp),
                       iconSize: MediaQuery.of(context).size.width * 0.10,
-                      color: Colors.blue,
+                      color: const Color(0xFF006E86),
                     ),
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.80,
@@ -304,7 +243,7 @@ class _ChatScreen extends State<ChatScreen> {
                             suffixIcon: IconButton(
                               icon: const Icon(
                                 Icons.send_sharp,
-                                color: Colors.blue,
+                                color: Color(0xFF006E86),
                               ),
                               onPressed: () {
                                 // Send a message to the User
@@ -313,7 +252,6 @@ class _ChatScreen extends State<ChatScreen> {
                             ),
                             hintText: "Type a message",
                             contentPadding: const EdgeInsets.all(5),
-                            border: InputBorder.none,
                             enabledBorder: const OutlineInputBorder(
                               borderSide: BorderSide(),
                               borderRadius:

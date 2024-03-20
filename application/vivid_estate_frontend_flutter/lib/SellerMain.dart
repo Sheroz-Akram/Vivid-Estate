@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/ChatHome.dart';
+import 'package:vivid_estate_frontend_flutter/Profile/ProfileHome.dart';
 
 class SellerMain extends StatefulWidget {
   const SellerMain({super.key});
@@ -16,8 +17,7 @@ class _SellerMain extends State<SellerMain> {
     ChatHome(),
     Text('Ads Page',
         style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
-    Text('Profile Page',
-        style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+    ProfileHome(),
   ];
 
   void _onItemTapped(int index) {
@@ -31,8 +31,10 @@ class _SellerMain extends State<SellerMain> {
     return Scaffold(
 
         // Our Main Page
-        body: Center(
-          child: _widgetOptions.elementAt(_selectedIndex),
+        body: SafeArea(
+          child: Center(
+            child: _widgetOptions.elementAt(_selectedIndex),
+          ),
         ),
         // Navigation bar
         bottomNavigationBar: BottomNavigationBar(

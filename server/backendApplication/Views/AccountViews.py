@@ -329,7 +329,7 @@ def loginUser(request):
                 user.save()
 
                 # Display Message to the User
-                return JsonResponse({"status":"success", "message":"Login is successfull!", "privateKey" : user.private_key, "userType" : user.user_type})
+                return JsonResponse({"status":"success", "message":"Login is successfull!", "privateKey" : user.private_key, "userType" : user.user_type, "profilePicture": user.profile_pic})
             
             # If User not found        
             except ApplicationUser.DoesNotExist as e:
@@ -468,3 +468,26 @@ def deleteAccount(request):
     except Exception as e:
         return httpErrorJsonResponse("Error in the server or an invalid request")
 
+@csrf_exempt
+def getUserProfileData(request):
+
+    # Check the User Authentications
+    authResult = checkUserLogin(request=request)
+    if authResult[0] == False:
+        return httpErrorJsonResponse(authResult[1])
+    
+    # Now we Get the User
+    user = authResult[1]
+
+    # Now we get our profile picture
+    try:
+        # Get Our Profile Picture
+        return httpSuccessJsonResponse({
+            "profilePic": user.profile_pic,
+            "userFullName": user.full_name,
+            "userName": user.user_name
+        })
+
+    # Something wrong just happen the process
+    except Exception as e:
+        return httpErrorJsonResponse("Error in the server or an invalid request")

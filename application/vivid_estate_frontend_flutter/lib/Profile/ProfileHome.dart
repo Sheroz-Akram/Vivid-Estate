@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ForgotPassword.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 import 'package:vivid_estate_frontend_flutter/Report/ReportIssue.dart';
@@ -10,28 +11,54 @@ class ProfileHome extends StatefulWidget {
 }
 
 class _ProfileHome extends State<ProfileHome> {
+  // Store User Profile Picture
+  String profilePicture = "${ServerInfo().host}/static/Default.jpg";
+  String userName = "No Name";
+  String userID = "No ID";
+
+  @override
+  void initState() {
+    super.initState();
+    getUserProfileData(context);
+  }
+
+  // Get the User Profile Image
+  void getUserProfileData(myContext) async {
+    // Create a New Server
+    var server = ServerInfo();
+
+    // Send Request to Our Server
+    server.sendPostRequest(
+        myContext, "profile_data", await server.getAuthData(), (result) {
+      if (result['status'] == "success") {
+        var data = result['message'];
+        setState(() {
+          profilePicture = "${server.host}/static/" + data['profilePic'];
+          userName = data['userFullName'];
+          userID = data['userName'];
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(children: [
-          const ListTile(
-            leading: CircleAvatar(
-                backgroundImage: AssetImage("assets/images/sheroz.jpg")),
+          ListTile(
+            leading: SizedBox(
+                height: 70,
+                width: 70,
+                child: CircleAvatar(
+                    backgroundImage: NetworkImage(profilePicture))),
             title: Text(
-              "Sheroz Akram",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              userName,
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             subtitle: Text(
-              "@sheroz01",
-              style: TextStyle(
+              userID,
+              style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                   color: Colors.grey),
@@ -39,11 +66,10 @@ class _ProfileHome extends State<ProfileHome> {
           ),
           Container(
               margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 15),
-              height: MediaQuery.of(context).size.height * 0.05,
               width: MediaQuery.of(context).size.width,
               child: const Text(
                 "Account & Settings ",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               )),
           Container(
             padding: const EdgeInsets.only(
@@ -53,7 +79,7 @@ class _ProfileHome extends State<ProfileHome> {
               borderRadius: BorderRadius.circular(10.0),
             ),
             margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 15),
-            height: 200,
+            height: 225,
             width: MediaQuery.of(context).size.width,
             child: Expanded(
               child: ListView(
@@ -169,7 +195,7 @@ class _ProfileHome extends State<ProfileHome> {
                   margin:
                       const EdgeInsets.only(left: 20.0, right: 20.0, top: 30),
                   width: MediaQuery.of(context).size.width,
-                  height: 67,
+                  height: 75,
                   child: ListTile(
                     onTap: () => {
                       // Display Dialog Box
@@ -204,7 +230,7 @@ class _ProfileHome extends State<ProfileHome> {
                   margin:
                       const EdgeInsets.only(left: 20.0, right: 20.0, top: 15),
                   width: MediaQuery.of(context).size.width,
-                  height: 67,
+                  height: 75,
                   child: ListTile(
                     onTap: () => {print("Delete Account")},
                     leading: const Icon(Icons.delete_forever,

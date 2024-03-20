@@ -30,11 +30,13 @@ urlpatterns = [
     path("password_reset_otp", view=AccountViews.verifyPasswordResetOTP, name="Verify Password Reset OTP"),
     path("reset_password", view=AccountViews.passwordReset, name="Reset Password"),
     path("delete_account", view=AccountViews.deleteAccount, name="Delete User Account"),
+    path("profile_data", view=AccountViews.getUserProfileData, name="Get User Profile Data"),
 
     # Chat API EndPoints
     path("initiate_chat", view=ChatViews.InitiateChat, name="Initiate Chat"),
     path("send_message", view=ChatViews.sendMessage, name="Send Message"),
     path("get_all_chats", view=ChatViews.get_all_user_chat, name="All Chats Data"),
     path("get_all_messages", view=ChatViews.get_all_chat_messages, name="Get Chat Messages"),
-    path("get_all_unview_messages", view=ChatViews.get_all_unview_messages, name="Get Unview Messages")
+    path("get_all_unview_messages", view=ChatViews.get_all_unview_messages, name="Get Unview Messages"),
+    path("delete_chat", view=ChatViews.deleteUserChat, name="Delete User Chat")
 ]

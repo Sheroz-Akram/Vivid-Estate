@@ -264,3 +264,40 @@ def get_all_unview_messages(request):
     # Something wrong just happen the process
     except Exception as e:
         return httpErrorJsonResponse("Error in the server or an invalid request")
+
+
+@csrf_exempt
+def deleteUserChat(request):
+
+    # Check the User Authentications
+    authResult = checkUserLogin(request=request)
+    if authResult[0] == False:
+        return httpErrorJsonResponse(authResult[1])
+    
+    # Now we Get the User
+    user = authResult[1]
+
+    # Now we get our profile picture
+    try:
+
+        # Get Chat ID of where user want new messages
+        ChatID = request.POST['ChatID']
+
+        # Check the User Chat Access
+        userChatAuth = validUserChatAccess(user=user, chatID=ChatID)
+        if userChatAuth[0] == False:
+            # User is not Allowed ot Chat does not Exists
+            return httpErrorJsonResponse(userChatAuth[1])
+        
+        # User is Allowed in this Chat
+        chatRoom = userChatAuth[1]
+
+        # Now we Delete the Chat
+        chatRoom.delete()
+
+        # Display Message to the User
+        return httpSuccessJsonResponse("User Chat Deleted Successfully")
+
+    # Something wrong just happen the process
+    except Exception as e:
+        return httpErrorJsonResponse("Error in the server or an invalid request")

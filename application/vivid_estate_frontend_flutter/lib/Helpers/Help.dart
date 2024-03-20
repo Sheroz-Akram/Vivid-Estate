@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/Welcome.dart';
@@ -42,4 +44,15 @@ Future<bool?> showLogoutDialog(BuildContext context) async {
       );
     },
   );
+}
+
+// Function to Scroll to the Bottom of the Page
+void scrollToBottom(scrollController) {
+  Timer(const Duration(seconds: 1), () {
+    scrollController.animateTo(
+      scrollController.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 500), // Adjust animation duration
+      curve: Curves.easeOut, // Adjust animation curve
+    );
+  });
 }

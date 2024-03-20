@@ -25,22 +25,23 @@ class _LoginPage extends State<LoginPage> {
 
   // Store the User Login Information
   void storeUserLoginData(String userEmail, String privateKey, String userType,
-      BuildContext myContext) async {
+      String profilePic, BuildContext myContext) async {
     var prefs = await SharedPreferences.getInstance();
     prefs.setBool("isLogin", true);
     prefs.setString("userEmail", userEmail);
     prefs.setString("privateKey", privateKey);
     prefs.setString("userType", userType);
+    prefs.setString("profilePic", profilePic);
 
     // Move to the Next Page. Depending Upon User Type
     Navigator.pop(myContext);
     Navigator.pop(myContext);
     if (userType == "Buyer") {
-      Navigator.push(
-          myContext, MaterialPageRoute(builder: (myContext) => BuyerMain()));
+      Navigator.push(myContext,
+          MaterialPageRoute(builder: (myContext) => const BuyerMain()));
     } else {
-      Navigator.push(
-          myContext, MaterialPageRoute(builder: (myContext) => SellerMain()));
+      Navigator.push(myContext,
+          MaterialPageRoute(builder: (myContext) => const SellerMain()));
     }
   }
 
@@ -110,8 +111,8 @@ class _LoginPage extends State<LoginPage> {
           EasyLoading.showSuccess(result['message']);
 
           // Store User Information
-          storeUserLoginData(
-              email, result['privateKey'], result['userType'], myContext);
+          storeUserLoginData(email, result['privateKey'], result['userType'],
+              result['profilePicture'], myContext);
         }
         // Error in request
         else {
