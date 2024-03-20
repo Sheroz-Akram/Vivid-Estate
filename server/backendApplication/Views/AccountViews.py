@@ -468,6 +468,7 @@ def deleteAccount(request):
     except Exception as e:
         return httpErrorJsonResponse("Error in the server or an invalid request")
 
+# Get the profile data of a User
 @csrf_exempt
 def getUserProfileData(request):
 

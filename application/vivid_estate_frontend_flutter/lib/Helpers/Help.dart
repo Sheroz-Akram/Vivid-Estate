@@ -56,3 +56,9 @@ void scrollToBottom(scrollController) {
     );
   });
 }
+
+// Display a Snack Bar on the User Screen
+void displaySnackBar(BuildContext context, String message) {
+  // Display the Snack Bar
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+}
