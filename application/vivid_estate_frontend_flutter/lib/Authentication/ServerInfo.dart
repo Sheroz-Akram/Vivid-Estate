@@ -40,10 +40,6 @@ class ServerInfo {
 
     // Error Connecting to Server
     catch (e) {
-      // Operation to Perform when request not Valid
-      ScaffoldMessenger.of(userContext).showSnackBar(
-          const SnackBar(content: Text("Error conecting the server")));
-
       // Display the Exception Error
       print(e);
     }

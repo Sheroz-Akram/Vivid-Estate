@@ -1,8 +1,5 @@
 import 'dart:async';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/ChatScreen.dart';
 
@@ -21,6 +18,7 @@ class _ChatHome extends State<ChatHome> {
   var times = [];
   var chatID = [];
   var countMessages = [];
+  var server = ServerInfo();
 
   @override
   void initState() {
@@ -34,57 +32,48 @@ class _ChatHome extends State<ChatHome> {
   }
 
   void getAllChats(myContext) async {
-    // Get the User Data
-    var prefs = await SharedPreferences.getInstance();
-    var userEmail = prefs.getString("userEmail");
-    var userPrivateKey = prefs.getString("privateKey");
+    // Get Our Auth Data
+    var authData = await server.getAuthData();
 
-    // URL to Send Request
-    var host = ServerInfo().host;
-    var url = Uri.parse("$host/get_all_chats");
-    try {
-      // Our Request
-      var response = await http
-          .post(url, body: {'Email': userEmail, 'PrivateKey': userPrivateKey});
-
-      // Get a Response from the Server
-      if (response.statusCode == 200) {
-        var result = jsonDecode(response.body);
-
-        // Valid Request
-        if (result['status'] == "success") {
-          var data = result['message'];
-          if (data.length > names.length) {
-            for (var i = names.length; i < data.length; i++) {
-              setState(() {
-                names.add(data[i]['fullName']);
-                messages.add(data[i]['lastMessage']);
-                img.add(
-                    "${ServerInfo().host}/static/" + data[i]['profilePicture']);
-                times.add(data[i]['time']);
-                chatID.add(data[i]['chatID']);
-                countMessages.add(data[i]['count']);
-              });
-            }
-          } else {
-            for (var i = 0; i < data.length; i++) {
-              setState(() {
-                names[i] = data[i]['fullName'];
-                messages[i] = data[i]['lastMessage'];
-                times[i] = data[i]['time'];
-                chatID[i] = data[i]['chatID'];
-                countMessages[i] = data[i]['count'];
-              });
-            }
+    // Send Data to Our Server
+    server.sendPostRequest(myContext, "get_all_chats", authData, (result) {
+      print(result);
+      // Valid Request
+      if (result['status'] == "success") {
+        var data = result['message'];
+        if (data.length > names.length) {
+          for (var i = names.length; i < data.length; i++) {
+            setState(() {
+              names.add(data[i]['fullName']);
+              messages.add(data[i]['lastMessage']);
+              img.add("${server.host}/static/" + data[i]['profilePicture']);
+              times.add(data[i]['time']);
+              chatID.add(data[i]['chatID']);
+              countMessages.add(data[i]['count']);
+            });
+          }
+        } else if (data.length < names.length) {
+          setState(() {
+            names = [];
+            messages = [];
+            img = [];
+            times = [];
+            chatID = [];
+            countMessages = [];
+          });
+        } else {
+          for (var i = 0; i < data.length; i++) {
+            setState(() {
+              names[i] = data[i]['fullName'];
+              messages[i] = data[i]['lastMessage'];
+              times[i] = data[i]['time'];
+              chatID[i] = data[i]['chatID'];
+              countMessages[i] = data[i]['count'];
+            });
           }
         }
-      } else {}
-    }
-
-    // Error Connecting to Server
-    catch (e) {
-      // Do Nothing
-    }
+      }
+    });
   }
 
   @override

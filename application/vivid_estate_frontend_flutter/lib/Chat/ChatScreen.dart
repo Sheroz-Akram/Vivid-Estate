@@ -133,17 +133,30 @@ class _ChatScreen extends State<ChatScreen> {
     });
   }
 
+  // Delete User Chat Function
+  void deleteChat(myContext) async {
+    // Get Our Auth Data
+    var authData = await server.getAuthData();
+    authData['ChatID'] = (widget.ChatID).toString();
+
+    // Send Data to Our Server
+    server.sendPostRequest(myContext, "delete_chat", authData, (result) {
+      // Valid Request
+      if (result['status'] == "success") {
+        ScaffoldMessenger.of(myContext).showSnackBar(
+            const SnackBar(content: Text("Chat deleted successfully")));
+
+        Navigator.pop(myContext);
+        Navigator.pop(myContext);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
         backgroundColor: Colors.white,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         leadingWidth: MediaQuery.of(context).size.width * 0.90,
         actions: <Widget>[
           PopupMenuButton<String>(itemBuilder: (BuildContext context) {
@@ -152,7 +165,7 @@ class _ChatScreen extends State<ChatScreen> {
                 value: "1",
                 child: InkWell(
                   onTap: () {
-                    print("Delete Chat");
+                    deleteChat(context);
                   },
                   child: const Text("Delete Chat"),
                 ),
@@ -160,7 +173,6 @@ class _ChatScreen extends State<ChatScreen> {
             ];
           })
         ],
-
         leading: Row(
           children: [
             IconButton(

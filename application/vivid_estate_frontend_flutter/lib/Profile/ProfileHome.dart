@@ -41,6 +41,78 @@ class _ProfileHome extends State<ProfileHome> {
     });
   }
 
+  // Show Delete Account Dialog Box
+  Future<String?> showAccountDeleteDialog(BuildContext context) async {
+    final passwordController = TextEditingController();
+    return await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Delete Account"),
+          content: SizedBox(
+            height: 150,
+            child: Column(
+              children: [
+                const Text(
+                    "To delete your account enter your password and click yes."),
+                const SizedBox(
+                  height: 20,
+                ),
+                TextField(
+                  controller: passwordController,
+                  obscureText: true, // Hide password input
+                  decoration: const InputDecoration(hintText: "Password"),
+                )
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("No"),
+              onPressed: () {
+                Navigator.pop(context); // Close dialog, return null
+              },
+            ),
+            TextButton(
+              child: const Text("Yes"),
+              onPressed: () {
+                String password = passwordController.text;
+                if (password.isEmpty) {
+                  Navigator.pop(context); // Close dialog, return null
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text("Please Enter your password!")));
+                } else {
+                  Navigator.pop(context, password);
+                  deleteUserAccount(context, password);
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Get the User Profile Image
+  void deleteUserAccount(myContext, userPassword) async {
+    // Create a New Server
+    var server = ServerInfo();
+
+    // Get User Data
+    var authData = await server.getAuthData();
+    authData['Password'] = userPassword;
+
+    // Send Request to Our Server
+    server.sendPostRequest(myContext, "delete_account", authData, (result) {
+      if (result['status'] == "success") {
+        logoutUser(myContext);
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(result['message'])));
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -232,7 +304,7 @@ class _ProfileHome extends State<ProfileHome> {
                   width: MediaQuery.of(context).size.width,
                   height: 75,
                   child: ListTile(
-                    onTap: () => {print("Delete Account")},
+                    onTap: () => {showAccountDeleteDialog(context)},
                     leading: const Icon(Icons.delete_forever,
                         size: 30, color: Colors.white),
                     title: const Text(
