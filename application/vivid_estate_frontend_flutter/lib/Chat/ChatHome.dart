@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/ChatScreen.dart';
 
@@ -106,7 +107,7 @@ class _ChatHome extends State<ChatHome> {
       body: ListView.builder(
         itemBuilder: (context, index) {
           return SingleChildScrollView(
-            child: Padding(
+            child: Container(
               padding: const EdgeInsets.all(8.0),
               child: InkWell(
                 onTap: () => {

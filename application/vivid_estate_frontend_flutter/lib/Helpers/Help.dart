@@ -62,3 +62,15 @@ void displaySnackBar(BuildContext context, String message) {
   // Display the Snack Bar
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
 }
+
+// Box Shadow for the Widgets
+List<BoxShadow> getBoxShadow() {
+  return const [
+    BoxShadow(
+      color: Color.fromARGB(255, 107, 107, 107), // Set shadow color to black
+      blurRadius: 4.0, // Adjust blur for softness
+      spreadRadius: 1.0, // Adjust spread for size
+      offset: Offset(0.0, 0.0), // Offset the shadow
+    ),
+  ];
+}

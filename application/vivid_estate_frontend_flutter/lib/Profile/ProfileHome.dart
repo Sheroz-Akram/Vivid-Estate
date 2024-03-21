@@ -118,22 +118,26 @@ class _ProfileHome extends State<ProfileHome> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(children: [
-          ListTile(
-            leading: SizedBox(
-                height: 70,
-                width: 70,
-                child: CircleAvatar(
-                    backgroundImage: NetworkImage(profilePicture))),
-            title: Text(
-              userName,
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(
-              userID,
-              style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey),
+          Container(
+            margin: const EdgeInsets.only(top: 20),
+            child: ListTile(
+              leading: SizedBox(
+                  height: 70,
+                  width: 70,
+                  child: CircleAvatar(
+                      backgroundImage: NetworkImage(profilePicture))),
+              title: Text(
+                userName,
+                style:
+                    const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                userID,
+                style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey),
+              ),
             ),
           ),
           Container(
@@ -147,9 +151,9 @@ class _ProfileHome extends State<ProfileHome> {
             padding: const EdgeInsets.only(
                 top: 10.0, left: 10.0, right: 10.0, bottom: 10.0),
             decoration: BoxDecoration(
-              color: const Color(0XFFE2E2E2),
-              borderRadius: BorderRadius.circular(10.0),
-            ),
+                color: const Color(0XFFE2E2E2),
+                borderRadius: BorderRadius.circular(10.0),
+                boxShadow: getBoxShadow()),
             margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 15),
             height: 210,
             width: MediaQuery.of(context).size.width,
@@ -264,9 +268,9 @@ class _ProfileHome extends State<ProfileHome> {
                   padding: const EdgeInsets.only(
                       top: 10.0, left: 10.0, right: 10.0, bottom: 10.0),
                   decoration: BoxDecoration(
-                    color: const Color(0XFFE2E2E2),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
+                      color: const Color(0XFFE2E2E2),
+                      borderRadius: BorderRadius.circular(10.0),
+                      boxShadow: getBoxShadow()),
                   margin:
                       const EdgeInsets.only(left: 20.0, right: 20.0, top: 30),
                   width: MediaQuery.of(context).size.width,
@@ -299,9 +303,9 @@ class _ProfileHome extends State<ProfileHome> {
                   padding: const EdgeInsets.only(
                       top: 10.0, left: 10.0, right: 10.0, bottom: 10.0),
                   decoration: BoxDecoration(
-                    color: const Color(0XFFA30000),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
+                      color: const Color(0XFFA30000),
+                      borderRadius: BorderRadius.circular(10.0),
+                      boxShadow: getBoxShadow()),
                   margin:
                       const EdgeInsets.only(left: 20.0, right: 20.0, top: 15),
                   width: MediaQuery.of(context).size.width,

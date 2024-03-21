@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 
 class SellerDashboard extends StatefulWidget {
   const SellerDashboard({super.key});
@@ -18,14 +19,14 @@ class _SellerDashboardState extends State<SellerDashboard> {
       body: Column(
         children: [
           Container(
-            margin: const EdgeInsets.only(left: 20.0),
+            margin: const EdgeInsets.only(left: 20.0, top: 20),
             width: MediaQuery.of(context).size.width,
             child: const Text(
               "Dashboard",
               style: TextStyle(
-                  color: Color(0XFF006E86),
+                  color: Color(0XFF5F5F5F),
                   fontSize: 36,
-                  fontWeight: FontWeight.bold),
+                  fontWeight: FontWeight.w900),
             ),
           ),
           SizedBox(
@@ -34,25 +35,20 @@ class _SellerDashboardState extends State<SellerDashboard> {
               leading: const CircleAvatar(
                 backgroundImage: AssetImage("assets/images/sheroz.jpg"),
               ),
-              title: Container(
-                  child: const Text(
+              title: const Text(
                 "Sheroz Akram",
                 style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: Color(0XFF7D7D7D)),
-              )),
-              subtitle: Container(
-                  child: const Text("Lahore,Pakistan",
-                      style: TextStyle(
-                          color: Color(0XFF9D9D9D),
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold))),
-              trailing: Container(
-                child: Image.asset(
-                  "assets/UI/seller-dashboard.png",
-                  height: 1000,
-                ),
+              ),
+              subtitle: const Text("Lahore, Pakistan",
+                  style: TextStyle(
+                      color: Color(0XFF9D9D9D),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold)),
+              trailing: Image.asset(
+                "assets/UI/seller-dashboard.png",
               ),
             ),
           ),
@@ -60,87 +56,97 @@ class _SellerDashboardState extends State<SellerDashboard> {
             padding: const EdgeInsets.only(
                 top: 10.0, left: 10.0, right: 10.0, bottom: 10.0),
             decoration: BoxDecoration(
-              color: const Color(0XFFBBE4EC),
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 15),
+                color: const Color(0xFFECECEC),
+                borderRadius: BorderRadius.circular(10.0),
+                boxShadow: getBoxShadow()),
+            margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 10),
             width: MediaQuery.of(context).size.width,
-            child: Column(
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  padding: const EdgeInsets.only(top: 5, bottom: 25),
-                  child: const Text(
-                    "This Month",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    padding: const EdgeInsets.only(top: 5, bottom: 10),
+                    child: const Text(
+                      "This Month",
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      children: [
-                        Image.asset("assets/UI/impressions.png"),
-                        const Text(
-                          "Impression",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        Row(
-                          children: [
-                            const Text(
-                              "20K",
-                              style: TextStyle(
-                                  fontSize: 36, fontWeight: FontWeight.bold),
-                            ),
-                            Image.asset("assets/UI/up.png"),
-                          ],
-                        )
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Image.asset("assets/UI/likes.png"),
-                        const Text(
-                          "View",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        Row(
-                          children: [
-                            const Text(
-                              "5K",
-                              style: TextStyle(
-                                  fontSize: 36, fontWeight: FontWeight.bold),
-                            ),
-                            Image.asset("assets/UI/down.png"),
-                          ],
-                        )
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Image.asset("assets/UI/views.png"),
-                        const Text(
-                          "Likes",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        Row(
-                          children: [
-                            const Text(
-                              "510K",
-                              style: TextStyle(
-                                  fontSize: 36, fontWeight: FontWeight.bold),
-                            ),
-                            Image.asset("assets/UI/up.png"),
-                          ],
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-              ],
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Column(
+                        children: [
+                          Image.asset(
+                            "assets/UI/impressions.png",
+                            width: 50,
+                          ),
+                          const Text(
+                            "Impression",
+                            style: TextStyle(
+                                fontSize: 15, fontWeight: FontWeight.bold),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "20K",
+                                style: TextStyle(fontSize: 15),
+                              ),
+                              Image.asset(
+                                "assets/UI/up.png",
+                                width: 25,
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Image.asset("assets/UI/likes.png", width: 50),
+                          const Text(
+                            "View",
+                            style: TextStyle(
+                                fontSize: 15, fontWeight: FontWeight.bold),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "5K",
+                                style: TextStyle(fontSize: 15),
+                              ),
+                              Image.asset("assets/UI/down.png", width: 25),
+                            ],
+                          )
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Image.asset("assets/UI/views.png", width: 50),
+                          const Text(
+                            "Likes",
+                            style: TextStyle(
+                                fontSize: 15, fontWeight: FontWeight.bold),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "510K",
+                                style: TextStyle(fontSize: 15),
+                              ),
+                              Image.asset("assets/UI/up.png", width: 25),
+                            ],
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
           Container(
@@ -163,9 +169,9 @@ class _SellerDashboardState extends State<SellerDashboard> {
             padding: const EdgeInsets.only(
                 top: 10.0, left: 10.0, right: 10.0, bottom: 10.0),
             decoration: BoxDecoration(
-              color: const Color(0XFFBBE4EC),
-              borderRadius: BorderRadius.circular(10.0),
-            ),
+                color: const Color(0xFFECECEC),
+                borderRadius: BorderRadius.circular(10.0),
+                boxShadow: getBoxShadow()),
             margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 15),
             width: MediaQuery.of(context).size.width,
             child: Row(
