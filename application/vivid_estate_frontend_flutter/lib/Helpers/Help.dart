@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -124,6 +127,87 @@ dynamic addPreview(imageLocation, propertyPrice, propertyAddress, widthSize) {
           ),
         )
       ],
+    ),
+  );
+}
+
+// Review Information
+dynamic generalReview(name, title, rating, date, text, widthSize) {
+  return Container(
+    margin: const EdgeInsets.all(6.0),
+    padding: const EdgeInsets.all(10),
+    decoration: BoxDecoration(
+      color: const Color(0XFFE2E2E2),
+      borderRadius: BorderRadius.circular(10.0),
+      boxShadow: getBoxShadow(),
+    ),
+    width: widthSize,
+    child: Center(
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const SizedBox(
+                height: 50,
+                width: 50,
+                child: CircleAvatar(
+                  backgroundImage: AssetImage("assets/house.jpg"),
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(left: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      date,
+                      textAlign: TextAlign.left,
+                    )
+                  ],
+                ),
+              ),
+            ],
+          ),
+          Container(
+            margin: const EdgeInsets.only(top: 10),
+            child: Row(
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(left: 10),
+                  child: RatingBarIndicator(
+                    rating: rating,
+                    itemBuilder: (context, index) => const Icon(
+                      Icons.star,
+                      color: Color(0xFF006E86),
+                    ),
+                    itemCount: 5,
+                    itemSize: 20.0,
+                    direction: Axis.horizontal,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.only(top: 10, bottom: 10),
+            width: widthSize,
+            child: Text(
+              text,
+              textAlign: TextAlign.justify,
+            ),
+          )
+        ],
+      ),
     ),
   );
 }

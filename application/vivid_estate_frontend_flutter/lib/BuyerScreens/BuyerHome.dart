@@ -7,7 +7,35 @@ import 'package:vivid_estate_frontend_flutter/BuyerScreens/Filter.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 
 class BuyerHome extends StatelessWidget {
-  const BuyerHome({super.key});
+  BuyerHome({super.key});
+
+  // Static Data of Reviews
+  final reviews = [
+    {
+      "Name": "Sheroz Akram",
+      "Title": "A home search lifesaver!",
+      "Date": "12/02/2024",
+      "Rating": 4.5,
+      "Text":
+          "This app is amazing. The filters are so detailed, and the map view lets me pinpoint exactly the neighborhoods I want. I found my dream apartment through this app, and I couldn't be happier."
+    },
+    {
+      "Name": "Ali Haider",
+      "Title": "My new real estate sidekick",
+      "Date": "10/01/2024",
+      "Rating": 3.5,
+      "Text":
+          "Love the clean interface and how easy it is to save listings. The mortgage calculator is a really helpful bonus feature, too. Makes the whole house hunting process way less overwhelming."
+    },
+    {
+      "Name": "Faizan Hassan",
+      "Title": "So much better than other sites",
+      "Date": "10/11/2023",
+      "Rating": 4.0,
+      "Text":
+          "The listings on this app seem more up-to-date than the big name real estate websites. The instant notifications when something matches my criteria are fantastic."
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -218,7 +246,7 @@ class BuyerHome extends StatelessWidget {
                           child: const Text(
                             "Find Property",
                             style: TextStyle(
-                                fontSize: 30.0,
+                                fontSize: 24,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF5F5F5F)),
                           ),
@@ -249,7 +277,7 @@ class BuyerHome extends StatelessWidget {
                                         children: [
                                           Image.asset(
                                             "assets/PropertyLogos/hostelLogo.png",
-                                            width: 60,
+                                            width: 40,
                                           ),
                                           const Text(
                                             'Hostel',
@@ -280,7 +308,7 @@ class BuyerHome extends StatelessWidget {
                                         children: [
                                           Image.asset(
                                             "assets/PropertyLogos/houseLogo.png",
-                                            height: 60,
+                                            height: 40,
                                           ),
                                           const Text(
                                             'House',
@@ -311,7 +339,7 @@ class BuyerHome extends StatelessWidget {
                                         children: [
                                           Image.asset(
                                             "assets/PropertyLogos/apartmentLogo.png",
-                                            height: 60,
+                                            height: 40,
                                           ),
                                           const Text(
                                             'Apartment',
@@ -344,7 +372,7 @@ class BuyerHome extends StatelessWidget {
                                             children: [
                                               Image.asset(
                                                 "assets/PropertyLogos/roomLogo.png",
-                                                height: 60,
+                                                height: 40,
                                               ),
                                               const Text(
                                                 'Room',
@@ -371,6 +399,49 @@ class BuyerHome extends StatelessWidget {
                 ],
               ),
             ),
+
+            // Reviews Section
+            Container(
+              padding: const EdgeInsets.all(10),
+              alignment: AlignmentDirectional.bottomStart,
+              child: const Text(
+                "Customer Reviews",
+                style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF5F5F5F)),
+              ),
+            ),
+
+            // Houses Carousal
+            Container(
+                width: MediaQuery.of(context).size.width,
+                margin: const EdgeInsets.all(10),
+                child: CarouselSlider.builder(
+                  itemCount: reviews.length,
+                  itemBuilder: (BuildContext userContext, int itemIndex,
+                          int pageViewIndex) =>
+                      Container(
+                    child: Center(
+                      child: generalReview(
+                          reviews[itemIndex]['Name'],
+                          reviews[itemIndex]['Title'],
+                          reviews[itemIndex]['Rating'],
+                          reviews[itemIndex]['Date'],
+                          reviews[itemIndex]['Text'],
+                          MediaQuery.of(context).size.width * 0.90),
+                    ),
+                  ),
+                  options: CarouselOptions(
+                    enlargeCenterPage: true,
+                    autoPlay: true,
+                    autoPlayCurve: Curves.fastOutSlowIn,
+                    enableInfiniteScroll: true,
+                    autoPlayAnimationDuration:
+                        const Duration(milliseconds: 800),
+                    viewportFraction: 0.8,
+                  ),
+                )),
           ],
         ),
       ),

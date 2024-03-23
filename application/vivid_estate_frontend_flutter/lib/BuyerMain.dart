@@ -12,12 +12,12 @@ class BuyerMain extends StatefulWidget {
 
 class _BuyerMain extends State<BuyerMain> {
   int _selectedIndex = 0;
-  static const List<Widget> _widgetOptions = <Widget>[
+  static final List<Widget> _widgetOptions = <Widget>[
     BuyerHome(),
-    ChatHome(),
-    Text('Favourite Page',
+    const ChatHome(),
+    const Text('Favourite Page',
         style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
-    ProfileHome(),
+    const ProfileHome(),
   ];
 
   void _onItemTapped(int index) {
