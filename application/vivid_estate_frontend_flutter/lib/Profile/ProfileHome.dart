@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ForgotPassword.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
@@ -324,6 +326,60 @@ class _ProfileHome extends State<ProfileHome> {
                   ),
                 ),
               )
+            ],
+          ),
+          Container(
+            margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 30),
+            child: const Align(
+              alignment: Alignment.centerLeft,
+              child: Text("User Feedback",
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            ),
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                    padding: const EdgeInsets.only(
+                        top: 10.0, left: 10.0, right: 10.0, bottom: 10.0),
+                    decoration: BoxDecoration(
+                        color: const Color(0XFFE2E2E2),
+                        borderRadius: BorderRadius.circular(10.0),
+                        boxShadow: getBoxShadow()),
+                    margin:
+                        const EdgeInsets.only(left: 20.0, right: 20.0, top: 15),
+                    width: MediaQuery.of(context).size.width,
+                    child: Center(
+                      child: Column(
+                        children: [
+                          const Text(
+                            "Please share your feedback on the app!",
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          RatingBar.builder(
+                            initialRating: 3,
+                            minRating: 1,
+                            direction: Axis.horizontal,
+                            allowHalfRating: true,
+                            itemCount: 5,
+                            itemPadding:
+                                const EdgeInsets.symmetric(horizontal: 4.0),
+                            itemBuilder: (context, _) => const Icon(
+                              Icons.star,
+                              color: Color(0xFF006E86),
+                            ),
+                            onRatingUpdate: (rating) {
+                              print(rating);
+                            },
+                          )
+                        ],
+                      ),
+                    )),
+              ),
             ],
           ),
         ]),

@@ -38,7 +38,7 @@ class _CnicEdit extends State<CnicEdit> {
   /*
   Confirm the CNIC Data
   */
-  void storeCNICData(name, father, cnic_number, dob, myContext) async {
+  void storeCNICData(name, father, cnicNumber, dob, myContext) async {
     EasyLoading.instance
       ..userInteractions = false
       ..loadingStyle = EasyLoadingStyle.dark;
@@ -60,7 +60,7 @@ class _CnicEdit extends State<CnicEdit> {
         'Password': widget.userInfo.Password,
         'cnicName': name,
         "cnicFather": father,
-        'cnicNumber': cnic_number,
+        'cnicNumber': cnicNumber,
         'cnicDob': dob
       });
 

@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/Welcome.dart';
@@ -73,4 +73,57 @@ List<BoxShadow> getBoxShadow() {
       offset: Offset(0.0, 0.0), // Offset the shadow
     ),
   ];
+}
+
+// Display the Property Add in a Preview Fomat with Little Info
+dynamic addPreview(imageLocation, propertyPrice, propertyAddress, widthSize) {
+  // Format the Property Price
+  final formatter = NumberFormat.currency(symbol: "RS ", decimalDigits: 0);
+  String formattedPrice = formatter.format(propertyPrice);
+
+  return Container(
+    margin: const EdgeInsets.all(6.0),
+    decoration: BoxDecoration(
+      color: const Color(0XFFE2E2E2),
+      borderRadius: BorderRadius.circular(10.0),
+      boxShadow: getBoxShadow(),
+    ),
+    width: widthSize,
+    child: Column(
+      children: [
+        SizedBox(
+          height: 200,
+          width: widthSize,
+          child: ClipRRect(
+            borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+            child: Image.asset(
+              imageLocation,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        Container(
+          padding: const EdgeInsets.only(left: 5),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              formattedPrice,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.only(left: 5),
+          child: Align(
+            alignment: Alignment.bottomLeft,
+            child: Text(propertyAddress),
+          ),
+        )
+      ],
+    ),
+  );
 }

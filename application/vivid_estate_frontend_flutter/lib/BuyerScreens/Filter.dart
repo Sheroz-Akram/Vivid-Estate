@@ -131,7 +131,6 @@ class _FilterPage extends State<FilterPage> {
                                 SizedBox(
                                   width:
                                       MediaQuery.sizeOf(context).width * 0.40,
-                                  height: 100,
                                   child: Column(
                                     children: [
                                       const Row(
@@ -187,7 +186,6 @@ class _FilterPage extends State<FilterPage> {
                 thickness: 1,
                 height: 40,
               ),
-              const SizedBox(height: 16),
               const Text(
                 'Select Location',
                 style: TextStyle(
@@ -209,7 +207,6 @@ class _FilterPage extends State<FilterPage> {
                 thickness: 1,
                 height: 40,
               ),
-              const SizedBox(height: 16),
               const Text(
                 'Property Size (in meters)',
                 style: TextStyle(
@@ -297,7 +294,6 @@ class _FilterPage extends State<FilterPage> {
                 thickness: 1,
                 height: 40,
               ),
-              const SizedBox(height: 16),
               const Text(
                 'Living Space',
                 style: TextStyle(
@@ -427,6 +423,8 @@ class _FilterPage extends State<FilterPage> {
                       // Apply filters
                     },
                     style: ButtonStyle(
+                      shadowColor: MaterialStateColor.resolveWith(
+                          (states) => const Color.fromARGB(255, 107, 107, 107)),
                       backgroundColor: MaterialStateColor.resolveWith(
                           (states) => const Color(0xFF006E86)),
                       side: MaterialStateProperty.all<BorderSide>(

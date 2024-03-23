@@ -1,8 +1,10 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerScreens/Filter.dart';
+import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 
 class BuyerHome extends StatelessWidget {
   const BuyerHome({super.key});
@@ -13,7 +15,7 @@ class BuyerHome extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Search bar
+            // Main Page
             Container(
               decoration: const BoxDecoration(
                   image: DecorationImage(
@@ -141,8 +143,8 @@ class BuyerHome extends StatelessWidget {
                       ),
                     ]),
                   ),
-                  // Trending section
 
+                  // Trending section
                   Container(
                     decoration: const BoxDecoration(
                         borderRadius: BorderRadius.only(
@@ -177,117 +179,35 @@ class BuyerHome extends StatelessWidget {
                             ],
                           ),
                         ),
-                        SizedBox(
-                          height: 200.0,
-                          child: ListView(
-                            scrollDirection: Axis.horizontal,
-                            children: [
-                              // First property listing
-                              Card(
-                                margin: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      // Property image
-                                      Expanded(
-                                        child: Image.asset(
-                                            "assets/images/House 01.jpg"),
-                                      ),
-                                      // Property details
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            // Property price
-                                            Row(
-                                              children: [
-                                                const Padding(
-                                                  padding:
-                                                      EdgeInsets.only(top: 8.0),
-                                                  child: Text(
-                                                    'Rs 53,000,000',
-                                                    style: TextStyle(
-                                                      fontSize: 18.0,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(
-                                                  width: 10,
-                                                ),
-                                                Image.asset(
-                                                  "assets/UI/vrIcon.png",
-                                                  height: 20,
-                                                ),
-                                                Image.asset(
-                                                  "assets/UI/mapIcon.png",
-                                                  height: 20,
-                                                ),
-                                              ],
-                                            ),
-                                            // Property location
-                                            const Text(
-                                              'DHA 9 Town, Lahore',
-                                              style: TextStyle(
-                                                fontSize: 16.0,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                            // Property time posted and favorite icon
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                const Text(
-                                                  '4 days ago',
-                                                  style: TextStyle(
-                                                    fontSize: 14.0,
-                                                    color: Colors.grey,
-                                                  ),
-                                                ),
-                                                const Padding(
-                                                  padding: EdgeInsets.all(08.0),
-                                                  child: Text(
-                                                    '12K',
-                                                    style: TextStyle(
-                                                      fontSize: 14.0,
-                                                      color: Colors.grey,
-                                                    ),
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Image.asset(
-                                                    "assets/UI/viewIcon.png",
-                                                    height: 20,
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Image.asset(
-                                                    "assets/UI/starIcon.png",
-                                                    height: 20,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              // Second property listing
+
+                        // Houses Carousal
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          margin: const EdgeInsets.all(10),
+                          child: CarouselSlider(
+                            items: [
+                              // First Item
+                              addPreview(
+                                  "house.jpg",
+                                  12234324,
+                                  "Harbanspura, Lahore",
+                                  MediaQuery.of(context).size.width * 0.80),
+
+                              addPreview(
+                                  "house2.jpg",
+                                  54545432,
+                                  "Johar Town, Lahore",
+                                  MediaQuery.of(context).size.width * 0.80)
                             ],
+                            options: CarouselOptions(
+                              height: 280,
+                              autoPlay: true,
+                              autoPlayCurve: Curves.fastOutSlowIn,
+                              enableInfiniteScroll: true,
+                              autoPlayAnimationDuration:
+                                  const Duration(milliseconds: 800),
+                              viewportFraction: 0.8,
+                            ),
                           ),
                         ),
 
@@ -450,7 +370,7 @@ class BuyerHome extends StatelessWidget {
                   )
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
