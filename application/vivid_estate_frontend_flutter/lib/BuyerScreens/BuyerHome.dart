@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerScreens/Filter.dart';
+import 'package:vivid_estate_frontend_flutter/BuyerScreens/Search/PropertySearch.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 
 class BuyerHome extends StatelessWidget {
@@ -40,19 +41,54 @@ class BuyerHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+          title: Column(
+            children: [
+              Container(
+                  child: const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Vivid Estate",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                      color: Color(0XFF006E86)),
+                ),
+              )),
+              Container(
+                  child: const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "You Path to Real Residence ",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                      color: Color(0XFF006E86)),
+                ),
+              )),
+            ],
+          ),
+          leading: Image.asset(
+            "assets/logo.png",
+            width: 10,
+            height: 20,
+          )),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Main Page
+            // Page Header
             Container(
-              decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image:
-                          AssetImage("assets/BuyerImages/headerBackground.png"),
-                      fit: BoxFit.fill)),
               child: Column(
                 children: [
                   Container(
+                    decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            topRight: Radius.circular(10)),
+                        image: DecorationImage(
+                            image: AssetImage(
+                                "assets/BuyerImages/headerBackground.png"),
+                            fit: BoxFit.fill)),
                     child: Column(children: [
                       Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -63,19 +99,23 @@ class BuyerHome extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                           child: TextField(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const PropertySearch()));
+                            },
                             decoration: InputDecoration(
                               hintText: 'Search property with location',
                               suffixIcon: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   InkWell(
-                                      onTap: () {
-                                        print(" Tap on Search");
-                                      },
                                       child: Image.asset(
-                                        "assets/UI/searchButton.png",
-                                        height: 40,
-                                      )),
+                                    "assets/UI/searchButton.png",
+                                    height: 40,
+                                  )),
                                 ],
                               ),
                             ),
@@ -244,7 +284,7 @@ class BuyerHome extends StatelessWidget {
                           padding: const EdgeInsets.all(10),
                           alignment: AlignmentDirectional.bottomStart,
                           child: const Text(
-                            "Find Property",
+                            "Explore Properties",
                             style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,

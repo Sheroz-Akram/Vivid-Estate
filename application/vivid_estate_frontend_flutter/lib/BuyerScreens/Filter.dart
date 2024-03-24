@@ -12,7 +12,7 @@ class FilterPage extends StatefulWidget {
 
 class _FilterPage extends State<FilterPage> {
   // Filter Information
-  var selectedPropertyType = 'House';
+  var selectedPropertyType = 'None';
   RangeValues priceRange = const RangeValues(0, 10000000);
   String selectedLocation = 'Lahore, Punjab';
   RangeValues sizeRange = const RangeValues(0, 1000);

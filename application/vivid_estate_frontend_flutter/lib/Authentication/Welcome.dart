@@ -54,7 +54,7 @@ class WelcomePage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF5006E86),
+                      color: Color(0xff5006e86),
                       fontFamily: "Berlin Sans", // Use a standard font
                     ))),
           ),
@@ -109,11 +109,11 @@ class WelcomePage extends StatelessWidget {
               child: Column(
                 children: <Widget>[
                   Container(
-                    margin: const EdgeInsets.only(top: 10, bottom: 10),
-                    child: const Text("Welcome Back",
+                    margin: const EdgeInsets.only(top: 30, bottom: 20),
+                    child: const Text("Welcome! Let's get started",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 36.0,
+                          fontSize: 26.0,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF006E86),
                           fontFamily: "Berlin Sans", // Use a standard font
@@ -150,7 +150,7 @@ class WelcomePage extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 18.0,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF5006E86),
+                              color: Color(0xff5006e86),
                               fontFamily: "Berlin Sans", // Use a standard font
                             )),
                       )),
