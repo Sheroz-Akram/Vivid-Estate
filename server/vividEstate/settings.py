@@ -38,6 +38,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'corsheaders',
     'backendApplication',
     'django.contrib.admin',
@@ -58,6 +59,14 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Vivid Estate",
+    "site_header": "Vivid Estate",
+    "site_brand": "Vivid Estate",
+    "site_logo": "logo.png",
+    "welcome_sign": "Welcome to Admin Panel"
+}
 
 ROOT_URLCONF = 'vividEstate.urls'
 
@@ -131,6 +140,8 @@ STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
     BASE_DIR / "ProfilePics",
+    
+    BASE_DIR / "Images",
 ]
 
 # Default primary key field type

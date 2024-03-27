@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib import admin
 
 # User model that store the data of both Buyer and Seller
 class ApplicationUser(models.Model):
@@ -18,7 +19,10 @@ class ApplicationUser(models.Model):
     cnic_dob = models.CharField(max_length=50)
 
     def __str__(self):
-        return "ID: " + str(self.id) + ":>\tUser: " + self.full_name
+        return "ID: " + str(self.id) + ":\t\tUser: " + self.full_name + "\t|\tEmail: " + self.email_address
+
+class ApplicationUserAdmin(admin.ModelAdmin):
+    search_fields = ['user_name__icontains', 'cnic_name__icontains', 'email_address__icontains']
 
 # Chat Room with Buyer and Seller
 class Chat(models.Model):
@@ -30,7 +34,7 @@ class Chat(models.Model):
     unviewPerson = models.ForeignKey(ApplicationUser, on_delete=models.CASCADE)
 
     def __str__(self):
-        return "ID: " + str(self.id) + ":>\tBuyer: " + self.Buyer.full_name + "\t<---->\tSeller: " +self.Seller.full_name
+        return "ID: " + str(self.id) + ":\t\tBuyer: " + self.Buyer.full_name + "\t<---->\tSeller: " +self.Seller.full_name
 
 # Messages within Chat Room
 class ChatMessage(models.Model):
@@ -41,7 +45,7 @@ class ChatMessage(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True) 
 
     def __str__(self):
-        return "ID: " + str(self.id) + ":>\tSender: " + self.Sender.full_name
+        return "ID: " + str(self.id) + ":\t\tSender: " + self.Sender.full_name
 
 # Choices given to the admin for the issue status
 IssueChoices = (
@@ -60,4 +64,4 @@ class Issue(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True) 
 
     def __str__(self):
-        return "ID: " + str(self.id) + ":>\tUser: " + self.SubmitBy.full_name + "\t|\tStatus: " + self.ResolveStatus 
+        return "ID: " + str(self.id) + ":\t\tUser: " + self.SubmitBy.full_name + "\t|\tStatus: " + self.ResolveStatus 

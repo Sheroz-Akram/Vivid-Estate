@@ -18,7 +18,7 @@ from django.urls import path, include
 from . import views
 from backendApplication.models import *
 
-admin.site.register(ApplicationUser)
+admin.site.register(ApplicationUser, ApplicationUserAdmin)
 admin.site.register(Chat)
 admin.site.register(ChatMessage)
 admin.site.register(Issue)
