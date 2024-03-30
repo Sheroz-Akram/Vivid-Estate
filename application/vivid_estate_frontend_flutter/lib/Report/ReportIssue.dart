@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/User.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 
 class ReportIssue extends StatefulWidget {
-  const ReportIssue({super.key});
+  ReportIssue({super.key, required this.user});
+  User user;
   @override
   State<ReportIssue> createState() => _ReportIssueState();
 }
@@ -14,7 +15,6 @@ class _ReportIssueState extends State<ReportIssue> {
   var issueType = "0";
   var reportDate = "dd/mm/yy";
   var issueDetails = TextEditingController();
-  var server = ServerInfo();
 
   // Submit the User Issue report to the Server
   void submitUserIssue(userContext) async {
@@ -33,17 +33,9 @@ class _ReportIssueState extends State<ReportIssue> {
       displaySnackBar(context, "Please select an Issue Type");
     }
 
-    // Now we send our Issue report to our Server
-    var userSendData = await server.getAuthData();
-    userSendData['IssueType'] = issueType;
-    userSendData['IssueDate'] = reportDate;
-    userSendData['IssueDetails'] = issueDetails.text;
-    server.sendPostRequest(userContext, "submit_issue", userSendData, (result) {
-      if (result['status'] == "success") {
-        Navigator.pop(userContext);
-      }
-      displaySnackBar(context, result['message']);
-    });
+    // Now we submit the User Issue
+    widget.user
+        .submitIssue(userContext, issueType, reportDate, issueDetails.text);
   }
 
   @override

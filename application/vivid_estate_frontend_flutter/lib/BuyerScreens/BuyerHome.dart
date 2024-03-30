@@ -473,6 +473,7 @@ class BuyerHome extends StatelessWidget {
                     ),
                   ),
                   options: CarouselOptions(
+                    height: 230,
                     enlargeCenterPage: true,
                     autoPlay: true,
                     autoPlayCurve: Curves.fastOutSlowIn,

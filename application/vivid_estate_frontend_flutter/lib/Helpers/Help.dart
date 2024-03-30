@@ -4,24 +4,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vivid_estate_frontend_flutter/Authentication/Welcome.dart';
-
-// Logout the User
-void logoutUser(BuildContext context) async {
-  // Get our shared preferences to manipulate our local storage
-  var prefs = await SharedPreferences.getInstance();
-
-  // Clear all the local data
-  prefs.clear();
-
-  // Now replace the current window with the welcome page
-  Navigator.pushReplacement(
-      context, MaterialPageRoute(builder: (context) => const WelcomePage()));
-}
+import 'package:vivid_estate_frontend_flutter/Classes/User.dart';
 
 // Display Logout Option
-Future<bool?> showLogoutDialog(BuildContext context) async {
+Future<bool?> showLogoutDialog(BuildContext context, User user) async {
   return await showDialog(
     context: context,
     barrierDismissible: false, // User must tap a button
@@ -39,7 +25,7 @@ Future<bool?> showLogoutDialog(BuildContext context) async {
           ElevatedButton(
             child: const Text('Yes'),
             onPressed: () {
-              logoutUser(context);
+              user.logoutUser(context);
               Navigator.of(context).pop(true); // Return true for 'Yes'
             },
           ),
@@ -180,7 +166,7 @@ dynamic generalReview(name, title, rating, date, text, widthSize) {
                 Text(
                   title,
                   style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold),
+                      fontSize: 14, fontWeight: FontWeight.bold),
                 ),
                 Container(
                   margin: const EdgeInsets.only(left: 10),
@@ -191,7 +177,7 @@ dynamic generalReview(name, title, rating, date, text, widthSize) {
                       color: Color(0xFF006E86),
                     ),
                     itemCount: 5,
-                    itemSize: 20.0,
+                    itemSize: 15.0,
                     direction: Axis.horizontal,
                   ),
                 ),
@@ -203,6 +189,7 @@ dynamic generalReview(name, title, rating, date, text, widthSize) {
             width: widthSize,
             child: Text(
               text,
+              style: const TextStyle(fontSize: 12),
               textAlign: TextAlign.justify,
             ),
           )

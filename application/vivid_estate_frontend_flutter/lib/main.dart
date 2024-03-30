@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/Welcome.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerMain.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/User.dart';
 import 'package:vivid_estate_frontend_flutter/SellerMain.dart';
 
 void main() {
@@ -42,24 +42,26 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    LoadHomePage(context);
+    loadHomePage(context);
   }
 
   // Add Delay of 2 Seconds
-  Future<void> myDelayedTask() async {
+  Future<void> delayTime() async {
     await Future.delayed(const Duration(seconds: 2));
   }
 
   // Loading the Application depending upon user login status
-  void LoadHomePage(BuildContext myContext) async {
-    var prefs = await SharedPreferences.getInstance();
-    var isLogin = prefs.getBool("isLogin");
-    var userType = prefs.getString("userType");
+  void loadHomePage(BuildContext myContext) async {
+    // Get the User Data
+    var user = User();
+    var userAuthData = await user.getAuthData();
 
     // Move to the Next Page. Depending Upon User Type
-    await myDelayedTask();
-    if (isLogin == true) {
-      if (userType == "Buyer") {
+    await delayTime();
+
+    // Now we move the user to its destinated screen
+    if (userAuthData == true) {
+      if (user.userType == "Buyer") {
         Navigator.pushReplacement(myContext,
             MaterialPageRoute(builder: (myContext) => const BuyerMain()));
       } else {

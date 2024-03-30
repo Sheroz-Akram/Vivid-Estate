@@ -3,7 +3,9 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ForgotPassword.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/User.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
+import 'package:vivid_estate_frontend_flutter/Profile/EditProfile.dart';
 import 'package:vivid_estate_frontend_flutter/Report/ReportIssue.dart';
 
 class ProfileHome extends StatefulWidget {
@@ -18,28 +20,27 @@ class _ProfileHome extends State<ProfileHome> {
   String userName = "No Name";
   String userID = "No ID";
 
+  var user = User();
+
   @override
   void initState() {
     super.initState();
-    getUserProfileData(context);
+
+    // Get the User Profile Data and Set It
+    loadPageData(context);
   }
 
-  // Get the User Profile Image
-  void getUserProfileData(myContext) async {
-    // Create a New Server
-    var server = ServerInfo();
+  // Load the Data of the Page
+  void loadPageData(context) async {
+    // Load Our Data from User
+    await user.getAuthData();
+    await user.getUserProfileData(context);
 
-    // Send Request to Our Server
-    server.sendPostRequest(
-        myContext, "profile_data", await server.getAuthData(), (result) {
-      if (result['status'] == "success") {
-        var data = result['message'];
-        setState(() {
-          profilePicture = "${server.host}/static/" + data['profilePic'];
-          userName = data['userFullName'];
-          userID = data['userName'];
-        });
-      }
+    // Set Data to the View
+    setState(() {
+      profilePicture = user.profilePictureLocation;
+      userName = user.fullName;
+      userID = user.username;
     });
   }
 
@@ -85,7 +86,7 @@ class _ProfileHome extends State<ProfileHome> {
                       content: Text("Please Enter your password!")));
                 } else {
                   Navigator.pop(context, password);
-                  deleteUserAccount(context, password);
+                  user.deleteAccount(context, password);
                 }
               },
             ),
@@ -93,26 +94,6 @@ class _ProfileHome extends State<ProfileHome> {
         );
       },
     );
-  }
-
-  // Get the User Profile Image
-  void deleteUserAccount(myContext, userPassword) async {
-    // Create a New Server
-    var server = ServerInfo();
-
-    // Get User Data
-    var authData = await server.getAuthData();
-    authData['Password'] = userPassword;
-
-    // Send Request to Our Server
-    server.sendPostRequest(myContext, "delete_account", authData, (result) {
-      if (result['status'] == "success") {
-        logoutUser(myContext);
-      } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(result['message'])));
-      }
-    });
   }
 
   @override
@@ -169,7 +150,15 @@ class _ProfileHome extends State<ProfileHome> {
                           width: MediaQuery.of(context).size.width,
                           height: 50,
                           child: ListTile(
-                            onTap: () => {print("Edit Profile")},
+                            onTap: () => {
+                              // Move to the Edit Profile Screen
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: ((context) => EditProfile(
+                                            user: user,
+                                          ))))
+                            },
                             leading: const Icon(
                               Icons.account_circle,
                               size: 30,
@@ -240,8 +229,9 @@ class _ProfileHome extends State<ProfileHome> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) =>
-                                          const ReportIssue()))
+                                      builder: (context) => ReportIssue(
+                                            user: user,
+                                          )))
                             },
                             leading: const Icon(
                               Icons.flag_outlined,
@@ -280,7 +270,7 @@ class _ProfileHome extends State<ProfileHome> {
                   child: ListTile(
                     onTap: () => {
                       // Display Dialog Box
-                      showLogoutDialog(context)
+                      showLogoutDialog(context, user)
                     },
                     leading: const Icon(
                       Icons.logout_sharp,
@@ -382,6 +372,9 @@ class _ProfileHome extends State<ProfileHome> {
               ),
             ],
           ),
+          const SizedBox(
+            height: 50,
+          )
         ]),
       ),
     );

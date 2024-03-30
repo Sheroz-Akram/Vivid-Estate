@@ -486,7 +486,9 @@ def getUserProfileData(request):
         return httpSuccessJsonResponse({
             "profilePic": user.profile_pic,
             "userFullName": user.full_name,
-            "userName": user.user_name
+            "userName": user.user_name,
+            "cnicNumber": user.cnic_number,
+            "dob": user.cnic_dob
         })
 
     # Something wrong just happen the process
