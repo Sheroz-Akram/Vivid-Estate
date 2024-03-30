@@ -488,7 +488,8 @@ def getUserProfileData(request):
             "userFullName": user.full_name,
             "userName": user.user_name,
             "cnicNumber": user.cnic_number,
-            "dob": user.cnic_dob
+            "dob": user.cnic_dob,
+            "feedbackRating": user.feedback
         })
 
     # Something wrong just happen the process

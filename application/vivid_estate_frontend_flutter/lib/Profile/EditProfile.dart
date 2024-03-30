@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/User.dart';
 
+// ignore: must_be_immutable
 class EditProfile extends StatefulWidget {
   EditProfile({super.key, required this.user});
   User user;
@@ -12,6 +17,47 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
+  // Store Our Profile Picture
+  File? profileImage;
+
+  // Select a image from the prefered source whether camera or gallery
+  Future pickImage(ImageSource imageSource, BuildContext myContext) async {
+    final image = await ImagePicker().pickImage(source: imageSource);
+
+    // If Image not Selected
+    if (image == null) {
+      ScaffoldMessenger.of(myContext).showSnackBar(
+          const SnackBar(content: Text("Please select or take a image!!")));
+    } else {
+      // Save our Image in Temporary Files
+      File? croppedImage = await ImageCropper().cropImage(
+        sourcePath: image.path,
+        compressFormat: ImageCompressFormat.png,
+        compressQuality: 100,
+        androidUiSettings: const AndroidUiSettings(
+            toolbarTitle: 'Crop CNIC',
+            toolbarColor: Colors.blue,
+            toolbarWidgetColor: Colors.white,
+            lockAspectRatio: false),
+        iosUiSettings: const IOSUiSettings(
+          title: 'Crop CNIC',
+        ),
+      );
+
+      // Check if User Cropped the Image or Not
+      if (croppedImage == null) {
+        ScaffoldMessenger.of(myContext).showSnackBar(
+            const SnackBar(content: Text("Please select or take a image!!")));
+      }
+      // Display the new Image
+      else {
+        setState(() {
+          profileImage = croppedImage;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,15 +81,22 @@ class _EditProfileState extends State<EditProfile> {
               Center(
                 child: Stack(children: [
                   SizedBox(
-                    height: 80,
-                    width: 80,
-                    child: CircleAvatar(
-                      backgroundImage:
-                          AssetImage(widget.user.profilePictureLocation),
+                    height: 100,
+                    width: 100,
+                    child: InkWell(
+                      onTap: () {
+                        // take picture from gallery
+                        pickImage(ImageSource.gallery, context);
+                      },
+                      child: CircleAvatar(
+                        backgroundImage: profileImage == null
+                            ? NetworkImage(widget.user.profilePictureLocation)
+                            : FileImage(profileImage!) as ImageProvider,
+                      ),
                     ),
                   ),
                   Container(
-                      margin: const EdgeInsets.only(left: 55, top: 55),
+                      margin: const EdgeInsets.only(left: 75, top: 75),
                       child: const Icon(
                         Icons.camera_alt_rounded,
                         weight: 50,
@@ -52,7 +105,7 @@ class _EditProfileState extends State<EditProfile> {
                 ]),
               ),
               Container(
-                margin: const EdgeInsets.only(top: 15, left: 40, right: 40),
+                margin: const EdgeInsets.only(top: 15, left: 15, right: 15),
                 width: MediaQuery.of(context).size.width,
                 child: Column(
                   children: [
@@ -106,7 +159,7 @@ class _EditProfileState extends State<EditProfile> {
                         shadowColor: Colors.black26,
                         child: TextField(
                           decoration: InputDecoration(
-                            hintText: "Lahore,Pakistan",
+                            hintText: "Lahore, Pakistan",
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(15),
                               borderSide:
@@ -182,7 +235,7 @@ class _EditProfileState extends State<EditProfile> {
               Center(
                   child: Container(
                 margin: const EdgeInsets.only(top: 10, bottom: 20),
-                width: 140,
+                width: 200,
                 height: 40,
                 child: ElevatedButton(
                     style: ElevatedButton.styleFrom(

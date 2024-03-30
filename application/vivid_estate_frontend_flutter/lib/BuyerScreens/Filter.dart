@@ -157,7 +157,6 @@ class _FilterPage extends State<FilterPage> {
                                 SizedBox(
                                   width:
                                       MediaQuery.sizeOf(context).width * 0.40,
-                                  height: 100,
                                   child: Column(children: [
                                     const Row(
                                       children: [
@@ -231,7 +230,6 @@ class _FilterPage extends State<FilterPage> {
                                 child: SizedBox(
                                   width:
                                       MediaQuery.sizeOf(context).width * 0.40,
-                                  height: 100,
                                   child: Column(
                                     children: [
                                       const Row(
@@ -263,7 +261,6 @@ class _FilterPage extends State<FilterPage> {
                                 child: SizedBox(
                                   width:
                                       MediaQuery.sizeOf(context).width * 0.40,
-                                  height: 100,
                                   child: Column(children: [
                                     const Row(
                                       mainAxisAlignment:
@@ -303,7 +300,6 @@ class _FilterPage extends State<FilterPage> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 16),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: SingleChildScrollView(

@@ -17,6 +17,7 @@ class ApplicationUser(models.Model):
     cnic_number = models.CharField(max_length=50)
     cnic_father_name = models.CharField(max_length=150)
     cnic_dob = models.CharField(max_length=50)
+    feedback = models.FloatField()
 
     def __str__(self):
         return "ID: " + str(self.id) + ":\t\tUser: " + self.full_name + "\t|\tEmail: " + self.email_address

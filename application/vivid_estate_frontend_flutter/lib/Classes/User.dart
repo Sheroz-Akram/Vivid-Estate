@@ -13,6 +13,7 @@ class User {
   late String cnicNumber;
   late String dob;
   late String userType;
+  late double feedbackRating;
 
   // Object to Communicate with server
   var server = ServerInfo();
@@ -51,6 +52,7 @@ class User {
         username = data['userName'];
         cnicNumber = data['cnicNumber'];
         dob = data['dob'];
+        feedbackRating = data['feedbackRating'];
         return true;
       } else {
         return false;

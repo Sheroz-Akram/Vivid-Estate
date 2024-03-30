@@ -99,6 +99,7 @@ class BuyerHome extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                           child: TextField(
+                            readOnly: true,
                             onTap: () {
                               Navigator.push(
                                   context,
@@ -143,7 +144,7 @@ class BuyerHome extends StatelessWidget {
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(10.0),
                                     ),
-                                    padding: const EdgeInsets.all(7.0),
+                                    padding: const EdgeInsets.all(10.0),
                                     child: Row(
                                       children: [
                                         Image.asset(
@@ -166,12 +167,12 @@ class BuyerHome extends StatelessWidget {
 
                               // Switch Buy or Rent Modes
                               Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(5.0),
                                 child: Container(
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10.0),
                                   ),
-                                  padding: const EdgeInsets.all(7.0),
+                                  padding: const EdgeInsets.all(2.0),
                                   child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceAround,

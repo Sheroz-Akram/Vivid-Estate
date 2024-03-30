@@ -19,6 +19,7 @@ class _ProfileHome extends State<ProfileHome> {
   String profilePicture = "${ServerInfo().host}/static/Default.jpg";
   String userName = "No Name";
   String userID = "No ID";
+  double feedbackRating = 5.0;
 
   var user = User();
 
@@ -41,6 +42,7 @@ class _ProfileHome extends State<ProfileHome> {
       profilePicture = user.profilePictureLocation;
       userName = user.fullName;
       userID = user.username;
+      feedbackRating = user.feedbackRating;
     });
   }
 
@@ -351,7 +353,7 @@ class _ProfileHome extends State<ProfileHome> {
                             height: 10,
                           ),
                           RatingBar.builder(
-                            initialRating: 3,
+                            initialRating: feedbackRating,
                             minRating: 1,
                             direction: Axis.horizontal,
                             allowHalfRating: true,

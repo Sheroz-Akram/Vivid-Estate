@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/User.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 
+// ignore: must_be_immutable
 class ReportIssue extends StatefulWidget {
   ReportIssue({super.key, required this.user});
   User user;
