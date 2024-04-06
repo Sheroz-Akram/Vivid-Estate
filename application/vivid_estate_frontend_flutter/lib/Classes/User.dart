@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
@@ -80,6 +83,7 @@ class User {
     });
   }
 
+  // Submit the User Issue to the Server
   void submitIssue(userContext, issueType, issueDate, issueDetails) {
     // Now Set the request payload
     var sendData = {"Email": emailAddress, "PrivateKey": privateKey};
@@ -89,6 +93,24 @@ class User {
 
     // Post Our request
     server.sendPostRequest(userContext, "submit_issue", sendData, (result) {
+      if (result['status'] == "success") {
+        Navigator.pop(userContext);
+      }
+      ScaffoldMessenger.of(userContext)
+          .showSnackBar(SnackBar(content: Text(result['message'])));
+    });
+  }
+
+  // Submit the User Profile Data to the Server
+  void updateProfileData(userContext, fullName, cnicnNumber, cnicDob) {
+    // Now Set the request payload
+    var sendData = {"Email": emailAddress, "PrivateKey": privateKey};
+    sendData['FullName'] = fullName;
+    sendData['CnicNumber'] = cnicNumber;
+    sendData['CnicDOB'] = cnicDob;
+
+    // Post Our request
+    server.sendPostRequest(userContext, "update_profile", sendData, (result) {
       if (result['status'] == "success") {
         Navigator.pop(userContext);
       }
@@ -108,5 +130,49 @@ class User {
     // Now replace the current window with the welcome page
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => const WelcomePage()));
+  }
+
+  // Update the profile picture of the user with a new picture
+  void updateUserProfilePicture(
+      File? profileImage, BuildContext userContext) async {
+    // Our API End Point
+    var host = ServerInfo().host;
+    var url = Uri.parse("$host/update_profile_picture");
+
+    // Send our profilePicture to the server
+    try {
+      // Get Our Image to upload
+      var imageUpload = await http.MultipartFile.fromPath(
+          'cnicImage', profileImage?.path ?? "Error");
+
+      var request = http.MultipartRequest('POST', url);
+
+      // Add our profile picture
+      request.files.add(imageUpload);
+
+      // Add Other Fields (consider strong typing)
+      request.fields["Email"] = emailAddress;
+      request.fields["PrivateKey"] = privateKey;
+
+      // Now send our request to the Server
+      var response = await request.send();
+
+      // Check our response
+      if (response.statusCode == 200) {
+        // listen for response
+        var responseString = response.stream.transform(utf8.decoder).single;
+
+        // Json Decode the Result
+        var result = jsonDecode(await responseString);
+
+        // Display the message
+        ScaffoldMessenger.of(userContext)
+            .showSnackBar(SnackBar(content: Text(result['message'])));
+      }
+    } catch (e) {
+      // An error has error in sending the file
+      ScaffoldMessenger.of(userContext).showSnackBar(
+          const SnackBar(content: Text("A network error has occured")));
+    }
   }
 }

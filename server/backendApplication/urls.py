@@ -32,6 +32,8 @@ urlpatterns = [
     path("reset_password", view=AccountViews.passwordReset, name="Reset Password"),
     path("delete_account", view=AccountViews.deleteAccount, name="Delete User Account"),
     path("profile_data", view=AccountViews.getUserProfileData, name="Get User Profile Data"),
+    path("update_profile_picture", view=AccountViews.updateProfilePicture, name="Update User Profile Picture"),
+    path("update_profile", view=AccountViews.updateProfileData, name="Update the User Profile Data"),
 
     # Chat API EndPoints
     path("initiate_chat", view=ChatViews.InitiateChat, name="Initiate Chat"),

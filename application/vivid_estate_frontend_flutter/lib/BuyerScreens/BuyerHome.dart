@@ -13,6 +13,7 @@ class BuyerHome extends StatelessWidget {
   // Static Data of Reviews
   final reviews = [
     {
+      "ProfilePic": "assets/house.jpg",
       "Name": "Sheroz Akram",
       "Title": "A home search lifesaver!",
       "Date": "12/02/2024",
@@ -21,6 +22,7 @@ class BuyerHome extends StatelessWidget {
           "This app is amazing. The filters are so detailed, and the map view lets me pinpoint exactly the neighborhoods I want. I found my dream apartment through this app, and I couldn't be happier."
     },
     {
+      "ProfilePic": "assets/house2.jpg",
       "Name": "Ali Haider",
       "Title": "My new real estate sidekick",
       "Date": "10/01/2024",
@@ -29,6 +31,7 @@ class BuyerHome extends StatelessWidget {
           "Love the clean interface and how easy it is to save listings. The mortgage calculator is a really helpful bonus feature, too. Makes the whole house hunting process way less overwhelming."
     },
     {
+      "ProfilePic": "assets/house.jpg",
       "Name": "Faizan Hassan",
       "Title": "So much better than other sites",
       "Date": "10/11/2023",
@@ -257,13 +260,13 @@ class BuyerHome extends StatelessWidget {
                             items: [
                               // First Item
                               addPreview(
-                                  "house.jpg",
+                                  "assets/house.jpg",
                                   12234324,
                                   "Harbanspura, Lahore",
                                   MediaQuery.of(context).size.width * 0.80),
 
                               addPreview(
-                                  "house2.jpg",
+                                  "assets/house2.jpg",
                                   54545432,
                                   "Johar Town, Lahore",
                                   MediaQuery.of(context).size.width * 0.80)
@@ -454,7 +457,7 @@ class BuyerHome extends StatelessWidget {
               ),
             ),
 
-            // Houses Carousal
+            // Review Carousal
             Container(
                 width: MediaQuery.of(context).size.width,
                 margin: const EdgeInsets.all(10),
@@ -465,6 +468,7 @@ class BuyerHome extends StatelessWidget {
                       Container(
                     child: Center(
                       child: generalReview(
+                          reviews[itemIndex]['ProfilePic'],
                           reviews[itemIndex]['Name'],
                           reviews[itemIndex]['Title'],
                           reviews[itemIndex]['Rating'],

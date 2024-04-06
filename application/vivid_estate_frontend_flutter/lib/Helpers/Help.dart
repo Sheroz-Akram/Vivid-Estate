@@ -118,7 +118,8 @@ dynamic addPreview(imageLocation, propertyPrice, propertyAddress, widthSize) {
 }
 
 // Review Information
-dynamic generalReview(name, title, rating, date, text, widthSize) {
+dynamic generalReview(profilePic, name, title, rating, date, text, widthSize) {
+  print(profilePic);
   return Container(
     margin: const EdgeInsets.all(6.0),
     padding: const EdgeInsets.all(10),
@@ -133,11 +134,11 @@ dynamic generalReview(name, title, rating, date, text, widthSize) {
         children: [
           Row(
             children: [
-              const SizedBox(
+              SizedBox(
                 height: 50,
                 width: 50,
                 child: CircleAvatar(
-                  backgroundImage: AssetImage("assets/house.jpg"),
+                  backgroundImage: AssetImage(profilePic),
                 ),
               ),
               Container(

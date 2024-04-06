@@ -66,3 +66,18 @@ class Issue(models.Model):
 
     def __str__(self):
         return "ID: " + str(self.id) + ":\t\tUser: " + self.SubmitBy.full_name + "\t|\tStatus: " + self.ResolveStatus 
+
+
+
+# Data of the property
+class Property(models.Model):
+    description = models.TextField()
+    propertyType = models.CharField(max_length=50)
+    views = models.IntegerField()
+    likes = models.IntegerField()
+    price = models.IntegerField()
+
+# Store the images of the location
+class PropertyImages(models.Model):
+    imageLocation = models.CharField(max_length=255)
+    propertyID = models.ForeignKey(Property, on_delete=models.CASCADE)

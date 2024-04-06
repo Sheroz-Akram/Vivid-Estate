@@ -495,3 +495,77 @@ def getUserProfileData(request):
     # Something wrong just happen the process
     except Exception as e:
         return httpErrorJsonResponse("Error in the server or an invalid request")
+
+
+# Update the profile picture of a user in the server
+@csrf_exempt
+def updateProfilePicture(request):
+
+    # Check the User Authentications
+    authResult = checkUserLogin(request=request)
+    if authResult[0] == False:
+        return httpErrorJsonResponse(authResult[1])
+
+    # Now we Get the User
+    user = authResult[1]
+
+    # Now we get update our profile picture
+    try:
+        # Get the Image Data
+        imageFile = request.FILES['cnicImage']
+
+        # Create or get an instance of FileSystemStorage to handle saving
+        fs = FileSystemStorage(location=settings.PROFILE_PIC_ROOT)
+        
+        # Save the file directly
+        fileNewName = str(uuid.uuid4()) + imageFile.name
+        filename = fs.save(fileNewName, imageFile)
+        file_path = os.path.join(settings.PROFILE_PIC_ROOT, filename)
+
+        # Delete the previous profile picture of the user
+        fs.delete(user.profile_pic)
+
+        # Store the File Path
+        user.profile_pic = file_path
+        user.save()
+
+        return httpSuccessJsonResponse("Profile picture has been update successfully")
+
+    # Something wrong just happen the process
+    except Exception as e:
+        return httpErrorJsonResponse("Error in the server or an invalid request")
+
+
+
+# Update the profile data of a user in the server
+@csrf_exempt
+def updateProfileData(request):
+
+    # Check the User Authentications
+    authResult = checkUserLogin(request=request)
+    if authResult[0] == False:
+        return httpErrorJsonResponse(authResult[1])
+
+    # Now we Get the User
+    user = authResult[1]
+
+    # Now we get update our profile data
+    try:
+
+        # Get the Data to Update for the User
+        fullName = request.POST['FullName']
+        cnicNumber = request.POST['CnicNumber']
+        cnicDob = request.POST['CnicDOB']
+
+        # Update the Data of the User
+        user.full_name = fullName
+        user.cnic_number = cnicNumber
+        user.cnic_dob = cnicDob
+        user.save()
+
+        return httpSuccessJsonResponse("Profile Data has been updated successfully")
+
+    # Something wrong just happen the process
+    except Exception as e:
+        return httpErrorJsonResponse("Error in the server or an invalid request")
+

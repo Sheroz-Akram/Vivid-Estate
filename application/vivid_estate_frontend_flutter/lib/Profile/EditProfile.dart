@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/User.dart';
 
 // ignore: must_be_immutable
@@ -17,6 +18,11 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
+  // Controllers to read the data from the user input text fields
+  final _display_name = TextEditingController();
+  final _cnic_number = TextEditingController();
+  final _cnic_dob = TextEditingController();
+
   // Store Our Profile Picture
   File? profileImage;
 
@@ -54,8 +60,22 @@ class _EditProfileState extends State<EditProfile> {
         setState(() {
           profileImage = croppedImage;
         });
+
+        // Update the profile picture in the server
+        widget.user.updateUserProfilePicture(profileImage, myContext);
       }
     }
+  }
+
+  // Now we have to get the user edited data and submit it the server
+  void submitDataToServer(BuildContext userContext) {
+    // Get all the required data
+    widget.user.updateProfileData(
+      userContext,
+      _display_name.text.isNotEmpty ? _display_name.text : widget.user.fullName,
+      _cnic_number.text.isNotEmpty ? _cnic_number.text : widget.user.cnicNumber,
+      _cnic_dob.text.isNotEmpty ? _cnic_dob.text : widget.user.dob,
+    );
   }
 
   @override
@@ -88,9 +108,15 @@ class _EditProfileState extends State<EditProfile> {
                         // take picture from gallery
                         pickImage(ImageSource.gallery, context);
                       },
+
+                      // Display the User Profile Picture
                       child: CircleAvatar(
                         backgroundImage: profileImage == null
+
+                            // Profile Picture store on the Internet
                             ? NetworkImage(widget.user.profilePictureLocation)
+
+                            // Profile Picture selected to change from local device
                             : FileImage(profileImage!) as ImageProvider,
                       ),
                     ),
@@ -128,6 +154,7 @@ class _EditProfileState extends State<EditProfile> {
                         elevation: 8,
                         shadowColor: Colors.black26,
                         child: TextField(
+                          controller: _display_name,
                           decoration: InputDecoration(
                             hintText: widget.user.fullName,
                             border: OutlineInputBorder(
@@ -188,6 +215,7 @@ class _EditProfileState extends State<EditProfile> {
                         elevation: 8,
                         shadowColor: Colors.black26,
                         child: TextField(
+                          controller: _cnic_number,
                           decoration: InputDecoration(
                             hintText: widget.user.cnicNumber,
                             border: OutlineInputBorder(
@@ -218,6 +246,22 @@ class _EditProfileState extends State<EditProfile> {
                         elevation: 8,
                         shadowColor: Colors.black26,
                         child: TextField(
+                          onTap: () async {
+                            // Get the Date from the User
+                            var selectedDate = await showDatePicker(
+                                context: context,
+                                firstDate: DateTime(1990),
+                                lastDate: DateTime.now());
+
+                            // Format Our Date
+                            var formatter = DateFormat('dd.MM.yy');
+
+                            // Now we Set the Date
+                            setState(() {
+                              _cnic_dob.text = formatter.format(selectedDate!);
+                            });
+                          },
+                          controller: _cnic_dob,
                           decoration: InputDecoration(
                             hintText: widget.user.dob,
                             border: OutlineInputBorder(
@@ -247,7 +291,8 @@ class _EditProfileState extends State<EditProfile> {
                       shadowColor: Colors.black26,
                     ),
                     onPressed: () {
-                      print("Save");
+                      // Submit the Edited data to the Server
+                      submitDataToServer(context);
                     },
                     child: const Text(
                       "Save",
