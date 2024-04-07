@@ -569,3 +569,33 @@ def updateProfileData(request):
     except Exception as e:
         return httpErrorJsonResponse("Error in the server or an invalid request")
 
+
+
+# Update the feedback of the user
+@csrf_exempt
+def updateFeedback(request):
+
+    # Check the User Authentications
+    authResult = checkUserLogin(request=request)
+    if authResult[0] == False:
+        return httpErrorJsonResponse(authResult[1])
+
+    # Now we Get the User
+    user = authResult[1]
+
+    # Now we get update our user feedback
+    try:
+
+        # Get the Data to Update for the User
+        feedback = request.POST['Feedback']
+
+        # Update the Data of the User
+        user.feedback = feedback
+        user.save()
+
+        return httpSuccessJsonResponse("Feedbac has been updated successfully")
+
+    # Something wrong just happen the process
+    except Exception as e:
+        return httpErrorJsonResponse("Error in the server or an invalid request")
+

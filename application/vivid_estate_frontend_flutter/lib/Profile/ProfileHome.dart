@@ -152,14 +152,17 @@ class _ProfileHome extends State<ProfileHome> {
                           width: MediaQuery.of(context).size.width,
                           height: 50,
                           child: ListTile(
-                            onTap: () => {
+                            onTap: () async {
                               // Move to the Edit Profile Screen
-                              Navigator.push(
+                              await Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: ((context) => EditProfile(
                                             user: user,
-                                          ))))
+                                          ))));
+
+                              // Reload the data of the page to show the updated results
+                              loadPageData(context);
                             },
                             leading: const Icon(
                               Icons.account_circle,
@@ -365,7 +368,8 @@ class _ProfileHome extends State<ProfileHome> {
                               color: Color(0xFF006E86),
                             ),
                             onRatingUpdate: (rating) {
-                              print(rating);
+                              // Update the User Feedback rating on the server
+                              user.updateFeedback(context, rating);
                             },
                           )
                         ],

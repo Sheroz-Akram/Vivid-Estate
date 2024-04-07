@@ -119,6 +119,19 @@ class User {
     });
   }
 
+  // Update the feed back rating of the user
+  void updateFeedback(userContext, newFeedback) {
+    // Now Set the request payload
+    var sendData = {"Email": emailAddress, "PrivateKey": privateKey};
+    sendData['Feedback'] = newFeedback.toString();
+
+    // Post Our request
+    server.sendPostRequest(userContext, "update_feedback", sendData, (result) {
+      ScaffoldMessenger.of(userContext)
+          .showSnackBar(SnackBar(content: Text(result['message'])));
+    });
+  }
+
   // Logout the User
   void logoutUser(BuildContext context) async {
     // Get our shared preferences to manipulate our local storage
