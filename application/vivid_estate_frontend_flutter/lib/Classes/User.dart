@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,6 +18,11 @@ class User {
   late String dob;
   late String userType;
   late double feedbackRating;
+  late double langitude;
+  late double longitude;
+  late String password;
+  late String fathername;
+  late String cnic_name;
 
   // Object to Communicate with server
   var server = ServerInfo();
@@ -186,6 +192,44 @@ class User {
       // An error has error in sending the file
       ScaffoldMessenger.of(userContext).showSnackBar(
           const SnackBar(content: Text("A network error has occured")));
+    }
+  }
+
+  // Get the current location of the user
+  Future<void> getCityLocation(userContext) async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    try {
+      // Check if Location Permission are enabled or not
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        ScaffoldMessenger.of(userContext).showSnackBar(
+            const SnackBar(content: Text("Please enable location service.")));
+        await Geolocator.openAppSettings();
+      }
+
+      // Request to Get the permission
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          ScaffoldMessenger.of(userContext).showSnackBar(const SnackBar(
+              content: Text("Request to access the location is denied")));
+        }
+      }
+
+      // Get the user Corrent position in longitude and langitude
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+
+      // Store the Location Data
+      langitude = position.latitude;
+      longitude = position.longitude;
+    } catch (e) {
+      // Error has occured during location access
+      langitude = 0;
+      longitude = 0;
     }
   }
 }

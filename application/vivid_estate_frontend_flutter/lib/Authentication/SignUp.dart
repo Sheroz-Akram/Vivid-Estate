@@ -7,7 +7,7 @@ import 'package:vivid_estate_frontend_flutter/Authentication/Login.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/OTP.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
-import 'package:vivid_estate_frontend_flutter/Authentication/User.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/User.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key, required this.userType});
@@ -70,6 +70,12 @@ class _SignUpPage extends State<SignUpPage> {
       status: "Loading...",
     );
 
+    // Get the User Location Data
+    var user = User();
+    await user.getCityLocation(myContext);
+    var lang = user.langitude.toString();
+    var long = user.longitude.toString();
+
     // URL to Send Request
     var host = ServerInfo().host;
     var url = Uri.parse("$host/signup");
@@ -80,7 +86,9 @@ class _SignUpPage extends State<SignUpPage> {
         'Email': email,
         'User': username,
         'Password': password,
-        'Type': userType
+        'Type': userType,
+        'Langitude': lang,
+        'Longitude': long
       });
 
       // Get a Response from the Server
@@ -96,12 +104,12 @@ class _SignUpPage extends State<SignUpPage> {
           EasyLoading.showSuccess(result['message']);
 
           // Store User Information
-          var userInfo = User(
-              Name: fullName,
-              Email: email,
-              Username: username,
-              Password: password,
-              Type: userType);
+          var userInfo = User();
+          userInfo.fullName = fullName;
+          userInfo.emailAddress = email;
+          userInfo.username = username;
+          userInfo.password = password;
+          userInfo.userType = userType;
 
           // Move to the OTP Page
           Navigator.push(

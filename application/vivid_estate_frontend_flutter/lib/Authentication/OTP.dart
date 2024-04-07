@@ -5,7 +5,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:http/http.dart' as http;
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
-import 'package:vivid_estate_frontend_flutter/Authentication/User.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/User.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/cnic.dart';
 
 class OTPPage extends StatefulWidget {
@@ -109,8 +109,8 @@ class _OTPPage extends State<OTPPage> {
     try {
       // Our Request
       var response = await http.post(url, body: {
-        'Email': widget.userInfo.Email,
-        'Password': widget.userInfo.Password,
+        'Email': widget.userInfo.emailAddress,
+        'Password': widget.userInfo.password,
       });
 
       setState(() {
@@ -162,8 +162,8 @@ class _OTPPage extends State<OTPPage> {
 
     // OTP is verified now send to the Server
     else {
-      sendSignUpRequest(
-          widget.userInfo.Email, otp, widget.userInfo.Type, myContext);
+      sendSignUpRequest(widget.userInfo.emailAddress, otp,
+          widget.userInfo.userType, myContext);
     }
   }
 
@@ -234,8 +234,9 @@ class _OTPPage extends State<OTPPage> {
                         fieldWidth: 50,
                         fieldHeight: 50,
                         activeFillColor: Colors.white,
-                        inactiveFillColor: Color.fromARGB(255, 29, 5, 170),
-                        selectedFillColor: Color(0xFF006E86),
+                        inactiveFillColor:
+                            const Color.fromARGB(255, 29, 5, 170),
+                        selectedFillColor: const Color(0xFF006E86),
                         inactiveColor: Colors.grey),
                     onChanged: (value) {
                       // Perform Opertaion When Output is 4

@@ -17,6 +17,7 @@ Before running the server you have to install the following python libraries els
 4. easyocr                  1.7.1
 5. opencv-python            4.7.0.72
 6. matplotlib               3.7.1
+7. geopy                    2.4.1
 
 
 For more info visit: <a href="https://sheroz.pages.dev/FYP/">FYP Documents</a>

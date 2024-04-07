@@ -11,6 +11,8 @@ from django.core.files.storage import FileSystemStorage
 from ..models import *
 import random
 import string
+from geopy.geocoders import Nominatim
+import json
 
 
 # Create your views here.
@@ -102,6 +104,13 @@ def SignUp(request):
             User = request.POST['User']
             Password = request.POST['Password']
             Type = request.POST['Type']
+            Langitude = request.POST['Langitude']
+            Longitude = request.POST['Longitude']
+
+            # Locate the location of the user
+            geolocator = Nominatim(user_agent="VividEstate")
+            location = geolocator.reverse((Langitude, Longitude),language="en")
+            address = location.raw['address']
 
 
             ## Save the Data to our database
@@ -124,7 +133,11 @@ def SignUp(request):
                         password=Password,
                         otp_code=str(otp),
                         verification_status="No",
-                        user_type=Type
+                        feedback=0,
+                        location= ', '.join(address.values()),
+                        user_type=Type,
+                        langitude=Langitude,
+                        longitude=Longitude
                 ) 
 
                 print("OTP Generated: "+ otp)
@@ -138,7 +151,7 @@ def SignUp(request):
                 return JsonResponse({"status":"success", "message":"Great Done"})
             
             except Exception as e:
-                return JsonResponse({"status":"error", "message":"User existed already"})
+                return JsonResponse({"status":"error", "message":"User existed already" + str(e)})
 
     except Exception as e:
         return JsonResponse({"status":"error", "message":"Invalid Request"})

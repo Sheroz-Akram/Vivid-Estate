@@ -68,7 +68,7 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   // Now we have to get the user edited data and submit it the server
-  void submitDataToServer(BuildContext userContext) {
+  void submitDataToServer(BuildContext userContext) async {
     // Get all the required data
     widget.user.updateProfileData(
       userContext,
@@ -135,6 +135,12 @@ class _EditProfileState extends State<EditProfile> {
                 width: MediaQuery.of(context).size.width,
                 child: Column(
                   children: [
+                    /*
+
+                    Update User Full Name Field
+
+                    */
+
                     const Padding(
                       padding: EdgeInsets.only(bottom: 1, left: 15),
                       child: Align(
@@ -166,6 +172,13 @@ class _EditProfileState extends State<EditProfile> {
                         ),
                       ),
                     ),
+
+                    /*
+
+                    Update Location Field
+
+                    */
+
                     const Padding(
                       padding: EdgeInsets.only(bottom: 1, left: 15),
                       child: Align(
@@ -196,6 +209,13 @@ class _EditProfileState extends State<EditProfile> {
                         ),
                       ),
                     ),
+
+                    /*
+
+                    Update CNIC Field
+
+                    */
+
                     const Padding(
                       padding: EdgeInsets.only(bottom: 1, left: 15),
                       child: Align(
@@ -209,6 +229,13 @@ class _EditProfileState extends State<EditProfile> {
                         ),
                       ),
                     ),
+
+                    /*
+
+                    Update Date of Birth Field
+
+                    */
+
                     Padding(
                       padding: const EdgeInsets.only(bottom: 10),
                       child: Card(
@@ -276,6 +303,13 @@ class _EditProfileState extends State<EditProfile> {
                   ],
                 ),
               ),
+
+              /*
+
+              Button to send the profile update request to the server
+
+              */
+
               Center(
                   child: Container(
                 margin: const EdgeInsets.only(top: 10, bottom: 20),

@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
-import 'package:vivid_estate_frontend_flutter/Authentication/User.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/User.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/cnic_edit.dart';
 
@@ -112,20 +112,16 @@ class _CnicPageState extends State<CnicPage> {
           EasyLoading.showSuccess("OCR Success");
 
           // Now Store the CNIC Data and Send to Next Activity
-          var cnicInfo = CNIC(
-              cnic_number: cnicNo!,
-              cnic_father_name: fatherName!,
-              cnic_name: Name!,
-              cnic_dob: dob!);
+          widget.userInfo.cnicNumber = cnicNo!;
+          widget.userInfo.fathername = fatherName!;
+          widget.userInfo.cnic_name = Name!;
+          widget.userInfo.dob = dob!;
 
           // Now Send the Data to Next Acitivity
           Navigator.push(
               myContext,
               MaterialPageRoute(
-                  builder: (context) => CnicEdit(
-                        userInfo: widget.userInfo,
-                        cnicInfo: cnicInfo,
-                      )));
+                  builder: (context) => CnicEdit(userInfo: widget.userInfo)));
         }
 
         // Error in OCR
@@ -183,7 +179,7 @@ class _CnicPageState extends State<CnicPage> {
       // Display the new Image
       else {
         setState(() {
-          this.cnicImage = croppedImage;
+          cnicImage = croppedImage;
         });
       }
     }
@@ -243,7 +239,7 @@ class _CnicPageState extends State<CnicPage> {
 
                   const SizedBox(height: 30),
 
-                  Container(
+                  SizedBox(
                     width: 270,
                     child: Column(
                       children: <Widget>[
@@ -304,7 +300,7 @@ class _CnicPageState extends State<CnicPage> {
                             : const SizedBox(height: 20),
 
                         Container(
-                          margin: EdgeInsets.only(top: 20),
+                          margin: const EdgeInsets.only(top: 20),
                           child: TextButton(
                               style: ButtonStyle(
                                   backgroundColor:
@@ -322,9 +318,9 @@ class _CnicPageState extends State<CnicPage> {
                                 // Send CNIC to Server for OCR
                                 if (cnicImage != null) {
                                   sendImageToServer(
-                                      widget.userInfo.Email,
-                                      widget.userInfo.Password,
-                                      widget.userInfo.Type,
+                                      widget.userInfo.emailAddress,
+                                      widget.userInfo.password,
+                                      widget.userInfo.userType,
                                       context);
                                 }
 

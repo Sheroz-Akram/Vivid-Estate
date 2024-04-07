@@ -6,12 +6,11 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/Congrats.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
-import 'package:vivid_estate_frontend_flutter/Authentication/User.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/User.dart';
 
 class CnicEdit extends StatefulWidget {
-  const CnicEdit({super.key, required this.userInfo, required this.cnicInfo});
+  const CnicEdit({super.key, required this.userInfo});
   final User userInfo;
-  final CNIC cnicInfo;
 
   @override
   State<CnicEdit> createState() => _CnicEdit();
@@ -29,10 +28,10 @@ class _CnicEdit extends State<CnicEdit> {
   @override
   void initState() {
     super.initState();
-    _cnic_name_controller.text = widget.cnicInfo.cnic_name;
-    _cnic_number.text = widget.cnicInfo.cnic_number;
-    _cnic_father_name.text = widget.cnicInfo.cnic_father_name;
-    _cnic_dob.text = widget.cnicInfo.cnic_dob;
+    _cnic_name_controller.text = widget.userInfo.cnic_name;
+    _cnic_number.text = widget.userInfo.cnicNumber;
+    _cnic_father_name.text = widget.userInfo.fathername;
+    _cnic_dob.text = widget.userInfo.dob;
   }
 
   /*
@@ -56,8 +55,8 @@ class _CnicEdit extends State<CnicEdit> {
     try {
       // Our Request
       var response = await http.post(url, body: {
-        'Email': widget.userInfo.Email,
-        'Password': widget.userInfo.Password,
+        'Email': widget.userInfo.emailAddress,
+        'Password': widget.userInfo.password,
         'cnicName': name,
         "cnicFather": father,
         'cnicNumber': cnicNumber,
