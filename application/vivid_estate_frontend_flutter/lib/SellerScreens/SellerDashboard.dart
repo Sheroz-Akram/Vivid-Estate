@@ -4,6 +4,7 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
+import 'package:vivid_estate_frontend_flutter/SellerScreens/CreateNewAd/NewPropertyAdd.dart';
 
 class SellerDashboard extends StatefulWidget {
   const SellerDashboard({super.key});
@@ -165,36 +166,41 @@ class _SellerDashboardState extends State<SellerDashboard> {
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.only(
-                top: 10.0, left: 10.0, right: 10.0, bottom: 10.0),
-            decoration: BoxDecoration(
-                color: const Color(0xFFECECEC),
-                borderRadius: BorderRadius.circular(10.0),
-                boxShadow: getBoxShadow()),
-            margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 15),
-            width: MediaQuery.of(context).size.width,
-            child: Row(
-              children: [
-                Expanded(
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: ListTile(
-                      leading: const Icon(
-                        Icons.add_circle_outline,
-                        size: 30,
+          InkWell(
+            onTap: () {
+              // Go to the Create new Add Page
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const NewPropertyAd()));
+            },
+            child: Container(
+              padding: const EdgeInsets.only(
+                  top: 10.0, left: 10.0, right: 10.0, bottom: 10.0),
+              decoration: BoxDecoration(
+                  color: const Color(0xFFECECEC),
+                  borderRadius: BorderRadius.circular(10.0),
+                  boxShadow: getBoxShadow()),
+              margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 15),
+              width: MediaQuery.of(context).size.width,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child: const ListTile(
+                        leading: Icon(
+                          Icons.add_circle_outline,
+                          size: 30,
+                        ),
+                        title: Text("Create New ad",
+                            style: TextStyle(fontSize: 16)),
+                        trailing: InkWell(child: Icon(Icons.arrow_forward_ios)),
                       ),
-                      title: const Text("Create New ad",
-                          style: TextStyle(fontSize: 16)),
-                      trailing: InkWell(
-                          onTap: () {
-                            print("Create ad");
-                          },
-                          child: const Icon(Icons.arrow_forward_ios)),
                     ),
-                  ),
-                )
-              ],
+                  )
+                ],
+              ),
             ),
           ),
         ],

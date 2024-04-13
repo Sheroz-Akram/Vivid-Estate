@@ -23,7 +23,7 @@ class ApplicationUser(models.Model):
     feedback = models.FloatField()
 
     def __str__(self):
-        return "ID: " + str(self.id) + ":\t\tUser: " + self.full_name + "\t|\tEmail: " + self.email_address
+        return "ID: " + str(self.id) + ">>\t\tUser: " + self.full_name + "\t|\tEmail: " + self.email_address + "\t|\tType: " + self.user_type
 
 class ApplicationUserAdmin(admin.ModelAdmin):
     search_fields = ['user_name__icontains', 'cnic_name__icontains', 'email_address__icontains']
@@ -38,7 +38,7 @@ class Chat(models.Model):
     unviewPerson = models.ForeignKey(ApplicationUser, on_delete=models.CASCADE)
 
     def __str__(self):
-        return "ID: " + str(self.id) + ":\t\tBuyer: " + self.Buyer.full_name + "\t<---->\tSeller: " +self.Seller.full_name
+        return "ID: " + str(self.id) + ">>\t\tBuyer: " + self.Buyer.full_name + "\t<---->\tSeller: " +self.Seller.full_name
 
 # Messages within Chat Room
 class ChatMessage(models.Model):
@@ -49,7 +49,7 @@ class ChatMessage(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True) 
 
     def __str__(self):
-        return "ID: " + str(self.id) + ":\t\tSender: " + self.Sender.full_name
+        return "ID: " + str(self.id) + ">>\t\tSender: " + self.Sender.full_name
 
 # Choices given to the admin for the issue status
 IssueChoices = (
@@ -68,7 +68,7 @@ class Issue(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True) 
 
     def __str__(self):
-        return "ID: " + str(self.id) + ":\t\tUser: " + self.SubmitBy.full_name + "\t|\tStatus: " + self.ResolveStatus 
+        return "ID: " + str(self.id) + ">>\t\tUser: " + self.SubmitBy.full_name + "\t|\tStatus: " + self.ResolveStatus 
 
 
 
@@ -91,7 +91,7 @@ class Property(models.Model):
     price = models.IntegerField()
 
     def __str__(self):
-        return "ID: " + str(self.id) + ":\t\tDescription: " + ' '.join(self.description.split()[:5]) + "..." + "\t|\tType: " + self.propertyType + "\t|\tPrice: " + str(self.price)
+        return "ID: " + str(self.id) + ">>\t\tDescription: " + ' '.join(self.description.split()[:5]) + "..." + "\t|\tType: " + self.propertyType + "\t|\tPrice: " + str(self.price)
 
 # Store the images of the location
 class PropertyImage(models.Model):
