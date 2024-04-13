@@ -22,6 +22,8 @@ admin.site.register(ApplicationUser, ApplicationUserAdmin)
 admin.site.register(Chat)
 admin.site.register(ChatMessage)
 admin.site.register(Issue)
+admin.site.register(Property)
+admin.site.register(PropertyImage)
 
 
 urlpatterns = [

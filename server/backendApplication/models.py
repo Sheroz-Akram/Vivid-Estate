@@ -72,15 +72,28 @@ class Issue(models.Model):
 
 
 
+
+# Property Types
+propertyTypes = (
+    ("Rent", "Rent"),
+    ("Buy", "Buy"),
+    ("N/A", "N/A")
+)
+
 # Data of the property
 class Property(models.Model):
     description = models.TextField()
-    propertyType = models.CharField(max_length=50)
+    propertyType = models.CharField(max_length=20, choices=propertyTypes, default="N/A")
+    location = models.CharField(max_length=255)
+    seller = models.ForeignKey(ApplicationUser, on_delete=models.CASCADE)
     views = models.IntegerField()
     likes = models.IntegerField()
     price = models.IntegerField()
 
+    def __str__(self):
+        return "ID: " + str(self.id) + ":\t\tDescription: " + ' '.join(self.description.split()[:5]) + "..." + "\t|\tType: " + self.propertyType + "\t|\tPrice: " + str(self.price)
+
 # Store the images of the location
-class PropertyImages(models.Model):
+class PropertyImage(models.Model):
     imageLocation = models.CharField(max_length=255)
     propertyID = models.ForeignKey(Property, on_delete=models.CASCADE)
