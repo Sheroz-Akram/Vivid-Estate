@@ -16,7 +16,7 @@ class NewPropertyAd extends StatefulWidget {
 }
 
 class _NewPropertyAdState extends State<NewPropertyAd> {
-  // Store Data
+  // Store Information regarding the property
   var selectedPropertyType = 'None';
   var listingType = 'Sell';
   var propertyLocationData = {
@@ -25,6 +25,7 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
     "longitude": 0.0,
     "address": "none"
   };
+  var propertyDescription = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -124,6 +125,9 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                         .toList(),
                   ),
                 ),
+                /**
+                 * Option to choose between selling or renting
+                 */
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -204,20 +208,22 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                         ],
                       ),
                     ),
+                    /**
+                     * Option to select the property location on map
+                     */
                     Container(
                         padding: const EdgeInsets.only(right: 15),
+                        width: MediaQuery.of(context).size.width * 0.49,
                         child: Column(
                           children: [
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.4,
-                                child: const Text(
-                                  "Select Location",
-                                  style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0XFF8D8D8D)),
+                            const Align(
+                              alignment: Alignment.topLeft,
+                              child: Text(
+                                "Select Location",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0XFF8D8D8D),
                                 ),
                               ),
                             ),
@@ -271,7 +277,7 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                                                 })));
                               },
                               child: Container(
-                                width: MediaQuery.of(context).size.width * 0.4,
+                                width: MediaQuery.of(context).size.width * 0.49,
                                 height: 40,
                                 decoration: BoxDecoration(
                                   border: Border.all(width: 1),
@@ -282,25 +288,25 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                    0.49 -
+                                                37,
                                         padding: const EdgeInsets.only(left: 5),
                                         child: propertyLocationData['isSet'] ==
                                                 'yes'
-                                            ? SingleChildScrollView(
-                                                scrollDirection:
-                                                    Axis.horizontal,
-                                                child: SizedBox(
-                                                  width: (MediaQuery.of(context)
-                                                              .size
-                                                              .width *
-                                                          0.4) -
-                                                      30,
-                                                  child: Text(
-                                                      textAlign:
-                                                          TextAlign.justify,
-                                                      '${propertyLocationData['address']}'),
-                                                ),
+                                            ? SizedBox(
+                                                width: (MediaQuery.of(context)
+                                                            .size
+                                                            .width *
+                                                        0.49) -
+                                                    30,
+                                                child: Text(
+                                                    textAlign:
+                                                        TextAlign.justify,
+                                                    '${propertyLocationData['address']}'),
                                               )
-                                            : const Text("Open Maps")),
+                                            : const Text("Open in Maps")),
                                     const Icon(
                                       Icons.arrow_forward_ios,
                                       size: 20,
@@ -313,6 +319,9 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                         )),
                   ],
                 ),
+                /**
+                 * Fields to Enter Property Information
+                 */
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
@@ -329,9 +338,12 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    /**
+                     * Input property price
+                     */
                     Container(
                       padding: const EdgeInsets.only(left: 15),
-                      width: MediaQuery.of(context).size.width * 0.4,
+                      width: MediaQuery.of(context).size.width * 0.49,
                       child: Column(
                         children: [
                           Align(
@@ -346,17 +358,22 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                             ),
                           ),
                           TextField(
+                            keyboardType: TextInputType.number,
                             decoration: InputDecoration(
-                                border: InputBorder.none,
-                                enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0))),
+                                hintText: "Price in Rupee",
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                )),
                           ),
                         ],
                       ),
                     ),
+                    /**
+                     * Input the Land Area
+                     */
                     Container(
                       padding: const EdgeInsets.only(right: 15),
-                      width: MediaQuery.of(context).size.width * 0.4,
+                      width: MediaQuery.of(context).size.width * 0.49,
                       child: Column(
                         children: [
                           const Align(
@@ -371,16 +388,21 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                             ),
                           ),
                           TextField(
+                            keyboardType: TextInputType.number,
                             decoration: InputDecoration(
-                                border: InputBorder.none,
-                                enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0))),
+                                hintText: "Total Land Aread in square meters",
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                )),
                           ),
                         ],
                       ),
                     ),
                   ],
                 ),
+                /**
+                 * Fields to Input the living space of the property
+                 */
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
@@ -399,11 +421,14 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                   children: [
                     Container(
                       padding: const EdgeInsets.only(left: 15),
-                      width: MediaQuery.of(context).size.width * 0.4,
+                      width: MediaQuery.of(context).size.width * 0.49,
                       child: Column(
                         children: [
+                          /**
+                           * Input number of beds in the property
+                           */
                           const Align(
-                            alignment: Alignment.centerLeft,
+                            alignment: Alignment.topLeft,
                             child: Text(
                               "No of Beds",
                               style: TextStyle(
@@ -414,6 +439,9 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                             ),
                           ),
                           DropdownMenu(
+                            inputDecorationTheme: InputDecorationTheme(
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10.0))),
                             dropdownMenuEntries: const [
                               DropdownMenuEntry(value: "1", label: "1"),
                               DropdownMenuEntry(value: "1", label: "2"),
@@ -426,19 +454,26 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                               DropdownMenuEntry(value: "9", label: "9"),
                               DropdownMenuEntry(value: "10", label: "10"),
                             ],
-                            width: MediaQuery.of(context).size.width * 0.4,
+                            width:
+                                MediaQuery.of(context).size.width * 0.49 - 15,
                             hintText: "Select  Beds",
                           ),
                         ],
                       ),
                     ),
+
+                    /**
+                     * 
+                     * Input Number of floors of the property
+                     * 
+                     */
                     Container(
-                      margin: const EdgeInsets.only(right: 15),
-                      width: MediaQuery.of(context).size.width * 0.4,
+                      margin: const EdgeInsets.only(right: 15, left: 10),
+                      width: MediaQuery.of(context).size.width * 0.49 - 15,
                       child: Column(
                         children: [
                           const Align(
-                            alignment: Alignment.centerLeft,
+                            alignment: Alignment.topLeft,
                             child: Text(
                               "No of Floors",
                               style: TextStyle(
@@ -448,21 +483,35 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                               ),
                             ),
                           ),
-                          DropdownMenu(
-                            dropdownMenuEntries: const [
-                              DropdownMenuEntry(value: "1", label: "1"),
-                              DropdownMenuEntry(value: "1", label: "2"),
-                              DropdownMenuEntry(value: "2", label: "3"),
-                              DropdownMenuEntry(value: "3", label: "4"),
-                            ],
-                            width: MediaQuery.of(context).size.width * 0.4,
-                            hintText: "Select  Floors",
+                          Align(
+                            alignment: Alignment.topLeft,
+                            child: DropdownMenu(
+                              inputDecorationTheme: InputDecorationTheme(
+                                  border: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(10.0))),
+                              dropdownMenuEntries: const [
+                                DropdownMenuEntry(value: "1", label: "1"),
+                                DropdownMenuEntry(value: "1", label: "2"),
+                                DropdownMenuEntry(value: "2", label: "3"),
+                                DropdownMenuEntry(value: "3", label: "4"),
+                              ],
+                              width:
+                                  MediaQuery.of(context).size.width * 0.49 - 15,
+                              hintText: "Select  Floors",
+                            ),
                           ),
                         ],
                       ),
                     ),
                   ],
                 ),
+
+                /**
+                 * 
+                 * Field to add pictures of the property
+                 * 
+                 */
                 Align(
                   child: Padding(
                     padding: const EdgeInsets.only(left: 15, top: 10),
@@ -491,6 +540,41 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                         print("Select images");
                       },
                     )),
+
+                /**
+                 * Description of the property entry field
+                 */
+                Align(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 15, top: 10),
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child: const Text(
+                        "Description",
+                        style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0XFF8D8D8D)),
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  margin: const EdgeInsets.all(10),
+                  child: TextField(
+                      maxLines: 10,
+                      minLines: 5,
+                      controller: propertyDescription,
+                      decoration: InputDecoration(
+                          hintText:
+                              "Please provide the complete details of the property.",
+                          helperMaxLines: 150,
+                          enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide:
+                                  const BorderSide(style: BorderStyle.solid)))),
+                ),
                 Container(
                   margin: const EdgeInsets.only(left: 15, top: 10),
                   child: Row(
