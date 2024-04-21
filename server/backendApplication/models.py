@@ -73,22 +73,37 @@ class Issue(models.Model):
 
 
 
-# Property Types
-propertyTypes = (
+# Listing Types
+listingTypes = (
     ("Rent", "Rent"),
     ("Buy", "Buy"),
     ("N/A", "N/A")
 )
 
+# Property Types
+propertyTypes = {
+    ("House", "Hosue"),
+    ("Appartment", "Appartment"),
+    ("Hostel", "Hostel"),
+    ("Room", "Room"),
+    ("N/A", "N/A")
+}
+
 # Data of the property
 class Property(models.Model):
+    seller = models.ForeignKey(ApplicationUser, on_delete=models.CASCADE)
     description = models.TextField()
     propertyType = models.CharField(max_length=20, choices=propertyTypes, default="N/A")
+    listingType = models.CharField(max_length=20, choices=listingTypes, default="N/A")
     location = models.CharField(max_length=255)
-    seller = models.ForeignKey(ApplicationUser, on_delete=models.CASCADE)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    price = models.IntegerField()
+    size = models.IntegerField()
+    beds = models.IntegerField()
+    floors = models.IntegerField()
     views = models.IntegerField()
     likes = models.IntegerField()
-    price = models.IntegerField()
 
     def __str__(self):
         return "ID: " + str(self.id) + ">>\t\tDescription: " + ' '.join(self.description.split()[:5]) + "..." + "\t|\tType: " + self.propertyType + "\t|\tPrice: " + str(self.price)

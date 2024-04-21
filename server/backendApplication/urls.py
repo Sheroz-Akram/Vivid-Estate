@@ -17,6 +17,7 @@ from django.urls import path, include
 from .Views import AccountViews
 from .Views import ChatViews
 from .Views import IssueReport
+from .Views import AdvertisementAPI
 
 urlpatterns = [
 
@@ -46,4 +47,8 @@ urlpatterns = [
 
     # User Issue & Reports
     path("submit_issue", view=IssueReport.submitIssueReport, name="User Issue Submit"),
+
+    # Add Management API Endpoints
+    path("submit_new_ad", view=AdvertisementAPI.StoreNewAd, name="Create a new Advertisement"),
+
 ]

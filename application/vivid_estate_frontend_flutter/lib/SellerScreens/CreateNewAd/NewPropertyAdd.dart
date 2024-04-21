@@ -10,6 +10,8 @@ import 'package:flutter/widgets.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:open_street_map_search_and_pick/open_street_map_search_and_pick.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/Seller.dart';
+import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 
 class NewPropertyAd extends StatefulWidget {
   const NewPropertyAd({super.key});
@@ -29,9 +31,13 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
     "address": "none"
   };
   var propertyDescription = TextEditingController();
+  var propertyPrice = TextEditingController();
+  var propertySize = TextEditingController();
+  var noBeds = "";
+  var noFloors = "";
 
   // store the Images from camera
-  var propertyImages = [];
+  List<dynamic> propertyImages = [];
 
   // Pick the Property Images from the Camera
   // Select a image from the prefered source whether camera or gallery
@@ -77,6 +83,51 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
         });
       }
     }
+  }
+
+  // Submit the Property Data to the Server
+  void submitPropertyDataToServer(BuildContext userContext) async {
+    // Check if the input data is valuid or not
+    if (selectedPropertyType == 'None') {
+      displaySnackBar(userContext, "Please Select the type of the property.");
+    } else if (propertyLocationData['isSet'] == "no") {
+      displaySnackBar(userContext, "Please select location of the property.");
+    } else if (propertyPrice.text.isEmpty) {
+      displaySnackBar(userContext, "Please enter the price of the property.");
+    } else if (propertySize.text.isEmpty) {
+      displaySnackBar(userContext, "Please enter the size of the property.");
+    }
+    if (noBeds == "") {
+      displaySnackBar(
+          userContext, "Please Select the number of bed in the house.");
+    } else if (noFloors == "") {
+      displaySnackBar(
+          userContext, "Please Select the number of floors in the house.");
+    } else if (propertyImages.length < 2) {
+      displaySnackBar(userContext, "Select at least 2 images of the property.");
+    } else if (propertyDescription.text.isEmpty) {
+      displaySnackBar(userContext, "Provide the details the property.");
+    }
+
+    // Combine Our Data into Single Variable
+    var propertyData = {
+      "PropertyType": selectedPropertyType,
+      "ListingType": listingType,
+      "Location": {
+        "Latitude": propertyLocationData['latitude'],
+        "Longitude": propertyLocationData['longitude']
+      },
+      "Price": propertyPrice.text,
+      "Size": propertySize.text,
+      "Beds": noBeds,
+      "Floors": noFloors,
+      "Description": propertyDescription.text
+    };
+
+    // As we checked the data. Now we submit it to the server
+    var seller = Seller();
+    await seller.getAuthData();
+    seller.submitNewPropertyAdd(userContext, propertyImages, propertyData);
   }
 
   @override
@@ -406,6 +457,7 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                           ),
                         ),
                         TextField(
+                          controller: propertyPrice,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                               hintText: "Price in Rupee",
@@ -436,6 +488,7 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                           ),
                         ),
                         TextField(
+                          controller: propertySize,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                               hintText: "Total Land Aread in square meters",
@@ -487,6 +540,9 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                           ),
                         ),
                         DropdownMenu(
+                          onSelected: (value) {
+                            noBeds = value!;
+                          },
                           inputDecorationTheme: InputDecorationTheme(
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10.0))),
@@ -533,6 +589,9 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                         Align(
                           alignment: Alignment.topLeft,
                           child: DropdownMenu(
+                            onSelected: (value) {
+                              noFloors = value!;
+                            },
                             inputDecorationTheme: InputDecorationTheme(
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10.0))),
@@ -791,7 +850,8 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                       shadowColor: Colors.black26,
                     ),
                     onPressed: () {
-                      // To Be Implemented
+                      // Submit the Data to the Server
+                      submitPropertyDataToServer(context);
                     },
                     child: const Text(
                       "Save",
