@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
@@ -6,8 +7,9 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:open_street_map_search_and_pick/open_street_map_search_and_pick.dart';
-import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 
 class NewPropertyAd extends StatefulWidget {
   const NewPropertyAd({super.key});
@@ -27,6 +29,55 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
     "address": "none"
   };
   var propertyDescription = TextEditingController();
+
+  // store the Images from camera
+  var propertyImages = [];
+
+  // Pick the Property Images from the Camera
+  // Select a image from the prefered source whether camera or gallery
+  Future pickImage(
+      ImageSource imageSource, BuildContext myContext, pictureIndex) async {
+    final image = await ImagePicker().pickImage(source: imageSource);
+
+    // If Image not Selected
+    if (image == null) {
+      ScaffoldMessenger.of(myContext).showSnackBar(
+          const SnackBar(content: Text("Please select or take a image!!")));
+    } else {
+      // Save our Image in Temporary Files
+      File? croppedImage = await ImageCropper().cropImage(
+        sourcePath: image.path,
+        compressFormat: ImageCompressFormat.png,
+        compressQuality: 100,
+        androidUiSettings: const AndroidUiSettings(
+            toolbarTitle: 'Crop CNIC',
+            toolbarColor: Colors.blue,
+            toolbarWidgetColor: Colors.white,
+            lockAspectRatio: false),
+        iosUiSettings: const IOSUiSettings(
+          title: 'Crop CNIC',
+        ),
+      );
+
+      Navigator.pop(myContext);
+
+      // Check if User Cropped the Image or Not
+      if (croppedImage == null) {
+        ScaffoldMessenger.of(myContext).showSnackBar(
+            const SnackBar(content: Text("Please select or take a image!!")));
+      }
+      // Display the new Image
+      else {
+        setState(() {
+          if (pictureIndex < propertyImages.length) {
+            propertyImages[pictureIndex] = croppedImage;
+          } else {
+            propertyImages.add(croppedImage);
+          }
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -522,32 +573,108 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                   ),
                 ),
               ),
-              SizedBox(
-                  height: 100,
+              Container(
+                  margin: const EdgeInsets.only(right: 15),
+                  height: 200,
                   child: InkWell(
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemBuilder: (context, index) {
-                        return Container(
-                          height: 100,
-                          margin: const EdgeInsets.only(left: 15),
-                          width: MediaQuery.of(context).size.width * 0.70,
-                          decoration: BoxDecoration(
-                              color: const Color.fromARGB(255, 216, 216, 216),
-                              borderRadius: BorderRadius.circular(10.0)),
-                          child: const Center(
-                              child: Icon(
-                            Icons.camera_alt_rounded,
-                            color: Color(0xFF006E86),
-                            size: 40,
-                          )),
+                        return InkWell(
+                          onTap: () {
+                            // Select Image from the User
+                            showModalBottomSheet(
+                                context: context,
+                                builder: (context) {
+                                  return SizedBox(
+                                      height: 200,
+                                      child: Container(
+                                        margin: const EdgeInsets.only(
+                                            left: 20, right: 20),
+                                        child: Column(children: <Widget>[
+                                          Align(
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 15, top: 20),
+                                              child: SizedBox(
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                child: const Text(
+                                                  "Select Picture",
+                                                  style: TextStyle(
+                                                      fontSize: 24,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Color(0XFF8D8D8D)),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+
+                                          // Take Picture from Camera Button
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              // take picture from camera
+                                              pickImage(ImageSource.camera,
+                                                  context, index);
+                                            },
+                                            child: const Row(
+                                              children: <Widget>[
+                                                Icon(Icons.camera_alt),
+                                                SizedBox(width: 10),
+                                                Text("Take Picture From Camera")
+                                              ],
+                                            ),
+                                          ),
+
+                                          Container(
+                                              margin: const EdgeInsets.only(
+                                                  top: 5, bottom: 5),
+                                              child: const Text(
+                                                  "-------------------- OR --------------------")),
+
+                                          // Take Picture from Galery Button
+                                          ElevatedButton(
+                                              onPressed: () {
+                                                // take picture from gallery
+                                                pickImage(ImageSource.gallery,
+                                                    context, index);
+                                              },
+                                              child: const Row(
+                                                children: <Widget>[
+                                                  Icon(Icons
+                                                      .photo_size_select_actual_rounded),
+                                                  SizedBox(width: 10),
+                                                  Text(
+                                                      "Select Picture From Gallery")
+                                                ],
+                                              ))
+                                        ]),
+                                      ));
+                                });
+                          },
+                          child: Container(
+                            height: 300,
+                            margin: const EdgeInsets.only(left: 15),
+                            width: MediaQuery.of(context).size.width * 0.70,
+                            decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 216, 216, 216),
+                                borderRadius: BorderRadius.circular(10.0)),
+                            child: Center(
+                                child: propertyImages.length >= index + 1
+                                    ? Image.file(propertyImages[index]!,
+                                        width: 300, fit: BoxFit.fill)
+                                    : const Icon(
+                                        Icons.camera_alt_rounded,
+                                        color: Color(0xFF006E86),
+                                        size: 40,
+                                      )),
+                          ),
                         );
                       },
-                      itemCount: 5,
+                      itemCount: propertyImages.length + 1,
                     ),
-                    onTap: () {
-                      print("Select images");
-                    },
                   )),
 
               /**
