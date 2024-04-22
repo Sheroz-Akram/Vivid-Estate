@@ -13,6 +13,7 @@ import random
 import string
 from geopy.geocoders import Nominatim
 import json
+from django.db.models import Q
 
 
 # Create your views here.
@@ -95,3 +96,51 @@ def StoreNewAd(request):
     except Exception as e:
         print(e)
         return httpErrorJsonResponse("Error in the server or an invalid request")
+
+
+# Search the properties based upon the user query
+@csrf_exempt
+def SearchLocationProperty(request):
+
+    # Perform the Search Operation
+    try:
+
+        # Get all the Data
+        Query = request.POST['Query']
+        Page = int(request.POST['Page'])
+
+        # Search
+        results = Property.objects.filter(Q(location__icontains=Query))
+
+        # Now Combine all the Data Into Json Response
+        SearchData = {}
+        SearchData['Count'] = results.count()
+
+        # Display the data in the specific page
+        PageCount = 0
+        SearchData['SearchItems'] = []
+        for x in range((Page - 1) * 5, Page * 5):
+            if x >= results.count():
+                break
+            PageCount += 1
+            searchProperty = results[x]
+            SearchData['SearchItems'].append({
+                "PropertyID": searchProperty.id,
+                "Location": {
+                    "Latitude" : searchProperty.latitude,
+                    "Longitude" : searchProperty.longitude
+                },
+                "Predict" : completeWordSearch(Query, searchProperty.location),
+                "Address": searchProperty.location,
+                "Price": searchProperty.price,
+                "Size" : searchProperty.size,
+                "Views": searchProperty.views,
+                "Likes": searchProperty.likes,
+            })
+
+        # Send JSON data back to the client
+        return httpSuccessJsonResponse(SearchData)
+    
+    # Something wrong just happen the process
+    except Exception as e:
+        return httpErrorJsonResponse("Error in the server or an invalid request" + str(e))

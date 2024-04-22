@@ -58,3 +58,17 @@ def validUserChatAccess(user, chatID):
     
     # User has access to the chat
     return True, chatRoom
+
+# Find the search word and complete the remaining results only
+def completeWordSearch(Search , Text):
+    isFound = False
+    Text = Text.lower()
+    Search = Search.lower()
+    Result = ""
+    for x in Text.split(','):
+        if Search in x:
+            isFound = True
+        if isFound == True:
+            Result += x + ","
+
+    return Result
