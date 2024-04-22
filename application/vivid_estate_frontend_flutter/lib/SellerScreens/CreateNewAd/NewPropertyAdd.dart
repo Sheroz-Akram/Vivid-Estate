@@ -651,15 +651,18 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                                         margin: const EdgeInsets.only(
                                             left: 20, right: 20),
                                         child: Column(children: <Widget>[
-                                          Align(
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 15, top: 20),
-                                              child: SizedBox(
-                                                width: MediaQuery.of(context)
-                                                    .size
-                                                    .width,
-                                                child: const Text(
+                                          /**
+                                           * Modal Header Bar
+                                           */
+                                          Container(
+                                            margin: const EdgeInsets.only(
+                                                top: 10, bottom: 10),
+                                            child: Row(
+                                              children: [
+                                                /**
+                                                 * Modal Title
+                                                 */
+                                                const Text(
                                                   "Select Picture",
                                                   style: TextStyle(
                                                       fontSize: 24,
@@ -667,12 +670,31 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                                                           FontWeight.bold,
                                                       color: Color(0XFF8D8D8D)),
                                                 ),
-                                              ),
+                                                const Spacer(),
+                                                /**
+                                                 * Modal Close Button
+                                                 */
+                                                Container(
+                                                  child: CloseButton(
+                                                    color:
+                                                        const Color(0XFF006E86),
+                                                    onPressed: () {
+                                                      // Move to the previous screen
+                                                      Navigator.pop(context);
+                                                    },
+                                                  ),
+                                                )
+                                              ],
                                             ),
                                           ),
 
                                           // Take Picture from Camera Button
                                           ElevatedButton(
+                                            style: const ButtonStyle(
+                                                backgroundColor:
+                                                    MaterialStatePropertyAll(
+                                                        Color.fromARGB(255, 230,
+                                                            230, 230))),
                                             onPressed: () {
                                               // take picture from camera
                                               pickImage(ImageSource.camera,
@@ -689,12 +711,17 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
 
                                           Container(
                                               margin: const EdgeInsets.only(
-                                                  top: 5, bottom: 5),
+                                                  top: 7, bottom: 7),
                                               child: const Text(
                                                   "-------------------- OR --------------------")),
 
                                           // Take Picture from Galery Button
                                           ElevatedButton(
+                                              style: const ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStatePropertyAll(
+                                                          Color.fromARGB(255,
+                                                              230, 230, 230))),
                                               onPressed: () {
                                                 // take picture from gallery
                                                 pickImage(ImageSource.gallery,
@@ -737,8 +764,8 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                   )),
 
               /**
-                 * Description of the property entry field
-                 */
+              * Description of the property entry field
+              */
               Align(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 15, top: 10),
@@ -792,41 +819,80 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                 width: MediaQuery.of(context).size.width,
                 child: Column(
                   children: [
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width - 30,
-                      child: ElevatedButton(
-                          onPressed: () {
-                            // To Be Implemented
-                          },
-                          child: const Row(
-                            children: <Widget>[
-                              Icon(Icons.map_outlined),
-                              SizedBox(width: 10),
-                              Text(
-                                "Add 2D Layout",
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              Spacer(),
-                              Icon(Icons.arrow_forward_ios_rounded),
+                    /**
+                     * Opens Page to create the 2D Layout of the property
+                     */
+                    InkWell(
+                      onTap: () {
+                        // To Be Implemented
+                        print("Open 2D Layout Creation");
+                      },
+                      child: Container(
+                          padding: const EdgeInsets.only(
+                              top: 10.0, left: 10.0, right: 10.0, bottom: 10.0),
+                          decoration: BoxDecoration(
+                              color: const Color(0xFFECECEC),
+                              borderRadius: BorderRadius.circular(10.0),
+                              boxShadow: getBoxShadow()),
+                          margin: const EdgeInsets.only(
+                              left: 20.0, right: 20.0, top: 15),
+                          width: MediaQuery.of(context).size.width,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: SizedBox(
+                                  width: MediaQuery.of(context).size.width,
+                                  child: const ListTile(
+                                    leading: Icon(
+                                      Icons.map_outlined,
+                                      size: 30,
+                                    ),
+                                    title: Text("Create 2D Layout",
+                                        style: TextStyle(fontSize: 16)),
+                                    trailing: InkWell(
+                                        child: Icon(Icons.arrow_forward_ios)),
+                                  ),
+                                ),
+                              )
                             ],
                           )),
                     ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width - 30,
-                      child: ElevatedButton(
-                          onPressed: () {
-                            // To Be Implemented
-                          },
-                          child: const Row(
-                            children: <Widget>[
-                              Icon(Icons.panorama_horizontal_sharp),
-                              SizedBox(width: 10),
-                              Text(
-                                "Add 360 View",
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              Spacer(),
-                              Icon(Icons.arrow_forward_ios_rounded),
+
+                    /**
+                     * Loads 360 Virtual Visit Creation Page
+                     */
+                    InkWell(
+                      onTap: () {
+                        // To Be Implemented
+                        print("Open 360 Virtual Visit Creation");
+                      },
+                      child: Container(
+                          padding: const EdgeInsets.only(
+                              top: 10.0, left: 10.0, right: 10.0, bottom: 10.0),
+                          decoration: BoxDecoration(
+                              color: const Color(0xFFECECEC),
+                              borderRadius: BorderRadius.circular(10.0),
+                              boxShadow: getBoxShadow()),
+                          margin: const EdgeInsets.only(
+                              left: 20.0, right: 20.0, top: 15),
+                          width: MediaQuery.of(context).size.width,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: SizedBox(
+                                  width: MediaQuery.of(context).size.width,
+                                  child: const ListTile(
+                                    leading: Icon(
+                                      Icons.vrpano_sharp,
+                                      size: 30,
+                                    ),
+                                    title: Text("Create 360 Virtual Visit",
+                                        style: TextStyle(fontSize: 16)),
+                                    trailing: InkWell(
+                                        child: Icon(Icons.arrow_forward_ios)),
+                                  ),
+                                ),
+                              )
                             ],
                           )),
                     ),
