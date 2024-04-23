@@ -1,4 +1,4 @@
-!["Application Logo"](./Images/logo.png)
+!["Application Logo"](./Images/Project-Header.png)
 
 ### Introduction
 Our mobile app named Vivid Estate transforms property and hostel exploration, utilizing 360 virtual visit tours for immersive experiences. Sellers easily create interactive property tours via smartphones, while buyers gain in-depth property understanding. The app's features include 360 Virtual Visits, 2D Layouts, refined search filters, map integration, chat, and confidential bidding systems.
