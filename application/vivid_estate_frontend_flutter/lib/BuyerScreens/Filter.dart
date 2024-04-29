@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+// ignore: must_be_immutable
 class FilterPage extends StatefulWidget {
   FilterPage({super.key, required this.filterData});
   dynamic filterData;

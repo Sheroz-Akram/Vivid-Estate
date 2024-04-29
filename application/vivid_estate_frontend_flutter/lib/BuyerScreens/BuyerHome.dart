@@ -7,17 +7,25 @@ import 'package:vivid_estate_frontend_flutter/BuyerScreens/Filter.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerScreens/Search/PropertySearch.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 
-class BuyerHome extends StatelessWidget {
-  BuyerHome({super.key});
+class BuyerHome extends StatefulWidget {
+  const BuyerHome({super.key});
 
+  @override
+  State<BuyerHome> createState() => _BuyerHome();
+}
+
+// ignore: must_be_immutable
+class _BuyerHome extends State<BuyerHome> {
   // Filter Data of the User
-  Map<String, Object> FilterData = {
+  dynamic FilterData = {
     "PropertyType": 'None',
     "Price": {"Lower": '', "Upper": ''},
     "Size": {"Lower": '', "Upper": ''},
     "NoBeds": '',
     "NoFloors": ''
   };
+
+  var listingType = 'Buy';
 
   // Static Data of Reviews
   final reviews = [
@@ -150,11 +158,17 @@ class BuyerHome extends StatelessWidget {
                                                 filterData: FilterData,
                                               ))).then((value) => {
                                         // Value Returned from the Filter Page
-                                        FilterData = value
+                                        if (value != null)
+                                          {
+                                            setState(() {
+                                              FilterData = value;
+                                            })
+                                          }
                                       });
                                 },
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.only(
+                                      top: 8.0, bottom: 8.0),
                                   child: Container(
                                     decoration: BoxDecoration(
                                       color: Colors.white,
@@ -194,30 +208,45 @@ class BuyerHome extends StatelessWidget {
                                         MainAxisAlignment.spaceAround,
                                     children: [
                                       ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                listingType == 'Rent'
+                                                    ? const Color(0xFF006E86)
+                                                    : Colors.white),
                                         onPressed: () {
-                                          print("Buttun Pressed Rent");
+                                          // Select Rent
+                                          setState(() {
+                                            listingType = "Rent";
+                                          });
                                         },
-                                        child: const Text(
+                                        child: Text(
                                           "Rent",
                                           style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 15),
+                                              color: listingType == 'Rent'
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                              fontWeight: FontWeight.bold),
                                         ),
                                       ),
                                       ElevatedButton(
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              const Color(0xFF006E86),
+                                          backgroundColor: listingType == 'Buy'
+                                              ? const Color(0xFF006E86)
+                                              : Colors.white,
                                         ),
                                         onPressed: () {
-                                          print("Buttun Pressed Buy");
+                                          // Select Rent
+                                          setState(() {
+                                            listingType = "Buy";
+                                          });
                                         },
-                                        child: const Text(
+                                        child: Text(
                                           "Buy",
                                           style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15,
-                                          ),
+                                              color: listingType == 'Buy'
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                              fontWeight: FontWeight.bold),
                                         ),
                                       ),
                                     ],
@@ -226,6 +255,296 @@ class BuyerHome extends StatelessWidget {
                               ),
                             ]),
                       ),
+
+                      /**
+                       * 
+                       * Display all the Filters of the Search
+                       */
+                      Container(
+                        alignment: Alignment.topLeft,
+                        child: Wrap(
+                          children: [
+                            // Display Floors Selection
+                            FilterData['PropertyType'] != "None"
+                                ? Container(
+                                    padding: const EdgeInsets.all(5.0),
+                                    margin: const EdgeInsets.only(
+                                        top: 2, bottom: 2),
+                                    child: Container(
+                                      padding: const EdgeInsets.only(
+                                          left: 10.0,
+                                          right: 10.0,
+                                          top: 5.0,
+                                          bottom: 5.0),
+                                      decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20))),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Text(
+                                            "Property Type:",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text(
+                                            FilterData['PropertyType'] == "None"
+                                                ? "0"
+                                                : FilterData['PropertyType'],
+                                          ),
+                                          const SizedBox(
+                                            width: 3,
+                                          ),
+                                          InkWell(
+                                            onTap: () {
+                                              // Clear the Size Selection Of Filter
+                                              setState(() {
+                                                FilterData['PropertyType'] =
+                                                    "None";
+                                              });
+                                            },
+                                            child: const Icon(Icons.close),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                : const Text(''),
+
+                            // Display Price Filter
+                            FilterData['Price']['Lower'] != '' ||
+                                    FilterData['Price']['Upper'] != ''
+                                ? Container(
+                                    padding: const EdgeInsets.all(5.0),
+                                    margin: const EdgeInsets.only(
+                                        top: 2, bottom: 2),
+                                    child: Container(
+                                      padding: const EdgeInsets.only(
+                                          left: 10.0,
+                                          right: 10.0,
+                                          top: 5.0,
+                                          bottom: 5.0),
+                                      decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20))),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Text(
+                                            "Price:",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text(
+                                            FilterData['Price']['Lower'] == ''
+                                                ? "0"
+                                                : formatNumber(int.parse(
+                                                    FilterData['Price']
+                                                        ['Lower'])),
+                                          ),
+                                          const Text(" to "),
+                                          Text(
+                                            FilterData['Price']['Upper'] == ''
+                                                ? "∞"
+                                                : formatNumber(int.parse(
+                                                    FilterData['Price']
+                                                        ['Upper'])),
+                                          ),
+                                          const SizedBox(width: 3),
+                                          InkWell(
+                                            onTap: () {
+                                              // Clear the price Selection
+                                              setState(() {
+                                                FilterData['Price']['Upper'] =
+                                                    '';
+                                                FilterData['Price']['Lower'] =
+                                                    '';
+                                              });
+                                            },
+                                            child: const Icon(Icons.close),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                : const Text(''),
+
+                            // Display Size Filter
+                            FilterData['Size']['Lower'] != '' ||
+                                    FilterData['Size']['Upper'] != ''
+                                ? Container(
+                                    padding: const EdgeInsets.all(5.0),
+                                    margin: const EdgeInsets.only(
+                                        top: 2, bottom: 2),
+                                    child: Container(
+                                      padding: const EdgeInsets.only(
+                                          left: 10.0,
+                                          right: 10.0,
+                                          top: 5.0,
+                                          bottom: 5.0),
+                                      decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20))),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Text(
+                                            "Size:",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text(
+                                            FilterData['Size']['Lower'] == ''
+                                                ? "0"
+                                                : formatNumber(int.parse(
+                                                    FilterData['Size']
+                                                        ['Lower'])),
+                                          ),
+                                          const Text(" to "),
+                                          Text(
+                                            FilterData['Size']['Upper'] == ''
+                                                ? "∞"
+                                                : formatNumber(int.parse(
+                                                    FilterData['Size']
+                                                        ['Upper'])),
+                                          ),
+                                          const SizedBox(
+                                            width: 3,
+                                          ),
+                                          InkWell(
+                                            onTap: () {
+                                              // Clear the Size Selection Of Filter
+                                              setState(() {
+                                                FilterData['Size']['Upper'] =
+                                                    '';
+                                                FilterData['Size']['Lower'] =
+                                                    '';
+                                              });
+                                            },
+                                            child: const Icon(Icons.close),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                : const Text(''),
+
+                            // Display Beds Selection
+                            FilterData['NoBeds'] != ''
+                                ? Container(
+                                    padding: const EdgeInsets.all(5.0),
+                                    margin: const EdgeInsets.only(
+                                        top: 2, bottom: 2),
+                                    child: Container(
+                                      padding: const EdgeInsets.only(
+                                          left: 10.0,
+                                          right: 10.0,
+                                          top: 5.0,
+                                          bottom: 5.0),
+                                      decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20))),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Text(
+                                            "Beds:",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text(
+                                            FilterData['NoBeds'] == ''
+                                                ? "0"
+                                                : formatNumber(int.parse(
+                                                    FilterData['NoBeds'])),
+                                          ),
+                                          const SizedBox(
+                                            width: 3,
+                                          ),
+                                          InkWell(
+                                            onTap: () {
+                                              // Clear the Size Selection Of Filter
+                                              setState(() {
+                                                FilterData['NoBeds'] = '';
+                                              });
+                                            },
+                                            child: const Icon(Icons.close),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                : const Text(''),
+
+                            // Display Floors Selection
+                            FilterData['NoFloors'] != ''
+                                ? Container(
+                                    padding: const EdgeInsets.all(5.0),
+                                    margin: const EdgeInsets.only(
+                                        top: 2, bottom: 2),
+                                    child: Container(
+                                      padding: const EdgeInsets.only(
+                                          left: 10.0,
+                                          right: 10.0,
+                                          top: 5.0,
+                                          bottom: 5.0),
+                                      decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20))),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Text(
+                                            "Floors:",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text(
+                                            FilterData['NoFloors'] == ''
+                                                ? "0"
+                                                : formatNumber(int.parse(
+                                                    FilterData['NoFloors'])),
+                                          ),
+                                          const SizedBox(
+                                            width: 3,
+                                          ),
+                                          InkWell(
+                                            onTap: () {
+                                              // Clear the Size Selection Of Filter
+                                              setState(() {
+                                                FilterData['NoFloors'] = '';
+                                              });
+                                            },
+                                            child: const Icon(Icons.close),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                : const Text(''),
+                          ],
+                        ),
+                      )
                     ]),
                   ),
 
