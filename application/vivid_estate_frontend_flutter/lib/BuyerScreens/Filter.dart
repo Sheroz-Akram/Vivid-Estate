@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 class FilterPage extends StatefulWidget {
-  const FilterPage({super.key});
-
+  FilterPage({super.key, required this.filterData});
+  dynamic filterData;
   @override
   State<FilterPage> createState() => _FilterPage();
 }
@@ -13,13 +13,57 @@ class FilterPage extends StatefulWidget {
 class _FilterPage extends State<FilterPage> {
   // Filter Information
   var selectedPropertyType = 'None';
-  RangeValues priceRange = const RangeValues(0, 10000000);
-  String selectedLocation = 'Lahore, Punjab';
-  RangeValues sizeRange = const RangeValues(0, 1000);
-  int noOfBeds = 5;
-  int noOfFloors = 2;
-  var newValue;
-  late String _selectedLocation = '1';
+  var priceLower = TextEditingController();
+  var priceUpper = TextEditingController();
+  var sizeUpper = TextEditingController();
+  var sizeLower = TextEditingController();
+  var noFloorsDropDown = TextEditingController();
+  var noBedsDropDown = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Set the already set filters in the Filters Page
+    setState(() {
+      selectedPropertyType = widget.filterData['PropertyType'];
+    });
+    priceLower.text = widget.filterData['Price']['Lower'];
+    priceUpper.text = widget.filterData['Price']['Upper'];
+    sizeUpper.text = widget.filterData['Size']['Upper'];
+    sizeLower.text = widget.filterData['Size']['Lower'];
+    noFloorsDropDown.text = widget.filterData['NoBeds'];
+    noBedsDropDown.text = widget.filterData['NoFloors'];
+  }
+
+  // Clear All the Settings of the filter
+  void clearFilterSettings() {
+    // Reset all the data
+    noBedsDropDown.text = '';
+    noFloorsDropDown.text = '';
+    priceLower.text = '';
+    priceUpper.text = '';
+    sizeLower.text = '';
+    sizeUpper.text = '';
+    setState(() {
+      selectedPropertyType = 'None';
+    });
+  }
+
+  // Apply the Filters and Send Data to the main Screen
+  void applyFilters(BuildContext userContext) {
+    // Data Need to be Send to Previous Screen
+    var FilterData = {
+      "PropertyType": selectedPropertyType,
+      "Price": {"Lower": priceLower.text, "Upper": priceUpper.text},
+      "Size": {"Lower": sizeLower.text, "Upper": sizeUpper.text},
+      "NoBeds": noBedsDropDown.text,
+      "NoFloors": noFloorsDropDown.text
+    };
+
+    // Move to Previous Screen
+    Navigator.of(userContext).pop(FilterData);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +90,8 @@ class _FilterPage extends State<FilterPage> {
                   ),
                   InkWell(
                       onTap: () {
-                        print(" Clear action ");
+                        // Reset the filter
+                        clearFilterSettings();
                       },
                       child: const Text(
                         "Clear all",
@@ -108,6 +153,10 @@ class _FilterPage extends State<FilterPage> {
                 thickness: 1,
                 height: 40,
               ),
+
+              /**
+               * Select Price of the Property in Range
+               */
               const Text(
                 'Price Range',
                 style: TextStyle(
@@ -139,6 +188,7 @@ class _FilterPage extends State<FilterPage> {
                                         ],
                                       ),
                                       TextField(
+                                          controller: priceLower,
                                           keyboardType: TextInputType.number,
                                           decoration: InputDecoration(
                                               hintText: "Lowest",
@@ -164,6 +214,7 @@ class _FilterPage extends State<FilterPage> {
                                       ],
                                     ),
                                     TextField(
+                                        controller: priceUpper,
                                         keyboardType: TextInputType.number,
                                         decoration: InputDecoration(
                                             hintText: "Highest",
@@ -185,27 +236,10 @@ class _FilterPage extends State<FilterPage> {
                 thickness: 1,
                 height: 40,
               ),
-              const Text(
-                'Select Location',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontFamily: "font1",
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const Text(
-                "Lahore,Punjab",
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey),
-              ),
-              const Divider(
-                color: Colors.black,
-                thickness: 1,
-                height: 40,
-              ),
+
+              /**
+               * Select the Size of the Property in Range
+               */
               const Text(
                 'Property Size (in meters)',
                 style: TextStyle(
@@ -240,6 +274,7 @@ class _FilterPage extends State<FilterPage> {
                                         ],
                                       ),
                                       TextField(
+                                          controller: sizeLower,
                                           keyboardType: TextInputType.number,
                                           decoration: InputDecoration(
                                               hintText: "Lowest",
@@ -270,6 +305,7 @@ class _FilterPage extends State<FilterPage> {
                                       ],
                                     ),
                                     TextField(
+                                        controller: sizeUpper,
                                         keyboardType: TextInputType.number,
                                         decoration: InputDecoration(
                                             hintText: "Highest",
@@ -300,123 +336,103 @@ class _FilterPage extends State<FilterPage> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Column(
-                    children: [
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(
-                              width: MediaQuery.sizeOf(context).width * 0.40,
-                              height: 100,
-                              child: Column(
-                                children: [
-                                  const Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text("No of Beds:"),
-                                    ],
-                                  ),
-                                  Container(
-                                    width:
-                                        MediaQuery.sizeOf(context).width * 0.40,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                          color: Colors
-                                              .grey), // Adjust color as needed
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(
-                                              10)), // Modify radius for desired curvature
-                                    ),
-                                    child: Center(
-                                      child: DropdownButton<String>(
-                                        icon: const Icon(Icons.bed_outlined),
-                                        underline: const SizedBox.shrink(),
-                                        items: <String>['1', '2', '3', '4']
-                                            .map((String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(value),
-                                          );
-                                        }).toList(),
-
-                                        // Not necessary for Option 1
-                                        value: _selectedLocation,
-                                        onChanged: (newValue) {
-                                          setState(() {
-                                            _selectedLocation = newValue!;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ],
+              Column(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(top: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.40,
+                          child: Column(
+                            children: [
+                              /**
+                         * Input number of beds in the property
+                         */
+                              const Align(
+                                alignment: Alignment.topLeft,
+                                child: Text(
+                                  "No of Beds",
+                                ),
                               ),
-                            ),
-                            SizedBox(
-                              width: (MediaQuery.sizeOf(context).width * 0.20) -
-                                  40,
-                            ),
-                            SizedBox(
-                              width: MediaQuery.sizeOf(context).width * 0.40,
-                              height: 100,
-                              child: Column(children: [
-                                const Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Text("No of Floors:"),
-                                  ],
-                                ),
-                                Container(
-                                  width:
-                                      MediaQuery.sizeOf(context).width * 0.40,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: Colors
-                                            .grey), // Adjust color as needed
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(
-                                            10)), // Modify radius for desired curvature
-                                  ),
-                                  child: Center(
-                                    child: DropdownButton<String>(
-                                      underline: const SizedBox.shrink(),
-                                      icon: const Icon(Icons.stairs_outlined),
-                                      items: <String>['1', '2', '3']
-                                          .map((String value) {
-                                        return DropdownMenuItem<String>(
-                                          value: value,
-                                          child: Text(value),
-                                        );
-                                      }).toList(),
+                              DropdownMenu(
+                                controller: noBedsDropDown,
+                                inputDecorationTheme: InputDecorationTheme(
+                                    border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10.0))),
+                                dropdownMenuEntries: const [
+                                  DropdownMenuEntry(value: "1", label: "1"),
+                                  DropdownMenuEntry(value: "1", label: "2"),
+                                  DropdownMenuEntry(value: "2", label: "3"),
+                                  DropdownMenuEntry(value: "3", label: "4"),
+                                  DropdownMenuEntry(value: "5", label: "5"),
+                                  DropdownMenuEntry(value: "6", label: "6"),
+                                  DropdownMenuEntry(value: "7", label: "7"),
+                                  DropdownMenuEntry(value: "8", label: "8"),
+                                  DropdownMenuEntry(value: "9", label: "9"),
+                                  DropdownMenuEntry(value: "10", label: "10"),
+                                ],
+                                width: MediaQuery.of(context).size.width * 0.40,
+                                hintText: "Select  Beds",
+                              ),
+                            ],
+                          ),
+                        ),
 
-                                      // Not necessary for Option 1
-                                      value: _selectedLocation,
-                                      onChanged: (newValue) {
-                                        setState(() {
-                                          _selectedLocation = newValue!;
-                                        });
-                                      },
-                                    ),
-                                  ),
+                        /**
+                                     * 
+                                     * Input Number of floors of the property
+                                     * 
+                                     */
+                        Container(
+                          margin: const EdgeInsets.only(right: 15),
+                          width: MediaQuery.of(context).size.width * 0.40,
+                          child: Column(
+                            children: [
+                              const Align(
+                                alignment: Alignment.topLeft,
+                                child: Text(
+                                  "No of Floors",
                                 ),
-                              ]),
-                            ),
-                          ]),
-                    ],
+                              ),
+                              Align(
+                                alignment: Alignment.topLeft,
+                                child: DropdownMenu(
+                                  controller: noFloorsDropDown,
+                                  inputDecorationTheme: InputDecorationTheme(
+                                      border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0))),
+                                  dropdownMenuEntries: const [
+                                    DropdownMenuEntry(value: "1", label: "1"),
+                                    DropdownMenuEntry(value: "1", label: "2"),
+                                    DropdownMenuEntry(value: "2", label: "3"),
+                                    DropdownMenuEntry(value: "3", label: "4"),
+                                  ],
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.40,
+                                  hintText: "Select  Floors",
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                ],
               ),
               Center(
-                child: SizedBox(
+                child: Container(
+                  margin: const EdgeInsets.only(top: 20),
                   height: 50,
                   width: 200,
                   child: OutlinedButton(
                     onPressed: () {
                       // Apply filters
+                      applyFilters(context);
                     },
                     style: ButtonStyle(
                       shadowColor: MaterialStateColor.resolveWith(

@@ -114,29 +114,21 @@ def SearchLocationProperty(request):
 
         # Now Combine all the Data Into Json Response
         SearchData = {}
-        SearchData['Count'] = results.count()
 
         # Display the data in the specific page
-        PageCount = 0
         SearchData['SearchItems'] = []
-        for x in range((Page - 1) * 5, Page * 5):
-            if x >= results.count():
-                break
-            PageCount += 1
+        unique_predictions = set()  # Set to store unique predictions
+
+        for x in range((Page - 1) * 5, min(Page * 5, results.count())):
             searchProperty = results[x]
-            SearchData['SearchItems'].append({
-                "PropertyID": searchProperty.id,
-                "Location": {
-                    "Latitude" : searchProperty.latitude,
-                    "Longitude" : searchProperty.longitude
-                },
-                "Predict" : completeWordSearch(Query, searchProperty.location),
-                "Address": searchProperty.location,
-                "Price": searchProperty.price,
-                "Size" : searchProperty.size,
-                "Views": searchProperty.views,
-                "Likes": searchProperty.likes,
-            })
+            prediction = completeWordSearch(Query, searchProperty.location)
+            if prediction not in unique_predictions:  # Check if prediction is not already added
+                SearchData['SearchItems'].append(prediction)
+                unique_predictions.add(prediction)
+
+        # Store the count of search items
+        SearchData['SearchCount'] = SearchData['SearchItems'].__len__()
+        SearchData['TotalCount'] = results.count()
 
         # Send JSON data back to the client
         return httpSuccessJsonResponse(SearchData)

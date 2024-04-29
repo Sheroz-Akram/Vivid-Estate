@@ -10,6 +10,15 @@ import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 class BuyerHome extends StatelessWidget {
   BuyerHome({super.key});
 
+  // Filter Data of the User
+  Map<String, Object> FilterData = {
+    "PropertyType": 'None',
+    "Price": {"Lower": '', "Upper": ''},
+    "Size": {"Lower": '', "Upper": ''},
+    "NoBeds": '',
+    "NoFloors": ''
+  };
+
   // Static Data of Reviews
   final reviews = [
     {
@@ -94,9 +103,9 @@ class BuyerHome extends StatelessWidget {
                             fit: BoxFit.fill)),
                     child: Column(children: [
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(5.0),
                         child: Container(
-                          margin: const EdgeInsets.only(top: 20),
+                          margin: const EdgeInsets.only(top: 10),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(10.0),
@@ -137,8 +146,12 @@ class BuyerHome extends StatelessWidget {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              const FilterPage()));
+                                          builder: (context) => FilterPage(
+                                                filterData: FilterData,
+                                              ))).then((value) => {
+                                        // Value Returned from the Filter Page
+                                        FilterData = value
+                                      });
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
