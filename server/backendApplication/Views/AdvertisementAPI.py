@@ -47,7 +47,6 @@ def StoreNewAd(request):
         # Locate the location of the property
         geolocator = Nominatim(user_agent="VividEstate")
         location = geolocator.reverse((LocationLatitude, LocationLongitude),language="en")
-        address = location.raw['address']
 
         # Create a new Property Add
         propertyNew = Property(
@@ -55,7 +54,7 @@ def StoreNewAd(request):
             description = Description,
             propertyType = PropertyType,
             listingType = ListingType,
-            location = ', '.join(address.values()),
+            location = location,
             latitude = LocationLatitude,
             longitude = LocationLongitude,
             price = Price,
@@ -107,7 +106,8 @@ def SearchLocationProperty(request):
 
         # Get all the Data
         Query = request.POST['Query']
-        Page = int(request.POST['Page'])
+
+        print(request.POST['Filter'])
 
         # Search
         results = Property.objects.filter(Q(location__icontains=Query))
@@ -119,9 +119,8 @@ def SearchLocationProperty(request):
         SearchData['SearchItems'] = []
         unique_predictions = set()  # Set to store unique predictions
 
-        for x in range((Page - 1) * 5, min(Page * 5, results.count())):
-            searchProperty = results[x]
-            prediction = completeWordSearch(Query, searchProperty.location)
+        for searchProperty in results:
+            prediction = completeWordSearch(Query, searchProperty.location).title()
             if prediction not in unique_predictions:  # Check if prediction is not already added
                 SearchData['SearchItems'].append(prediction)
                 unique_predictions.add(prediction)

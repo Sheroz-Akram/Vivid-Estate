@@ -18,6 +18,7 @@ class BuyerHome extends StatefulWidget {
 class _BuyerHome extends State<BuyerHome> {
   // Filter Data of the User
   dynamic FilterData = {
+    "ListingType": "Buy",
     "PropertyType": 'None',
     "Price": {"Lower": '', "Upper": ''},
     "Size": {"Lower": '', "Upper": ''},
@@ -121,11 +122,13 @@ class _BuyerHome extends State<BuyerHome> {
                           child: TextField(
                             readOnly: true,
                             onTap: () {
+                              // Open the Search Screen
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) =>
-                                          const PropertySearch()));
+                                      builder: (context) => PropertySearch(
+                                            filterData: FilterData,
+                                          )));
                             },
                             decoration: InputDecoration(
                               hintText: 'Search property with location',
@@ -217,6 +220,7 @@ class _BuyerHome extends State<BuyerHome> {
                                           // Select Rent
                                           setState(() {
                                             listingType = "Rent";
+                                            FilterData['ListingType'] = "Rent";
                                           });
                                         },
                                         child: Text(
@@ -238,6 +242,7 @@ class _BuyerHome extends State<BuyerHome> {
                                           // Select Rent
                                           setState(() {
                                             listingType = "Buy";
+                                            FilterData['ListingType'] = "Buy";
                                           });
                                         },
                                         child: Text(

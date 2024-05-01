@@ -1,14 +1,61 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 
+// ignore: must_be_immutable
 class PropertySearch extends StatefulWidget {
-  const PropertySearch({super.key});
+  PropertySearch({super.key, required this.filterData});
+
+  dynamic filterData;
 
   @override
   State<PropertySearch> createState() => _PropertySearch();
 }
 
 class _PropertySearch extends State<PropertySearch> {
+  // Our Server Object used to perform search results
+  ServerInfo server = ServerInfo();
+
+  // Our Text controller
+  var searchQueryController = TextEditingController();
+  var searchResults = [];
+
+  // Perform the Search Operation based upon the user query
+  void searchQuery(BuildContext userContext) {
+    // Check if user has enter any data or not
+    if (searchQueryController.text.length < 3) {
+      setState(() {
+        searchResults = [];
+      });
+      return;
+    }
+
+    // Data to Send to the Server
+    var searchQueryData = {
+      "Query": searchQueryController.text,
+      "Filter": jsonEncode(widget.filterData)
+    };
+
+    // Send Our POST Requst to the Server
+    server.sendPostRequest(userContext, "search_property", searchQueryData,
+        (result) {
+      if (result['status'] == "success") {
+        setState(() {
+          searchResults = [];
+        });
+        for (var element in result['message']['SearchItems']) {
+          setState(() {
+            searchResults.add(element as String);
+          });
+        }
+      }
+      ScaffoldMessenger.of(userContext)
+          .showSnackBar(SnackBar(content: Text(result['message'])));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -40,6 +87,11 @@ class _PropertySearch extends State<PropertySearch> {
                   borderRadius: BorderRadius.circular(10.0),
                 ),
                 child: TextField(
+                  controller: searchQueryController,
+                  onChanged: (value) {
+                    // Update the Search Result When the Value Got Changed
+                    searchQuery(context);
+                  },
                   decoration: InputDecoration(
                     hintText: 'Search property with location',
                     disabledBorder:
@@ -49,6 +101,7 @@ class _PropertySearch extends State<PropertySearch> {
                       children: [
                         InkWell(
                             onTap: () {
+                              // Button pressed on tap to search directly
                               print(" Tap on Search");
                             },
                             child: Image.asset(
@@ -61,9 +114,38 @@ class _PropertySearch extends State<PropertySearch> {
                 ),
               ),
             ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.5,
-              child: ListView(),
+            Container(
+              margin: const EdgeInsets.only(left: 15, right: 15),
+              height: MediaQuery.of(context).size.height - 212,
+              child: ListView.builder(
+                itemBuilder: (context, index) {
+                  return Column(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          // Search Option is Pressed
+                          print("Pressed at $index");
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.only(
+                              top: 5, bottom: 5, left: 5, right: 5),
+                          width: MediaQuery.of(context).size.width - 30,
+                          decoration: const BoxDecoration(
+                              color: Color.fromARGB(255, 238, 238, 238)),
+                          child: Text(
+                            searchResults[index],
+                            style: const TextStyle(
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const Divider()
+                    ],
+                  );
+                },
+                itemCount: searchResults.length,
+              ),
             ),
           ],
         ),
