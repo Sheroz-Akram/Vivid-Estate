@@ -98,6 +98,7 @@ class Property(models.Model):
     location = models.CharField(max_length=255)
     latitude = models.FloatField()
     longitude = models.FloatField()
+    abstractLocation = models.CharField(max_length=255)
     price = models.IntegerField()
     size = models.IntegerField()
     beds = models.IntegerField()

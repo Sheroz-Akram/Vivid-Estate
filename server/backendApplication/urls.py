@@ -51,6 +51,8 @@ urlpatterns = [
     # Add Management API Endpoints
     path("submit_new_ad", view=AdvertisementAPI.StoreNewAd, name="Create a new Advertisement"),
     path("search_property", view=AdvertisementAPI.SearchLocationProperty, name="Search Properties with Location and Filters"),
+    path("search_property_all", view=AdvertisementAPI.DetailSearchQuery, name="Detail Search Results of the Properties"),
+    
     
 
 ]

@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
+import 'package:vivid_estate_frontend_flutter/BuyerScreens/Search/SearchResult.dart';
+import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 
 // ignore: must_be_immutable
 class PropertySearch extends StatefulWidget {
@@ -62,61 +64,83 @@ class _PropertySearch extends State<PropertySearch> {
       child: Scaffold(
         body: Column(
           children: [
-            Row(
-              children: [
-                IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: const Icon(Icons.arrow_back_ios_new,
-                        color: Color(0XFF006E86))),
-                const Text(
-                  "Property Search",
-                  style: TextStyle(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 22,
-                      color: Color(0XFF006E86)),
-                )
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                child: TextField(
-                  controller: searchQueryController,
-                  onChanged: (value) {
-                    // Update the Search Result When the Value Got Changed
-                    searchQuery(context);
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'Search property with location',
-                    disabledBorder:
-                        const OutlineInputBorder(borderSide: BorderSide.none),
-                    suffixIcon: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        InkWell(
-                            onTap: () {
-                              // Button pressed on tap to search directly
-                              print(" Tap on Search");
-                            },
-                            child: Image.asset(
-                              "assets/UI/searchButton.png",
-                              height: 40,
-                            )),
-                      ],
+            SizedBox(
+              height: 130,
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: const Icon(Icons.arrow_back_ios_new,
+                              color: Color(0XFF006E86))),
+                      const Text(
+                        "Property Search",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 22,
+                            color: Color(0XFF006E86)),
+                      )
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: TextField(
+                        controller: searchQueryController,
+                        onChanged: (value) {
+                          // Update the Search Result When the Value Got Changed
+                          searchQuery(context);
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Search property with location',
+                          disabledBorder: const OutlineInputBorder(
+                              borderSide: BorderSide.none),
+                          suffixIcon: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              InkWell(
+                                  onTap: () {
+                                    // Button pressed on tap to search directly
+                                    if (searchQueryController.text.length >=
+                                        3) {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  SearchResult(
+                                                      filterData:
+                                                          widget.filterData,
+                                                      searchQuery:
+                                                          searchQueryController
+                                                              .text)));
+                                    } else {
+                                      displaySnackBar(context,
+                                          "Please enter a location to search for properties.");
+                                    }
+                                  },
+                                  child: Image.asset(
+                                    "assets/UI/searchButton.png",
+                                    height: 40,
+                                  )),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
             Container(
               margin: const EdgeInsets.only(left: 15, right: 15),
-              height: MediaQuery.of(context).size.height - 212,
+              height: MediaQuery.of(context).size.height - 280,
               child: ListView.builder(
                 itemBuilder: (context, index) {
                   return Column(

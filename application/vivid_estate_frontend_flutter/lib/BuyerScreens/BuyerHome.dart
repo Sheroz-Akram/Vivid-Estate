@@ -26,8 +26,6 @@ class _BuyerHome extends State<BuyerHome> {
     "NoFloors": ''
   };
 
-  var listingType = 'Buy';
-
   // Static Data of Reviews
   final reviews = [
     {
@@ -213,44 +211,48 @@ class _BuyerHome extends State<BuyerHome> {
                                       ElevatedButton(
                                         style: ElevatedButton.styleFrom(
                                             backgroundColor:
-                                                listingType == 'Rent'
+                                                FilterData['ListingType'] ==
+                                                        'Rent'
                                                     ? const Color(0xFF006E86)
                                                     : Colors.white),
                                         onPressed: () {
                                           // Select Rent
                                           setState(() {
-                                            listingType = "Rent";
                                             FilterData['ListingType'] = "Rent";
                                           });
                                         },
                                         child: Text(
                                           "Rent",
                                           style: TextStyle(
-                                              color: listingType == 'Rent'
-                                                  ? Colors.white
-                                                  : Colors.black,
+                                              color:
+                                                  FilterData['ListingType'] ==
+                                                          'Rent'
+                                                      ? Colors.white
+                                                      : Colors.black,
                                               fontWeight: FontWeight.bold),
                                         ),
                                       ),
                                       ElevatedButton(
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: listingType == 'Buy'
-                                              ? const Color(0xFF006E86)
-                                              : Colors.white,
+                                          backgroundColor:
+                                              FilterData['ListingType'] == 'Buy'
+                                                  ? const Color(0xFF006E86)
+                                                  : Colors.white,
                                         ),
                                         onPressed: () {
-                                          // Select Rent
+                                          // Select Buy
                                           setState(() {
-                                            listingType = "Buy";
                                             FilterData['ListingType'] = "Buy";
                                           });
                                         },
                                         child: Text(
                                           "Buy",
                                           style: TextStyle(
-                                              color: listingType == 'Buy'
-                                                  ? Colors.white
-                                                  : Colors.black,
+                                              color:
+                                                  FilterData['ListingType'] ==
+                                                          'Buy'
+                                                      ? Colors.white
+                                                      : Colors.black,
                                               fontWeight: FontWeight.bold),
                                         ),
                                       ),

@@ -37,6 +37,8 @@ class _ProfileHome extends State<ProfileHome> {
     await user.getAuthData();
     await user.getUserProfileData(context);
 
+    print(user.profilePictureLocation);
+
     // Set Data to the View
     setState(() {
       profilePicture = user.profilePictureLocation;

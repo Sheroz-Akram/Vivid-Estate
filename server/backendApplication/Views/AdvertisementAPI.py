@@ -47,6 +47,8 @@ def StoreNewAd(request):
         # Locate the location of the property
         geolocator = Nominatim(user_agent="VividEstate")
         location = geolocator.reverse((LocationLatitude, LocationLongitude),language="en")
+        address = location.raw['address']
+        littleLocation = address['suburb'] + ", " + address['district'] + ", " + address['state']
 
         # Create a new Property Add
         propertyNew = Property(
@@ -57,6 +59,7 @@ def StoreNewAd(request):
             location = location,
             latitude = LocationLatitude,
             longitude = LocationLongitude,
+            abstractLocation = littleLocation,
             price = Price,
             size = Size,
             beds = Beds,
@@ -74,12 +77,12 @@ def StoreNewAd(request):
             imageFile = request.FILES['PropertyImage' + str(x)]
 
             # Create or get an instance of FileSystemStorage to handle saving
-            fs = FileSystemStorage(location=settings.PROPERTY_PIC_ROOT)
+            fs = FileSystemStorage(location=settings.PROFILE_PIC_ROOT)
             
             # Save the file directly
             fileNewName = str(uuid.uuid4()) + imageFile.name
             filename = fs.save(fileNewName, imageFile)
-            file_path = os.path.join(settings.PROPERTY_PIC_ROOT, filename)
+            file_path = os.path.join(settings.PROFILE_PIC_ROOT, filename)
 
             # Store the Property Image Location in the Server
             propertyImagesLocation = PropertyImage(
@@ -115,9 +118,14 @@ def SearchLocationProperty(request):
         # Now Combine all the Data Into Json Response
         SearchData = {}
 
+        # Locate the location of the property
+        geolocator = Nominatim(user_agent="VividEstate")
+
         # Display the data in the specific page
         SearchData['SearchItems'] = []
         unique_predictions = set()  # Set to store unique predictions
+
+        
 
         for searchProperty in results:
             prediction = completeWordSearch(Query, searchProperty.location).title()
@@ -128,6 +136,53 @@ def SearchLocationProperty(request):
         # Store the count of search items
         SearchData['SearchCount'] = SearchData['SearchItems'].__len__()
         SearchData['TotalCount'] = results.count()
+
+        # Send JSON data back to the client
+        return httpSuccessJsonResponse(SearchData)
+    
+    # Something wrong just happen the process
+    except Exception as e:
+        return httpErrorJsonResponse("Error in the server or an invalid request" + str(e))
+
+
+# Search the properties based upon the user query
+@csrf_exempt
+def DetailSearchQuery(request):
+
+    # Perform the Search Operation
+    try:
+
+        # Get all the Data
+        Query = request.POST['Query']
+        Filter = request.POST['Filter']
+
+        # Search
+        results = Property.objects.filter(Q(location__icontains=Query))
+
+        # Now Combine all the Data Into Json Response
+        SearchData = {}
+
+        # Display the data in the specific page
+        SearchData['SearchItems'] = []
+
+        # Loop Through all the Properties find in the search
+        for searchProperty in results:
+
+            # Get the First Picture of the Property
+            picture = PropertyImage.objects.filter(propertyID=searchProperty).first()
+            
+            # Add Property Details to our result
+            SearchData['SearchItems'].append({
+                "ID": searchProperty.id,
+                "Price": searchProperty.price,
+                "Location": searchProperty.abstractLocation,
+                "Picture": picture.imageLocation,
+                "Type": searchProperty.propertyType
+            })
+            
+
+        # Store the count of search items
+        SearchData['SearchCount'] = SearchData['SearchItems'].__len__()
 
         # Send JSON data back to the client
         return httpSuccessJsonResponse(SearchData)
