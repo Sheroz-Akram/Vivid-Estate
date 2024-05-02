@@ -92,12 +92,12 @@ def StoreNewAd(request):
 
             propertyImagesLocation.save()
 
-        return httpSuccessJsonResponse("New Ad is created successfully!")
+        return httpSuccessJsonResponse("Success: New Add Created")
 
     # Something wrong just happen the process
     except Exception as e:
         print(e)
-        return httpErrorJsonResponse("Error in the server or an invalid request")
+        return httpErrorJsonResponse("Error: Invalid Request")
 
 
 # Search the properties based upon the user query
@@ -141,7 +141,7 @@ def SearchLocationProperty(request):
     
     # Something wrong just happen the process
     except Exception as e:
-        return httpErrorJsonResponse("Error in the server or an invalid request" + str(e))
+        return httpErrorJsonResponse("Error: Invalid Request")
 
 
 # Search the properties based upon the user query
@@ -188,7 +188,7 @@ def DetailSearchQuery(request):
     
     # Something wrong just happen the process
     except Exception as e:
-        return httpErrorJsonResponse("Error in the server or an invalid request" + str(e))
+        return httpErrorJsonResponse("Error: Invalid Request")
 
     
 # Get the complete detail of the property
@@ -205,7 +205,7 @@ def GetPropertyDetail(request):
             # Search The Property using its ID
             result = Property.objects.get(pk=PropertyID)
         except Exception as e:
-            return httpErrorJsonResponse("Error: Property not found." + str(e))
+            return httpErrorJsonResponse("Error: Invalid Request")
 
         # Now Send the Details of the Property Back to Client
         message = {
@@ -221,12 +221,23 @@ def GetPropertyDetail(request):
         for picture in pictures:
             message['Images'].append(picture.imageLocation)
 
+        # Get the Seller of the Property
+        seller = result.seller
+
         # Now Add Other Data to our Response
         message['PropertyType'] = result.propertyType
+        message['Description'] = result.description
         message['ListingType'] = result.listingType
-
-        print(message)
-        
+        message['Location'] = result.abstractLocation
+        message['Price'] = result.price
+        message['Size'] = result.size
+        message['Beds'] = result.beds
+        message['Floors'] = result.floors
+        message['Views'] = result.views
+        message['Likes'] = result.likes
+        message['SellerPicture'] = seller.profile_pic
+        message['SellerName'] = seller.full_name
+        message['SellerEmail'] = seller.email_address
 
         # Send JSON data back to the client
         return httpSuccessJsonResponse(message)

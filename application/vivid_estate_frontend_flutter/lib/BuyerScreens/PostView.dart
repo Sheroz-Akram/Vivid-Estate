@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Buyer.dart';
+import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 
 // ignore: must_be_immutable
 class PostView extends StatefulWidget {
@@ -20,10 +21,6 @@ class PostView extends StatefulWidget {
 /// Display The Preview of the Property
 class _PostView extends State<PostView> {
   var Rs = ["7800000"];
-  var bid = ["Place Bid"];
-  var address = ["Wapda Town Lahore"];
-  var Likes = ["12K"];
-  var View = ["12K"];
 
   // The Index of the Image Display In Top Carousal
   var imageCarousalController = CarouselController();
@@ -37,6 +34,19 @@ class _PostView extends State<PostView> {
   dynamic PropertyData = {
     "Images": [],
     "ImagesCount": 0,
+    "PropertyType": "",
+    "ListingType": "",
+    "Description": "",
+    "Location": "",
+    "Price": 0,
+    "Size": 0,
+    "Beds": 0,
+    "Floors": 0,
+    "Views": 0,
+    "Likes": 0,
+    "SellerPicture": "Default.jpg",
+    "SellerName": "",
+    "SellerEmail": ""
   };
 
   @override
@@ -47,6 +57,7 @@ class _PostView extends State<PostView> {
     loadPageData(context);
   }
 
+  // Load the Details of the Property
   void loadPageData(BuildContext userContext) async {
     // Now Get the Property Data
     var responseData =
@@ -55,28 +66,6 @@ class _PostView extends State<PostView> {
     // Update the State of our Property Data
     setState(() {
       PropertyData = responseData;
-    });
-  }
-
-  void getPropertyDetail(BuildContext userContext) {
-    // Our Request Body
-    var requestBody = {"PropertyID": widget.PropertyID};
-
-    print("PropertyID:" + widget.PropertyID);
-
-    // Send a Request to the Server
-    server.sendPostRequest(userContext, "property_detail", requestBody,
-        (result) {
-      if (result['status'] == "success") {
-        // Now we store the property data and display IT
-        setState(() {
-          images = result['message']['Images'];
-          totalImages = images.length;
-        });
-        print(images);
-      }
-      ScaffoldMessenger.of(userContext)
-          .showSnackBar(SnackBar(content: Text(result['message'])));
     });
   }
 
@@ -280,6 +269,12 @@ class _PostView extends State<PostView> {
                     )
                   ],
                 ),
+
+                /**
+                 * 
+                 * Display Price and Place Bid Option
+                 * 
+                 */
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Row(
@@ -291,26 +286,30 @@ class _PostView extends State<PostView> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
+                              // Price of the Property
                               Text(
-                                "Rs ${Rs[0]}",
+                                "RS ${formatNumber(PropertyData['Price'])}",
                                 style: const TextStyle(
                                     color: Color(0XFF5F5F5F),
                                     fontWeight: FontWeight.bold,
                                     fontSize: 28),
                               ),
+                              // Option to place bid
                               InkWell(
-                                child: Text(bid[0],
-                                    style: const TextStyle(
+                                child: const Text("Place Bid",
+                                    style: TextStyle(
                                         color: Color(0XFF00627C),
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 16)),
+                                        fontSize: 20)),
                                 onTap: () {
-                                  print("Place bid");
+                                  // Option to Place Bid on the Property
+                                  print("Place BID");
                                 },
                               ),
                             ],
                           )),
                       Container(
+                        width: 100,
                         margin: const EdgeInsets.only(right: 15),
                         child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
@@ -319,7 +318,8 @@ class _PostView extends State<PostView> {
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10.0))),
                             onPressed: () {
-                              print("likes");
+                              // Likes the Property
+                              print("Likes Property");
                             },
                             child: Row(
                               children: [
@@ -331,7 +331,7 @@ class _PostView extends State<PostView> {
                                   width: 5,
                                 ),
                                 Text(
-                                  Likes[0],
+                                  formatNumber(PropertyData['Likes']),
                                   style: const TextStyle(color: Colors.white),
                                 )
                               ],
@@ -340,20 +340,67 @@ class _PostView extends State<PostView> {
                     ],
                   ),
                 ),
+                // Display Information Regarding Property
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      margin: const EdgeInsets.only(left: 15),
-                      child: Text(
-                        address[0],
-                        style: const TextStyle(
-                            color: Color(0XFF8D8D8D),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20),
-                      ),
-                    ),
+                        margin: const EdgeInsets.only(left: 15),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Display Location
+                            Text(
+                              PropertyData['Location'],
+                              style: const TextStyle(
+                                  color: Color(0XFF8D8D8D),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16),
+                            ),
+                            // Display Property Type
+                            Row(
+                              children: [
+                                const Text(
+                                  "Property Type: ",
+                                  style: TextStyle(
+                                      color: Color(0XFF5F5F5F),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16),
+                                ),
+                                Text(
+                                  PropertyData['PropertyType'],
+                                  style: const TextStyle(
+                                      color: Color(0XFF8D8D8D),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16),
+                                ),
+                              ],
+                            ),
+                            // Display Listing Type
+                            Row(
+                              children: [
+                                const Text(
+                                  "Listing Type: ",
+                                  style: TextStyle(
+                                      color: Color(0XFF5F5F5F),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16),
+                                ),
+                                Text(
+                                  PropertyData['ListingType'],
+                                  style: const TextStyle(
+                                      color: Color(0XFF8D8D8D),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16),
+                                ),
+                              ],
+                            )
+                          ],
+                        )),
                     Container(
+                      width: 100,
                       margin: const EdgeInsets.only(right: 15),
                       child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
@@ -372,7 +419,7 @@ class _PostView extends State<PostView> {
                                 width: 5,
                               ),
                               Text(
-                                View[0],
+                                formatNumber(PropertyData['Views']),
                                 style: const TextStyle(color: Colors.white),
                               )
                             ],
@@ -391,9 +438,9 @@ class _PostView extends State<PostView> {
                             margin: const EdgeInsets.only(left: 15),
                             height: 70,
                             width: 70,
-                            child: const CircleAvatar(
-                              backgroundImage:
-                                  AssetImage("assets/images/sheroz.jpg"),
+                            child: CircleAvatar(
+                              backgroundImage: NetworkImage(
+                                  "${server.host}/static/${PropertyData['SellerPicture']}"),
                             ),
                           ),
                           SizedBox(
@@ -404,8 +451,8 @@ class _PostView extends State<PostView> {
                                   alignment: Alignment.centerLeft,
                                   child: Container(
                                     margin: const EdgeInsets.only(left: 15),
-                                    child: const Text("Ahmen Khan",
-                                        style: TextStyle(
+                                    child: Text(PropertyData['SellerName'],
+                                        style: const TextStyle(
                                             color: Color(0XFF5F5F5F),
                                             fontSize: 28)),
                                   ),
@@ -427,7 +474,10 @@ class _PostView extends State<PostView> {
                                                 borderRadius:
                                                     BorderRadius.circular(
                                                         10.0))),
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          // Initiate Chat with Seller
+                                          print("Iniate Chat with Seller");
+                                        },
                                         child: const Text("Start chat",
                                             style: TextStyle(
                                                 color: Colors.white))),
@@ -461,14 +511,19 @@ class _PostView extends State<PostView> {
                           ),
                         ),
                         onTap: () {
+                          // Open the Profile of Seller
                           print("View Profile");
                         },
                       ),
                     ],
                   ),
                 ),
+
+                /**
+                 * Display the Data of Property with Icons as welll
+                 */
                 Padding(
-                  padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
+                  padding: const EdgeInsets.only(left: 20, right: 20),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -476,17 +531,17 @@ class _PostView extends State<PostView> {
                         child: Column(
                           children: [
                             Image.asset(
-                              "assets/images/Image 14@1x.png",
-                              height: 25,
+                              "assets/UI/beds.png",
+                              height: MediaQuery.of(context).size.width * 0.15,
                             ),
                             const SizedBox(
                               height: 5,
                             ),
-                            const Text(
-                              "5 Bed Rooms",
-                              style: TextStyle(
+                            Text(
+                              "${PropertyData['Beds']} Beds",
+                              style: const TextStyle(
                                   color: Color(0XFF8D8D8D),
-                                  fontSize: 14,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold),
                             )
                           ],
@@ -496,17 +551,17 @@ class _PostView extends State<PostView> {
                         child: Column(
                           children: [
                             Image.asset(
-                              "assets/images/Image 15@1x.png",
-                              height: 25,
+                              "assets/UI/size.png",
+                              height: MediaQuery.of(context).size.width * 0.15,
                             ),
                             const SizedBox(
                               height: 5,
                             ),
-                            const Text(
-                              "10 Kanal",
-                              style: TextStyle(
+                            Text(
+                              "${PropertyData['Size']} m",
+                              style: const TextStyle(
                                   color: Color(0XFF8D8D8D),
-                                  fontSize: 14,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold),
                             )
                           ],
@@ -516,17 +571,17 @@ class _PostView extends State<PostView> {
                         child: Column(
                           children: [
                             Image.asset(
-                              "assets/images/Image 15@1x (2).png",
-                              height: 25,
+                              "assets/UI/floors.png",
+                              height: MediaQuery.of(context).size.width * 0.15,
                             ),
                             const SizedBox(
                               height: 5,
                             ),
-                            const Text(
-                              "2 Floors",
-                              style: TextStyle(
+                            Text(
+                              "${PropertyData['Floors']} Floors",
+                              style: const TextStyle(
                                   color: Color(0XFF8D8D8D),
-                                  fontSize: 14,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold),
                             )
                           ],
@@ -537,7 +592,7 @@ class _PostView extends State<PostView> {
                 ),
                 Container(
                   width: MediaQuery.of(context).size.width,
-                  margin: const EdgeInsets.only(left: 20),
+                  margin: const EdgeInsets.only(left: 20, top: 20),
                   child: const Text(
                     "Description",
                     style: TextStyle(
@@ -549,11 +604,10 @@ class _PostView extends State<PostView> {
                 Container(
                   width: MediaQuery.of(context).size.width,
                   margin: const EdgeInsets.only(left: 20, right: 20),
-                  child: const Text(
-                    "Real estate is real "
-                    "include buildings, fixtures, roads, structures, and utility systems. Property rights give a title of ownership to the land, "
-                    "improvements,",
-                    style: TextStyle(color: Color(0XFF8D8D8D), fontSize: 16),
+                  child: Text(
+                    PropertyData['Description'],
+                    style:
+                        const TextStyle(color: Color(0XFF8D8D8D), fontSize: 16),
                     maxLines: 10,
                   ),
                 ),

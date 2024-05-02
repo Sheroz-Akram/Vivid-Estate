@@ -14,6 +14,19 @@ class Buyer extends User {
     dynamic PropertyData = {
       "Images": [],
       "ImagesCount": 0,
+      "PropertyType": "",
+      "ListingType": "",
+      "Description": "",
+      "Location": "",
+      "Price": 0,
+      "Size": 0,
+      "Beds": 0,
+      "Floors": 0,
+      "Views": 0,
+      "Likes": 0,
+      "SellerPicture": "",
+      "SellerName": "",
+      "SellerEmail": ""
     };
 
     // Send a Request to the Server
@@ -24,6 +37,19 @@ class Buyer extends User {
         // Now we Store the Data
         PropertyData['Images'] = result['message']['Images'];
         PropertyData['ImagesCount'] = result['message']['TotalImages'];
+        PropertyData['ListingType'] = result['message']['ListingType'];
+        PropertyData['PropertyType'] = result['message']['PropertyType'];
+        PropertyData['Description'] = result['message']['Description'];
+        PropertyData['Location'] = result['message']['Location'];
+        PropertyData['Price'] = result['message']['Price'];
+        PropertyData['Size'] = result['message']['Size'];
+        PropertyData['Beds'] = result['message']['Beds'];
+        PropertyData['Floors'] = result['message']['Floors'];
+        PropertyData['Views'] = result['message']['Views'];
+        PropertyData['Likes'] = result['message']['Likes'];
+        PropertyData['SellerPicture'] = result['message']["SellerPicture"];
+        PropertyData['SellerName'] = result['message']['SellerName'];
+        PropertyData['SellerEmail'] = result['message']['SellerEmail'];
       }
       ScaffoldMessenger.of(userContext)
           .showSnackBar(SnackBar(content: Text(result['message'])));
