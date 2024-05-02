@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -7,6 +5,7 @@ import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerScreens/Filter.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerScreens/Search/PropertySearch.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerScreens/Search/PropertySearchPreview.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/Buyer.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 
 // ignore: must_be_immutable
@@ -29,45 +28,25 @@ class _SearchResult extends State<SearchResult> {
   var FilterData;
   var searchResults = [];
 
+  // Our Buyer Object
+  var buyer = Buyer();
+
   @override
   void initState() {
     super.initState();
     FilterData = widget.filterData;
-    getAllSearchProperties(context);
+    performDetailSearch(context);
   }
 
-  // Get all the properties details of the user
-  void getAllSearchProperties(BuildContext userContext) async {
-    // Check if user has enter any data or not
-    if (widget.searchQuery.length < 3) {
-      setState(() {
-        searchResults = [];
-      });
-      return;
-    }
+  // Request a Detail Search of Perperty
+  void performDetailSearch(BuildContext userContext) async {
+    // Send a request
+    var responseData = await buyer.detailSearchQuery(
+        userContext, widget.searchQuery, widget.filterData);
 
-    // Data to Send to the Server
-    var searchQueryData = {
-      "Query": widget.searchQuery,
-      "Filter": jsonEncode(widget.filterData)
-    };
-
-    // Send Our POST Requst to the Server
-    server.sendPostRequest(userContext, "search_property_all", searchQueryData,
-        (result) {
-      if (result['status'] == "success") {
-        setState(() {
-          searchResults = [];
-        });
-        for (var element in result['message']['SearchItems']) {
-          setState(() {
-            searchResults.add(element);
-          });
-        }
-        print(searchResults);
-      }
-      ScaffoldMessenger.of(userContext)
-          .showSnackBar(SnackBar(content: Text(result['message'])));
+    // Now Update our State
+    setState(() {
+      searchResults = responseData;
     });
   }
 
@@ -599,6 +578,9 @@ class _SearchResult extends State<SearchResult> {
                                             )
                                           : PropertySearchPreview(
                                               propertySimpleInformation: {
+                                                  "PropertyID":
+                                                      searchResults[index]
+                                                          ["PropertyID"],
                                                   "PropertyImageAddress":
                                                       "${server.host}/static/${searchResults[index]['Picture']}",
                                                   "Price": searchResults[index]

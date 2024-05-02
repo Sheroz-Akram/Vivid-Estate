@@ -1,9 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerScreens/Search/SearchResult.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/Buyer.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 
 // ignore: must_be_immutable
@@ -24,37 +23,18 @@ class _PropertySearch extends State<PropertySearch> {
   var searchQueryController = TextEditingController();
   var searchResults = [];
 
+  // Our Buyer Object
+  var buyer = Buyer();
+
   // Perform the Search Operation based upon the user query
-  void searchQuery(BuildContext userContext) {
-    // Check if user has enter any data or not
-    if (searchQueryController.text.length < 3) {
-      setState(() {
-        searchResults = [];
-      });
-      return;
-    }
+  void searchQuery(BuildContext userContext) async {
+    // Perform the Search Operation
+    var responseData = await buyer.searchQuery(
+        userContext, searchQueryController.text, widget.filterData);
 
-    // Data to Send to the Server
-    var searchQueryData = {
-      "Query": searchQueryController.text,
-      "Filter": jsonEncode(widget.filterData)
-    };
-
-    // Send Our POST Requst to the Server
-    server.sendPostRequest(userContext, "search_property", searchQueryData,
-        (result) {
-      if (result['status'] == "success") {
-        setState(() {
-          searchResults = [];
-        });
-        for (var element in result['message']['SearchItems']) {
-          setState(() {
-            searchResults.add(element as String);
-          });
-        }
-      }
-      ScaffoldMessenger.of(userContext)
-          .showSnackBar(SnackBar(content: Text(result['message'])));
+    // Update our State
+    setState(() {
+      searchResults = responseData;
     });
   }
 

@@ -25,7 +25,11 @@ class _PropertySearchPreview extends State<PropertySearchPreview> {
       onTap: () {
         // Open the Detail POST View of the Property
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => const PostView()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => PostView(
+                    PropertyID: widget.propertySimpleInformation['PropertyID']
+                        .toString())));
       },
       child: Container(
         margin: const EdgeInsets.all(6.0),

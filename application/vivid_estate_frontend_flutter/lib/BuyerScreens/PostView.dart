@@ -3,9 +3,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/Buyer.dart';
 
+// ignore: must_be_immutable
 class PostView extends StatefulWidget {
-  const PostView({super.key});
+  PostView({super.key, required this.PropertyID});
+
+  // The Property ID of our Property
+  dynamic PropertyID;
 
   @override
   State<PostView> createState() => _PostView();
@@ -19,21 +25,58 @@ class _PostView extends State<PostView> {
   var Likes = ["12K"];
   var View = ["12K"];
 
-  var images = ["assets/house.jpg", 'assets/house2.jpg'];
-
   // The Index of the Image Display In Top Carousal
   var imageCarousalController = CarouselController();
+  var images = [];
   var totalImages = 1;
   var imageIndex = 1;
 
+  // Our Server Object used to perform post request
+  ServerInfo server = ServerInfo();
+  var buyer = Buyer();
+  dynamic PropertyData = {
+    "Images": [],
+    "ImagesCount": 0,
+  };
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
-    // Set our data variables
+    // Load the Data Of Page
+    loadPageData(context);
+  }
+
+  void loadPageData(BuildContext userContext) async {
+    // Now Get the Property Data
+    var responseData =
+        await buyer.getPropertyDetail(context, widget.PropertyID);
+
+    // Update the State of our Property Data
     setState(() {
-      totalImages = images.length;
+      PropertyData = responseData;
+    });
+  }
+
+  void getPropertyDetail(BuildContext userContext) {
+    // Our Request Body
+    var requestBody = {"PropertyID": widget.PropertyID};
+
+    print("PropertyID:" + widget.PropertyID);
+
+    // Send a Request to the Server
+    server.sendPostRequest(userContext, "property_detail", requestBody,
+        (result) {
+      if (result['status'] == "success") {
+        // Now we store the property data and display IT
+        setState(() {
+          images = result['message']['Images'];
+          totalImages = images.length;
+        });
+        print(images);
+      }
+      ScaffoldMessenger.of(userContext)
+          .showSnackBar(SnackBar(content: Text(result['message'])));
     });
   }
 
@@ -115,32 +158,39 @@ class _PostView extends State<PostView> {
                 Stack(
                   children: [
                     ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(15.0),
-                          topRight: Radius.circular(15.0)),
-                      child:
-                          // Display the Images of the Properties in Carousel Slider
-                          CarouselSlider.builder(
-                              carouselController: imageCarousalController,
-                              itemCount: totalImages,
-                              itemBuilder: (context, index, pageviewIndex) {
-                                return Image.asset(
-                                  images[index],
-                                  fit: BoxFit.cover,
+                        borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(15.0),
+                            topRight: Radius.circular(15.0)),
+                        child: PropertyData['ImagesCount'] != 0
+                            ? // Display the Images of the Properties in Carousel Slider
+                            CarouselSlider.builder(
+                                carouselController: imageCarousalController,
+                                itemCount: PropertyData['ImagesCount'],
+                                itemBuilder: (context, index, pageviewIndex) {
+                                  return Image.network(
+                                    "${server.host}/static/${PropertyData['Images'][index]}",
+                                    fit: BoxFit.fill,
+                                    height: 300,
+                                    width: MediaQuery.of(context).size.width,
+                                  );
+                                },
+                                options: CarouselOptions(
                                   height: 300,
-                                  width: MediaQuery.of(context).size.width,
-                                );
-                              },
-                              options: CarouselOptions(
+                                  autoPlay: false,
+                                  autoPlayCurve: Curves.fastOutSlowIn,
+                                  enableInfiniteScroll: true,
+                                  autoPlayAnimationDuration:
+                                      const Duration(milliseconds: 800),
+                                  viewportFraction: 1,
+                                ))
+                            :
+                            // If No Image is Found
+                            Image.asset(
+                                "assets/BuyerImages/loadingImage.jpg",
+                                fit: BoxFit.fill,
                                 height: 300,
-                                autoPlay: false,
-                                autoPlayCurve: Curves.fastOutSlowIn,
-                                enableInfiniteScroll: true,
-                                autoPlayAnimationDuration:
-                                    const Duration(milliseconds: 800),
-                                viewportFraction: 1,
+                                width: MediaQuery.of(context).size.width,
                               )),
-                    ),
                     Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10.0),
@@ -164,7 +214,7 @@ class _PostView extends State<PostView> {
                                 width: 5,
                               ),
                               Text(
-                                "${imageIndex.toString()}/${totalImages.toString()}",
+                                "${imageIndex.toString()}/${PropertyData['ImagesCount'].toString()}",
                                 style: const TextStyle(color: Colors.white),
                               )
                             ],
@@ -183,7 +233,7 @@ class _PostView extends State<PostView> {
                                 duration: Durations.long1);
                             if (imageIndex - 1 == 0) {
                               setState(() {
-                                imageIndex = totalImages;
+                                imageIndex = PropertyData['ImagesCount'];
                               });
                             } else {
                               setState(() {
@@ -210,7 +260,7 @@ class _PostView extends State<PostView> {
                             // Display Next Picture
                             imageCarousalController.nextPage(
                                 duration: Durations.long1);
-                            if (imageIndex + 1 > totalImages) {
+                            if (imageIndex + 1 > PropertyData['ImagesCount']) {
                               setState(() {
                                 imageIndex = 1;
                               });

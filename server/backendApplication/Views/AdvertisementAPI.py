@@ -172,7 +172,7 @@ def DetailSearchQuery(request):
             
             # Add Property Details to our result
             SearchData['SearchItems'].append({
-                "ID": searchProperty.id,
+                "PropertyID": searchProperty.id,
                 "Price": searchProperty.price,
                 "Location": searchProperty.abstractLocation,
                 "Picture": picture.imageLocation,
@@ -189,3 +189,48 @@ def DetailSearchQuery(request):
     # Something wrong just happen the process
     except Exception as e:
         return httpErrorJsonResponse("Error in the server or an invalid request" + str(e))
+
+    
+# Get the complete detail of the property
+@csrf_exempt
+def GetPropertyDetail(request):
+
+    # Perform the Search Operation
+    try:
+
+        # Get all the Data
+        PropertyID = request.POST['PropertyID']
+
+        try:
+            # Search The Property using its ID
+            result = Property.objects.get(pk=PropertyID)
+        except Exception as e:
+            return httpErrorJsonResponse("Error: Property not found." + str(e))
+
+        # Now Send the Details of the Property Back to Client
+        message = {
+            "PropertyID": PropertyID,
+        }
+
+        # Now we get all the Images of the property
+        pictures = PropertyImage.objects.filter(propertyID=result)
+
+        # Add Images to Our Response
+        message['Images'] = []
+        message['TotalImages'] = pictures.count()
+        for picture in pictures:
+            message['Images'].append(picture.imageLocation)
+
+        # Now Add Other Data to our Response
+        message['PropertyType'] = result.propertyType
+        message['ListingType'] = result.listingType
+
+        print(message)
+        
+
+        # Send JSON data back to the client
+        return httpSuccessJsonResponse(message)
+    
+    # Something wrong just happen the process
+    except Exception as e:
+        return httpErrorJsonResponse("Error: Invalid Request")
