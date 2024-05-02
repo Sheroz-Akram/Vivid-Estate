@@ -125,10 +125,9 @@ def SearchLocationProperty(request):
         SearchData['SearchItems'] = []
         unique_predictions = set()  # Set to store unique predictions
 
-        
-
+        # Go Through each property find the resutls and only display properties in the same area
         for searchProperty in results:
-            prediction = completeWordSearch(Query, searchProperty.location).title()
+            prediction = completeWordSearch(Query, searchProperty.location).strip().title().rstrip(',')
             if prediction not in unique_predictions:  # Check if prediction is not already added
                 SearchData['SearchItems'].append(prediction)
                 unique_predictions.add(prediction)

@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerScreens/Filter.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerScreens/Search/PropertySearch.dart';
+import 'package:vivid_estate_frontend_flutter/BuyerScreens/Search/PropertySearchPreview.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 
 // ignore: must_be_immutable
@@ -571,91 +573,54 @@ class _SearchResult extends State<SearchResult> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Search Results",
-                      style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0XFF8D8D8D)),
-                    ),
-                    SizedBox(
-                        height: MediaQuery.of(context).size.height,
-                        child: ListView.builder(
-                          itemBuilder: (context, index) {
-                            return index == searchResults.length
-                                ? SizedBox(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.5,
-                                  )
-                                : Container(
-                                    margin: const EdgeInsets.all(6.0),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0XFFE2E2E2),
-                                      borderRadius: BorderRadius.circular(10.0),
-                                      boxShadow: getBoxShadow(),
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        SizedBox(
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                const BorderRadius.only(
-                                              topLeft: Radius.circular(10),
-                                              topRight: Radius.circular(10),
-                                            ),
-                                            child: Image.network(
-                                              // ignore: prefer_interpolation_to_compose_strings
-                                              "${server.host}/static/" +
-                                                  searchResults[index]
-                                                      ['Picture'],
-                                              fit: BoxFit
-                                                  .cover, // Adjust this as per your requirement
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        Container(
-                                          padding:
-                                              const EdgeInsets.only(left: 5),
-                                          child: Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: Text(
-                                              "Price: ${formatNumber(searchResults[index]['Price'])}",
-                                              style: const TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          padding:
-                                              const EdgeInsets.only(left: 5),
-                                          child: Align(
-                                            alignment: Alignment.bottomLeft,
-                                            child: Text(
-                                                "Location: ${searchResults[index]['Location']}"),
-                                          ),
-                                        ),
-                                        Container(
-                                          padding:
-                                              const EdgeInsets.only(left: 5),
-                                          child: Align(
-                                            alignment: Alignment.bottomLeft,
-                                            child: Text(
-                                                "Type: ${searchResults[index]['Type']}"),
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                          },
-                          itemCount: searchResults.length + 1,
-                        )),
+                    searchResults.isNotEmpty
+                        ? Column(
+                            children: [
+                              const Align(
+                                alignment: Alignment.topLeft,
+                                child: Text(
+                                  "Search Results:",
+                                  style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0XFF8D8D8D)),
+                                ),
+                              ),
+                              SizedBox(
+                                  height: MediaQuery.of(context).size.height,
+                                  child: ListView.builder(
+                                    itemBuilder: (context, index) {
+                                      return index == searchResults.length
+                                          ? SizedBox(
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.5,
+                                            )
+                                          : PropertySearchPreview(
+                                              propertySimpleInformation: {
+                                                  "PropertyImageAddress":
+                                                      "${server.host}/static/${searchResults[index]['Picture']}",
+                                                  "Price": searchResults[index]
+                                                      ['Price'],
+                                                  "Location":
+                                                      searchResults[index]
+                                                          ['Location'],
+                                                  "Type": searchResults[index]
+                                                      ['Type']
+                                                });
+                                    },
+                                    itemCount: searchResults.length + 1,
+                                  )),
+                            ],
+                          )
+                        : const Center(
+                            child: Text("No Results Found",
+                                style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0XFF8D8D8D))),
+                          )
                   ],
                 ),
               )

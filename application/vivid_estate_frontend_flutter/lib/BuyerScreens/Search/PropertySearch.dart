@@ -148,7 +148,12 @@ class _PropertySearch extends State<PropertySearch> {
                       InkWell(
                         onTap: () {
                           // Search Option is Pressed
-                          print("Pressed at $index");
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SearchResult(
+                                      filterData: widget.filterData,
+                                      searchQuery: searchResults[index])));
                         },
                         child: Container(
                           padding: const EdgeInsets.only(
