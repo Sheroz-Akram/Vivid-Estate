@@ -12,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:open_street_map_search_and_pick/open_street_map_search_and_pick.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Seller.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
+import 'package:vivid_estate_frontend_flutter/SellerScreens/2D%20Layout/drawing_page.dart';
 
 class NewPropertyAd extends StatefulWidget {
   const NewPropertyAd({super.key});
@@ -826,6 +827,10 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                       onTap: () {
                         // To Be Implemented
                         print("Open 2D Layout Creation");
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const DrawingPage()));
                       },
                       child: Container(
                           padding: const EdgeInsets.only(
