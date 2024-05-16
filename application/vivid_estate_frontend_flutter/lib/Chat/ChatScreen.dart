@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/Reply.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/Send.dart';
+import 'package:vivid_estate_frontend_flutter/Chat/SendFileMessage.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/User.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
+import 'package:file_picker/file_picker.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen(
@@ -28,10 +31,16 @@ class _ChatScreen extends State<ChatScreen> {
   final _scoll_controller = ScrollController();
   var server = ServerInfo();
 
+  // Our User Object
+  var user = User();
+
   @override
   void initState() {
     super.initState();
+
     getAllMessages(context);
+
+    PageLoad();
 
     // Scoll to the Bottom
     scrollToBottom(_scoll_controller);
@@ -40,6 +49,11 @@ class _ChatScreen extends State<ChatScreen> {
     Timer.periodic(const Duration(seconds: 2), (timer) {
       getUnviewMessages(context);
     });
+  }
+
+  // Load All the Data of the Page
+  void PageLoad() async {
+    await user.getAuthData();
   }
 
   // Get all the Chat Messsages
@@ -89,6 +103,7 @@ class _ChatScreen extends State<ChatScreen> {
             messages.add({
               "Status": data[i]['Status'],
               "Message": data[i]['Message'],
+              "MessageType": data[i]['MessageType'],
               "Time": data[i]['Time'],
               "Type": data[i]['Type']
             });
@@ -122,6 +137,7 @@ class _ChatScreen extends State<ChatScreen> {
           messages.add({
             "Status": "Send",
             "Message": _send_controller.text,
+            "MessageType": "text",
             "Time": "now",
             "Type": "Send"
           });
@@ -150,6 +166,18 @@ class _ChatScreen extends State<ChatScreen> {
         Navigator.pop(myContext);
       }
     });
+  }
+
+  // Pick a file from the Menu
+  dynamic pickFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles();
+      PlatformFile file = result!.files.first;
+      return file;
+    } catch (e) {
+      print('Error picking file: $e');
+      return null;
+    }
   }
 
   @override
@@ -218,16 +246,30 @@ class _ChatScreen extends State<ChatScreen> {
           width: MediaQuery.of(context).size.width,
           child: Stack(
             children: [
+              /**
+               * 
+               * Display All the Messages Between User
+               * 
+               */
               Container(
                 margin: const EdgeInsets.only(bottom: 80),
                 child: ListView.builder(
                   controller: _scoll_controller,
                   itemBuilder: (context, index) =>
-                      messages[index]['Type'] == "Reply"
-                          ? Reply(
-                              message: messages[index]['Message'],
-                              time: messages[index]['Time'])
-                          : Send(
+
+                      // Check Between Text Messages and Files
+                      messages[index]['MessageType'] == "text"
+                          // Display Text Messages
+                          ? messages[index]['Type'] == "Reply"
+                              ? Reply(
+                                  message: messages[index]['Message'],
+                                  time: messages[index]['Time'])
+                              : Send(
+                                  message: messages[index]['Message'],
+                                  time: messages[index]['Time'],
+                                  status: messages[index]['Status'])
+                          // Display File Messages
+                          : SendFileMessage(
                               message: messages[index]['Message'],
                               time: messages[index]['Time'],
                               status: messages[index]['Status']),
@@ -238,14 +280,47 @@ class _ChatScreen extends State<ChatScreen> {
                 alignment: Alignment.bottomCenter,
                 child: Row(
                   children: [
+                    /**
+                     * 
+                     * Send a file Icon Buttom
+                     */
                     IconButton(
-                      onPressed: () {
-                        print("upload file");
+                      onPressed: () async {
+                        // Pick a File
+                        PlatformFile fileData = await pickFile();
+
+                        // Send File to Server
+                        var responseMessage = await user.SendPickedFile(
+                            fileData.bytes!,
+                            fileData.name,
+                            (widget.ChatID).toString(),
+                            context);
+
+                        // Add New Message to Our Status
+                        setState(() {
+                          messages.add({
+                            "Status": "Send",
+                            "Message": responseMessage,
+                            "MessageType": "file",
+                            "Time": "now",
+                            "Type": "Send"
+                          });
+                          _send_controller.text = "";
+                        });
+
+                        // Scoll to the Bottom
+                        scrollToBottom(_scoll_controller);
                       },
                       icon: const Icon(Icons.attach_file_sharp),
                       iconSize: MediaQuery.of(context).size.width * 0.10,
                       color: const Color(0xFF006E86),
                     ),
+
+                    /**
+                     * 
+                     * Send Message BOX
+                     * 
+                     */
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.80,
                       child: TextFormField(

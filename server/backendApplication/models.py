@@ -45,6 +45,7 @@ class ChatMessage(models.Model):
     ChatRoom = models.ForeignKey(Chat, on_delete=models.CASCADE)
     Sender = models.ForeignKey(ApplicationUser, on_delete=models.CASCADE)
     Message = models.CharField(max_length=255)
+    Type = models.CharField(max_length=255)
     Status = models.CharField(max_length=20)
     timestamp = models.DateTimeField(auto_now_add=True) 
 

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -231,5 +232,53 @@ class User {
       langitude = 0;
       longitude = 0;
     }
+  }
+
+  // Send the File Using POST Request to the Server
+  dynamic SendPickedFile(Uint8List fileBytes, String fileName, String ChatID,
+      BuildContext userContext) async {
+    // Store the Response Message from the Server
+    var responseMessage = "";
+
+    // Our API End Point
+    var host = ServerInfo().host;
+    var url = Uri.parse("$host/send_file_message");
+
+    // Send Our file to the Server
+    try {
+      // Generate File to Upload
+      var fileToUpload = http.MultipartFile.fromBytes('SendFile', fileBytes,
+          filename: fileName);
+
+      var request = http.MultipartRequest('POST', url);
+
+      // Add our file to upload
+      request.files.add(fileToUpload);
+
+      // Add Other Fields (consider strong typing)
+      request.fields["Email"] = emailAddress;
+      request.fields["PrivateKey"] = privateKey;
+      request.fields["ChatID"] = ChatID;
+
+      // Now send our request to the Server
+      var response = await request.send();
+
+      // Check our response
+      if (response.statusCode == 200) {
+        // listen for response
+        var responseString = response.stream.transform(utf8.decoder).single;
+
+        // Json Decode the Result
+        var result = jsonDecode(await responseString);
+
+        responseMessage = result['message'];
+      }
+    } catch (e) {
+      // An error has error in sending the file
+      ScaffoldMessenger.of(userContext).showSnackBar(
+          const SnackBar(content: Text("A network error has occured")));
+    }
+
+    return responseMessage;
   }
 }

@@ -1,6 +1,11 @@
 from ..modules.helper import *
 from django.views.decorators.csrf import csrf_exempt
 from ..models import *
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+import uuid
+import os
+import json
 
 
 # Initiate a Chat Between Buyer and Seller
@@ -86,7 +91,7 @@ def sendMessage(request):
         chatRoom.save()
             
         # Now we Store the Message in the Chat
-        chat_message = ChatMessage(ChatRoom=chatRoom, Sender=user, Status="Send", Message=UserMessage)
+        chat_message = ChatMessage(ChatRoom=chatRoom, Sender=user, Status="Send", Type="text", Message=UserMessage)
         chat_message.save()
 
         # Display Message to the User
@@ -178,6 +183,7 @@ def get_all_chat_messages(request):
             data = {
                     "Status": message.Status,
                     "Message": message.Message,
+                    "MessageType": message.Type,
                     "Time": message.timestamp.strftime("%H:%M %p")
             }
             if message.Sender.email_address == user.email_address:
@@ -242,6 +248,7 @@ def get_all_unview_messages(request):
                 data = {
                         "Status": message.Status,
                         "Message": message.Message,
+                        "MessageType": message.Type,
                         "Time": message.timestamp.strftime("%H:%M %p")
                 }
                 data['Type'] = "Reply"
@@ -299,3 +306,60 @@ def deleteUserChat(request):
     # Something wrong just happen the process
     except Exception as e:
         return httpErrorJsonResponse("Error in the server or an invalid request")
+
+
+# Store the file of the User Send in Server
+@csrf_exempt
+def StoreSendFile(request):
+
+    # Check the User Authentications
+    authResult = checkUserLogin(request=request)
+    if authResult[0] == False:
+        return httpErrorJsonResponse(authResult[1])
+
+    # Now we Get the User
+    user = authResult[1]
+
+    # Now We Store the File Message in Our Server
+    try:
+
+        # Get the File Data
+        sendFile = request.FILES['SendFile']
+        ChatID = request.POST['ChatID']
+
+        # Create or get an instance of FileSystemStorage to handle saving
+        fs = FileSystemStorage(location=settings.PROFILE_PIC_ROOT)
+        
+        # Save the file directly
+        fileNewName = str(uuid.uuid4()) + sendFile.name
+        filename = fs.save(fileNewName, sendFile)
+        file_path = os.path.join(settings.PROFILE_PIC_ROOT, filename)
+
+        # We add the store the file data into json format in message
+        UserMessage = json.dumps({"fileLocation": file_path, "fileName": sendFile.name})
+
+        # Check the User Chat Access
+        userChatAuth = validUserChatAccess(user=user, chatID=ChatID)
+        if userChatAuth[0] == False:
+            # User is not Allowed ot Chat does not Exists
+            return httpErrorJsonResponse(userChatAuth[1])
+        
+        # User is Allowed in this Chat
+        chatRoom = userChatAuth[1]
+
+        # Save the Last Mesasge
+        chatRoom.unviewPerson = user
+        chatRoom.unviewCount = chatRoom.unviewCount + 1
+        chatRoom.LastMessage = "File Transfered! " + sendFile.name
+        chatRoom.save()
+            
+        # Now we Store the Message in the Chat
+        chat_message = ChatMessage(ChatRoom=chatRoom, Sender=user, Status="Send", Type="file", Message=UserMessage)
+        chat_message.save()
+
+        return httpSuccessJsonResponse(UserMessage)
+
+    # Something wrong just happen the process
+    except Exception as e:
+        return httpErrorJsonResponse("Error in the server or an invalid request")
+

@@ -44,6 +44,7 @@ urlpatterns = [
     path("get_all_messages", view=ChatViews.get_all_chat_messages, name="Get Chat Messages"),
     path("get_all_unview_messages", view=ChatViews.get_all_unview_messages, name="Get Unview Messages"),
     path("delete_chat", view=ChatViews.deleteUserChat, name="Delete User Chat"),
+    path("send_file_message", view=ChatViews.StoreSendFile, name="Send a file to other user"),
 
     # User Issue & Reports
     path("submit_issue", view=IssueReport.submitIssueReport, name="User Issue Submit"),
@@ -56,5 +57,6 @@ urlpatterns = [
     path("add_to_favourite", view=AdvertisementAPI.AddToFavourite, name="Add Property to Favourite List"),
     path("remove_from_favourite", view=AdvertisementAPI.RemoveFromFavourite, name="Remove Property from Favourite List"),
     path("report_property", view=AdvertisementAPI.StorePropertyReport, name="Buyer Report Property to Admin"),
+    
 
 ]
