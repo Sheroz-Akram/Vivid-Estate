@@ -96,7 +96,7 @@ def StoreNewAd(request):
 
     # Something wrong just happen the process
     except Exception as e:
-        print(e)
+        
         return httpErrorJsonResponse("Error: Invalid Request")
 
 
@@ -195,6 +195,14 @@ def DetailSearchQuery(request):
 @csrf_exempt
 def GetPropertyDetail(request):
 
+    # Check the User Authentications
+    authResult = checkUserLogin(request=request)
+    if authResult[0] == False:
+        return httpErrorJsonResponse(authResult[1])
+
+    # Now we Get the User
+    user = authResult[1]
+
     # Perform the Search Operation
     try:
 
@@ -224,6 +232,16 @@ def GetPropertyDetail(request):
         # Get the Seller of the Property
         seller = result.seller
 
+        # Check if the Property is Added to Favourite or Not
+        existing_favorite = Favourite.objects.filter(propertyID=result, user=user).first()
+        isFavourite = "False"
+        if existing_favorite:
+            isFavourite = "True"
+
+        # Update the View Count
+        result.views = result.views + 1
+        result.save()
+
         # Now Add Other Data to our Response
         message['PropertyType'] = result.propertyType
         message['Description'] = result.description
@@ -238,10 +256,139 @@ def GetPropertyDetail(request):
         message['SellerPicture'] = seller.profile_pic
         message['SellerName'] = seller.full_name
         message['SellerEmail'] = seller.email_address
+        message['IsFavourite'] = isFavourite
+
 
         # Send JSON data back to the client
         return httpSuccessJsonResponse(message)
     
     # Something wrong just happen the process
     except Exception as e:
+        return httpErrorJsonResponse("Error: Invalid Request")
+
+
+# API to Add the Property to Favourite List by Buyer
+@csrf_exempt
+def AddToFavourite(request):
+
+    # Check the User Authentications
+    authResult = checkUserLogin(request=request)
+    if authResult[0] == False:
+        return httpErrorJsonResponse(authResult[1])
+
+    # Now we Get the User
+    user = authResult[1]
+
+    # Now We Add the Property to our List
+    try:
+
+        # Get the POST Data from user
+        PropertyID = request.POST['PropertyID']
+
+        # Now We get the property through its id
+        try:
+            # Search The Property using its ID
+            result = Property.objects.get(pk=PropertyID)
+        except Exception as e:
+            return httpErrorJsonResponse("Error: Property Not Found")
+
+        # Check if the user has already favorited the property
+        existing_favorite = Favourite.objects.filter(propertyID=result, user=user).first()
+
+        if existing_favorite:
+            # If the user has already favorited the property, return a response indicating it
+            return httpSuccessJsonResponse('Error: Property already added')
+        else:
+            # Add new favorite to the list
+            favouriteProperty = Favourite(propertyID=result, user=user)
+            favouriteProperty.save()
+            return httpSuccessJsonResponse('Success: Property added to favorites')
+
+    # Something wrong just happen the process
+    except Exception as e:
+        
+        return httpErrorJsonResponse("Error: Invalid Request")
+
+# API to Remove the Property from Favourite List
+@csrf_exempt
+def RemoveFromFavourite(request):
+
+    # Check the User Authentications
+    authResult = checkUserLogin(request=request)
+    if authResult[0] == False:
+        return httpErrorJsonResponse(authResult[1])
+
+    # Now we Get the User
+    user = authResult[1]
+
+    # Now We Add the Property to our List
+    try:
+
+        # Get the POST Data from user
+        PropertyID = request.POST['PropertyID']
+
+        # Now We get the property through its id
+        try:
+            # Search The Property using its ID
+            result = Property.objects.get(pk=PropertyID)
+        except Exception as e:
+            return httpErrorJsonResponse("Error: Property Not Found")
+
+        # Check if the user has already favorited the property
+        existing_favorite = Favourite.objects.filter(propertyID=result, user=user).first()
+
+        # Is the Property is List Exists
+        if existing_favorite:
+            existing_favorite.delete()
+            return httpSuccessJsonResponse('Success: Property Remove from Favourite List')
+        else:
+            return httpErrorJsonResponse('Error: Property is not in Favourite List')
+
+    # Something wrong just happen the process
+    except Exception as e:
+        
+        return httpErrorJsonResponse("Error: Invalid Request")
+
+
+# Store the Report of the User regarding Property
+@csrf_exempt
+def StorePropertyReport(request):
+
+    # Check the User Authentications
+    authResult = checkUserLogin(request=request)
+    if authResult[0] == False:
+        return httpErrorJsonResponse(authResult[1])
+
+    # Now we Get the User
+    user = authResult[1]
+
+    # We Begin our process to Store Report
+    try:
+
+        # Get the POST Data from user
+        PropertyID = request.POST['PropertyID']
+        ReportType = request.POST['ReportType']
+        ReportDetails = request.POST['ReportDetails']
+
+        # Now We get the property through its id
+        try:
+            # Search The Property using its ID
+            result = Property.objects.get(pk=PropertyID)
+        except Exception as e:
+            return httpErrorJsonResponse("Error: Property Not Found")
+
+        # Store the Report of the User
+        propertyReport = PropertyReport(
+            propertyID=result,
+            reportingUser=user,
+            issueType=ReportType,
+            reportDetails=ReportDetails,
+        )
+        propertyReport.save()
+
+        return httpSuccessJsonResponse("Success: Report is stored and will be viewed be Admin")
+
+    # Something wrong just happen the process
+    except Exception as e:
+        print(e)
         return httpErrorJsonResponse("Error: Invalid Request")

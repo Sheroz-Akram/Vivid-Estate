@@ -53,7 +53,8 @@ urlpatterns = [
     path("search_property", view=AdvertisementAPI.SearchLocationProperty, name="Search Properties with Location and Filters"),
     path("search_property_all", view=AdvertisementAPI.DetailSearchQuery, name="Detail Search Results of the Properties"),
     path("property_detail", view=AdvertisementAPI.GetPropertyDetail, name="Complete Detail of the property"),
-    
-    
+    path("add_to_favourite", view=AdvertisementAPI.AddToFavourite, name="Add Property to Favourite List"),
+    path("remove_from_favourite", view=AdvertisementAPI.RemoveFromFavourite, name="Remove Property from Favourite List"),
+    path("report_property", view=AdvertisementAPI.StorePropertyReport, name="Buyer Report Property to Admin"),
 
 ]

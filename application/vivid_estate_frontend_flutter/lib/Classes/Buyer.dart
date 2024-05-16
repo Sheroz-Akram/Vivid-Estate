@@ -8,7 +8,11 @@ class Buyer extends User {
   // Get the Complete Detail of the Property
   dynamic getPropertyDetail(BuildContext userContext, String propertyID) async {
     // Prepare our Post Request Data Body
-    var requestBody = {"PropertyID": propertyID};
+    var requestBody = {
+      "Email": emailAddress,
+      "PrivateKey": privateKey,
+      "PropertyID": propertyID
+    };
 
     // Data That We want to return
     dynamic PropertyData = {
@@ -26,7 +30,8 @@ class Buyer extends User {
       "Likes": 0,
       "SellerPicture": "",
       "SellerName": "",
-      "SellerEmail": ""
+      "SellerEmail": "",
+      "IsFavourite": "False"
     };
 
     // Send a Request to the Server
@@ -50,6 +55,7 @@ class Buyer extends User {
         PropertyData['SellerPicture'] = result['message']["SellerPicture"];
         PropertyData['SellerName'] = result['message']['SellerName'];
         PropertyData['SellerEmail'] = result['message']['SellerEmail'];
+        PropertyData['IsFavourite'] = result['message']['IsFavourite'];
       }
       ScaffoldMessenger.of(userContext)
           .showSnackBar(SnackBar(content: Text(result['message'])));
@@ -120,5 +126,92 @@ class Buyer extends User {
     });
 
     return searchResults;
+  }
+
+  // Add the property to the favourite list
+  dynamic addToFavourite(userContext, String propertyID) async {
+    // Variable to Store the Status of our request
+    var requestStatus = false;
+
+    // Now Set the request payload
+    var sendData = {
+      "Email": emailAddress,
+      "PrivateKey": privateKey,
+      "PropertyID": propertyID
+    };
+
+    // Send Request to Our Server
+    await server.sendPostRequest(userContext, "add_to_favourite", sendData,
+        (result) {
+      // Check the Status of Our Request
+      if (result['status'] == "success") {
+        requestStatus = true;
+      }
+
+      // Display a Status Message to the User
+      ScaffoldMessenger.of(userContext)
+          .showSnackBar(SnackBar(content: Text(result['message'])));
+    });
+
+    return requestStatus;
+  }
+
+  // Add the property to the favourite list
+  dynamic removeFromFavourite(userContext, String propertyID) async {
+    // Variable to Store the Status of our request
+    var requestStatus = false;
+
+    // Now Set the request payload
+    var sendData = {
+      "Email": emailAddress,
+      "PrivateKey": privateKey,
+      "PropertyID": propertyID
+    };
+
+    // Send Request to Our Server
+    await server.sendPostRequest(userContext, "remove_from_favourite", sendData,
+        (result) {
+      // Check the Status of Our Request
+      if (result['status'] == "success") {
+        requestStatus = true;
+      }
+
+      // Display a Status Message to the User
+      ScaffoldMessenger.of(userContext)
+          .showSnackBar(SnackBar(content: Text(result['message'])));
+    });
+
+    return requestStatus;
+  }
+
+  // Submit the Report of the Property Add to Admin
+  dynamic submitReport(userContext, String propertyID, String ReportType,
+      String ReportDetails) async {
+    // Variable to Store the Status of our request
+    var requestStatus = false;
+
+    // Now Set the request payload
+    var sendData = {
+      "Email": emailAddress,
+      "PrivateKey": privateKey,
+      "PropertyID": propertyID,
+      "ReportType": ReportType,
+      "ReportDetails": ReportDetails,
+    };
+
+    // Send Request to Our Server
+    await server.sendPostRequest(userContext, "report_property", sendData,
+        (result) {
+      // Check the Status of Our Request
+      if (result['status'] == "success") {
+        requestStatus = true;
+      }
+
+      // Display a Status Message to the User
+      ScaffoldMessenger.of(userContext)
+          .showSnackBar(SnackBar(content: Text(result['message'])));
+    });
+
+    return requestStatus;
   }
 }

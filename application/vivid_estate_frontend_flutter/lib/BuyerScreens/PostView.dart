@@ -27,6 +27,10 @@ class _PostView extends State<PostView> {
   var images = [];
   var totalImages = 1;
   var imageIndex = 1;
+  var isFavourite = false;
+
+  var selectedReportType = 'Issue';
+  final reportDetailsController = TextEditingController();
 
   // Our Server Object used to perform post request
   ServerInfo server = ServerInfo();
@@ -46,7 +50,8 @@ class _PostView extends State<PostView> {
     "Likes": 0,
     "SellerPicture": "Default.jpg",
     "SellerName": "",
-    "SellerEmail": ""
+    "SellerEmail": "",
+    "IsFavourite": "False"
   };
 
   @override
@@ -59,14 +64,55 @@ class _PostView extends State<PostView> {
 
   // Load the Details of the Property
   void loadPageData(BuildContext userContext) async {
+    // First Get Our Auth Data
+    await buyer.getAuthData();
+
     // Now Get the Property Data
     var responseData =
-        await buyer.getPropertyDetail(context, widget.PropertyID);
+        await buyer.getPropertyDetail(userContext, widget.PropertyID);
 
     // Update the State of our Property Data
     setState(() {
       PropertyData = responseData;
+      if (PropertyData['IsFavourite'] == "False") {
+        isFavourite = false;
+      } else {
+        isFavourite = true;
+      }
     });
+  }
+
+  // Add the property to the favourite list
+  void addToFavourite(BuildContext context) async {
+    // Send our request to the server
+    var status = await buyer.addToFavourite(context, widget.PropertyID);
+
+    // Make the Buttom Glow If Status is Success
+    if (status == true) {
+      setState(() {
+        isFavourite = true;
+      });
+    }
+  }
+
+  // Remove the Property from the Favourite List
+  void removeFromFavourite(BuildContext context) async {
+    // Send our request to the server
+    var status = await buyer.removeFromFavourite(context, widget.PropertyID);
+
+    // Make the Buttom Glow If Status is Success
+    if (status == true) {
+      setState(() {
+        isFavourite = false;
+      });
+    }
+  }
+
+  // Report the Property to the Admin
+  void reportProperty(BuildContext context, String propertyID,
+      String ReportType, String ReportDetails) async {
+    // Send our request to the server
+    await buyer.submitReport(context, propertyID, ReportType, ReportDetails);
   }
 
   @override
@@ -78,21 +124,121 @@ class _PostView extends State<PostView> {
                 width: 10,
               ),
               const Spacer(),
+
+              /**
+               * 
+               * Add To Favourite Button
+               * 
+               */
               InkWell(
                   onTap: () {
-                    print(" star ");
+                    // When User Click the Favourite Button
+                    if (isFavourite == false) {
+                      // Send Request to Add to Favourite
+                      addToFavourite(context);
+                    } else {
+                      // Send Request to Remove from the Favourite List
+                      removeFromFavourite(context);
+                    }
                   },
-                  child: const Icon(
-                    Icons.star_border_outlined,
+                  child: Icon(
+                    isFavourite ? Icons.star : Icons.star_border_outlined,
                     size: 30,
-                    color: Color(0XFF00627C),
+                    color: isFavourite ? Colors.amber : const Color(0XFF00627C),
                   )),
               const SizedBox(
                 width: 10,
               ),
+
+              /**
+               * 
+               * Button to report the ad to the Admin
+               * 
+               */
               InkWell(
                   onTap: () {
-                    print(" edit");
+                    // Display Dialog
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Submit Report'),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              const Text(
+                                'Select Report Type:',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              DropdownButton<String>(
+                                isExpanded: true,
+                                value: selectedReportType,
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    selectedReportType = newValue!;
+                                  });
+                                },
+                                items: <String>[
+                                  'Issue',
+                                  'Feedback',
+                                  'Other'
+                                ].map<DropdownMenuItem<String>>((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
+                              ),
+                              const SizedBox(height: 16.0),
+                              const Text(
+                                'Report Details:',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              TextField(
+                                controller: reportDetailsController,
+                                maxLines: 5,
+                                decoration: const InputDecoration(
+                                  hintText: 'Enter report details...',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ],
+                          ),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                // Handle submitting report here
+                                String reportType = selectedReportType;
+                                String reportDetails =
+                                    reportDetailsController.text;
+
+                                if (reportDetails.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              "Please write your report in detail.")));
+                                } else {
+                                  // Submit the Report to the Server
+                                  reportProperty(context, widget.PropertyID,
+                                      reportType, reportDetails);
+
+                                  // Close the dialog
+                                  Navigator.of(context).pop();
+                                }
+                              },
+                              child: const Text('Submit'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   },
                   child: const Icon(
                     Icons.report_gmailerrorred_rounded,

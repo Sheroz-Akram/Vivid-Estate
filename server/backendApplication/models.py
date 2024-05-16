@@ -71,8 +71,6 @@ class Issue(models.Model):
         return "ID: " + str(self.id) + ">>\t\tUser: " + self.SubmitBy.full_name + "\t|\tStatus: " + self.ResolveStatus 
 
 
-
-
 # Listing Types
 listingTypes = (
     ("Rent", "Rent"),
@@ -113,3 +111,16 @@ class Property(models.Model):
 class PropertyImage(models.Model):
     imageLocation = models.CharField(max_length=255)
     propertyID = models.ForeignKey(Property, on_delete=models.CASCADE)
+
+# Store the Favourite Properties of the User
+class Favourite(models.Model):
+    propertyID = models.ForeignKey(Property, on_delete=models.CASCADE)
+    user = models.ForeignKey(ApplicationUser, on_delete=models.CASCADE)
+
+# Store the Report Request of the Buyer to Admin
+class PropertyReport(models.Model):
+    propertyID = models.ForeignKey(Property, on_delete=models.CASCADE)
+    reportingUser = models.ForeignKey(ApplicationUser, on_delete=models.CASCADE)
+    issueType = models.CharField(max_length=50)
+    reportDetails = models.TextField()
+
