@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/Welcome.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/DisplayHelper.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/InputValidator.dart';
 
 class User {
   // Attributes of our User
@@ -24,6 +26,12 @@ class User {
   late String password;
   late String fathername;
   late String cnic_name;
+
+  // Helper Classes
+  var inputValidator =
+      InputValidator(); // Input Validator to Check if our input is valid or not
+  var displayHelper =
+      DisplayHelper(); // Helps to display correct message and reponse to the screen
 
   // Object to Communicate with server
   var server = ServerInfo();
@@ -137,6 +145,67 @@ class User {
       ScaffoldMessenger.of(userContext)
           .showSnackBar(SnackBar(content: Text(result['message'])));
     });
+  }
+
+  // Login the User (This will generate a new private key)
+  dynamic login(BuildContext context, String email, String password) async {
+    // *** 1. Input Data Validation ***
+    // 1.1 Email Validation
+    if (!inputValidator.validateEmailAddress(email)) {
+      displayHelper.displaySnackBar(inputValidator.message, false, context);
+      return;
+    }
+    // 1.2 Password Validation
+    else if (!inputValidator.validatePassword(password)) {
+      displayHelper.displaySnackBar(inputValidator.message, false, context);
+      return;
+    }
+
+    // *** 2. Prepare Payload ***
+    var sendData = {"Email": email, "Password": password};
+
+    // *** 3. Send Request ***
+    // 3.1 Check Reponse Status
+    var responseStatus = false;
+
+    // Show Loadin Bar
+    displayHelper.displayLoadingbar();
+
+    // 3.2 Perform Request to Server
+    await server.sendPostRequest(context, "login", sendData, (result) {
+      // 3.3 Store the Response Status
+      responseStatus = result['status'] == "success";
+
+      // 3.4 Success Response from Server
+      if (responseStatus) {
+        // 3.4.1 Get and Store Data from the Reponse
+        emailAddress = email;
+        this.password = password;
+        privateKey = result['privateKey'];
+        userType = result['userType'];
+        profilePictureLocation = result['profilePicture'];
+      }
+
+      // 3.5 Display Message to Screen
+      displayHelper.displaySnackBar(result['message'], responseStatus, context);
+    });
+
+    // *** 4. Store User Data in Shared Preferences ***
+    if (responseStatus) {
+      var prefs = await SharedPreferences.getInstance();
+      prefs.setBool("isLogin", true);
+      prefs.setString("userEmail", emailAddress);
+      prefs.setString("privateKey", privateKey);
+      prefs.setString("userType", userType);
+      prefs.setString("profilePic", profilePictureLocation);
+      prefs.setString("password", this.password);
+    }
+
+    // Now Stop the Loading bar
+    displayHelper.stopLoadingBar(responseStatus);
+
+    // Return the Reponse Status
+    return responseStatus;
   }
 
   // Logout the User

@@ -1,13 +1,7 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:http/http.dart' as http;
-import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ForgotPassword.dart';
-import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerMain.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/User.dart';
 import 'package:vivid_estate_frontend_flutter/SellerMain.dart';
 
 class LoginPage extends StatefulWidget {
@@ -19,146 +13,27 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPage extends State<LoginPage> {
   // Controllers to handle user Input
-  final _email_controller = TextEditingController();
-  final _password_controller = TextEditingController();
-  var userExit = true;
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
 
-  // Store the User Login Information
-  void storeUserLoginData(String userEmail, String privateKey, String userType,
-      String profilePic, BuildContext myContext) async {
-    var prefs = await SharedPreferences.getInstance();
-    prefs.setBool("isLogin", true);
-    prefs.setString("userEmail", userEmail);
-    prefs.setString("privateKey", privateKey);
-    prefs.setString("userType", userType);
-    prefs.setString("profilePic", profilePic);
+  // User Class to Perform Different User Functions
+  var user = User();
 
-    // Move to the Next Page. Depending Upon User Type
-    Navigator.pop(myContext);
-    Navigator.pop(myContext);
-    if (userType == "Buyer") {
-      Navigator.push(myContext,
-          MaterialPageRoute(builder: (myContext) => const BuyerMain()));
-    } else {
-      Navigator.push(myContext,
-          MaterialPageRoute(builder: (myContext) => const SellerMain()));
-    }
-  }
+  // Perform the User Login
+  void performLogin(BuildContext context, String email, String password) async {
+    // Make a User Login Request
+    if (await user.login(context, email, password)) {
+      // Move to Home Page. Depends Upon User Type
+      Navigator.pop(context);
+      Navigator.pop(context);
 
-  // Validate Email Address
-  bool isEmailValid(String email) {
-    String pattern =
-        r'^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-    RegExp regex = RegExp(pattern);
-    return regex.hasMatch(email);
-  }
+      // Create a new Home Page
+      var homePage =
+          user.userType == "Buyer" ? const BuyerMain() : const SellerMain();
 
-  // Make Sure Password is Strong
-  bool isPasswordStrong(String password) {
-    // Length Requirement
-    if (password.length < 8) {
-      return false;
-    }
-
-    // Capital Letter Requirement
-    bool hasCapital = false;
-    for (int i = 0; i < password.length; i++) {
-      if (password.codeUnitAt(i) >= 65 && password.codeUnitAt(i) <= 90) {
-        hasCapital = true;
-        break;
-      }
-    }
-
-    return hasCapital;
-  }
-
-  /*
-
-  Send a Request to the Server
-
-
-  */
-  void sendLoginRequest(email, password, myContext) async {
-    EasyLoading.instance
-      ..userInteractions = false
-      ..loadingStyle = EasyLoadingStyle.dark;
-
-    setState(() {
-      userExit = false;
-    });
-    EasyLoading.show(
-      status: "Loading...",
-    );
-
-    // URL to Send Request
-    var host = ServerInfo().host;
-    var url = Uri.parse("$host/login");
-    try {
-      // Our Request
-      var response =
-          await http.post(url, body: {'Email': email, 'Password': password});
-
-      // Get a Response from the Server
-      if (response.statusCode == 200) {
-        var result = jsonDecode(response.body);
-
-        // Valid Request
-        if (result['status'] == "success") {
-          // Show Success Message
-          setState(() {
-            userExit = true;
-          });
-          EasyLoading.showSuccess(result['message']);
-
-          // Store User Information
-          storeUserLoginData(email, result['privateKey'], result['userType'],
-              result['profilePicture'], myContext);
-        }
-        // Error in request
-        else {
-          setState(() {
-            userExit = true;
-          });
-          EasyLoading.showError(result['message']);
-        }
-      } else {
-        setState(() {
-          userExit = true;
-        });
-        throw Exception('Failed to load data');
-      }
-    }
-
-    // Error Connecting to Server
-    catch (e) {
-      setState(() {
-        userExit = true;
-      });
-      EasyLoading.showError('Failed to connect to the server: $e');
-    }
-  }
-
-  /*
-
-  Validate the input data and send request
-
-  */
-  void submitLoginData(BuildContext myContext) {
-    // Check Email is Valid or Not
-    if (!isEmailValid(_email_controller.text)) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("Entered email is invalid! Check email")));
-    } else if (!isPasswordStrong(_password_controller.text)) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("Password is weak. Enter Strong Password")));
-    }
-
-    // Clear All the checks
-    // Now send request to the server
-    else {
-      // Send the Request
-      sendLoginRequest(
-          _email_controller.text, _password_controller.text, myContext);
+      // Move to the Home Page
+      Navigator.push(
+          context, MaterialPageRoute(builder: (myContext) => homePage));
     }
   }
 
@@ -238,7 +113,7 @@ class _LoginPage extends State<LoginPage> {
                                 )),
                           ),
                           TextField(
-                            controller: _email_controller,
+                            controller: emailController,
                             decoration: const InputDecoration(
                                 hintText: "example@example.com"),
                           ),
@@ -264,7 +139,7 @@ class _LoginPage extends State<LoginPage> {
                           ),
                           TextField(
                             obscureText: true,
-                            controller: _password_controller,
+                            controller: passwordController,
                             decoration: const InputDecoration(
                                 hintText: "8+ Characters, 1 Capital"),
                           ),
@@ -285,8 +160,9 @@ class _LoginPage extends State<LoginPage> {
                               borderRadius: BorderRadius.circular(4.0),
                             ))),
                         onPressed: () {
-                          // Create a new Account
-                          submitLoginData(context);
+                          // Perform a Login request for the User
+                          performLogin(context, emailController.text,
+                              passwordController.text);
                         },
                         child: Container(
                           width: 200,

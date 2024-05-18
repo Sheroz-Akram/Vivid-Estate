@@ -318,7 +318,9 @@ def passwordReset(request):
 # Login to user account
 @csrf_exempt
 def loginUser(request):
-    print("NEW USER LOGIN REQUEST")
+
+    # Perform Log
+    print("\nNew Login Request. ")
 
     try:
         # Make Sure it is POST Request
@@ -328,6 +330,10 @@ def loginUser(request):
             Email = request.POST['Email']
             Password = request.POST['Password']
 
+            # Display User Info
+            print(json.dumps({"Email": Email, "Password": Password}))
+            print()
+
             # Get the User
             try:
                 # Find the User with Email Address
@@ -335,23 +341,23 @@ def loginUser(request):
 
                 # Check the User Password
                 if user.password != Password:
-                    return JsonResponse({"status":"error", "message": "Password not correct"})
+                    return JsonResponse({"status":"error", "message": "Enter Password is not Correct. Please try again"})
 
                 # Store the New User Password as Password
                 user.private_key = generate_random_string(50)
                 user.save()
 
                 # Display Message to the User
-                return JsonResponse({"status":"success", "message":"Login is successfull!", "privateKey" : user.private_key, "userType" : user.user_type, "profilePicture": user.profile_pic})
+                return JsonResponse({"status":"success", "message":"Account Login is Successfull", "privateKey" : user.private_key, "userType" : user.user_type, "profilePicture": user.profile_pic})
             
             # If User not found        
             except ApplicationUser.DoesNotExist as e:
-                return JsonResponse({"status":"error", "message": "User not found"})
+                return JsonResponse({"status":"error", "message": "User does not exist"})
 
     except Exception as e:
-        return JsonResponse({"status":"error", "message": "User not found"})
+        return JsonResponse({"status":"error", "message": "User does not exist"})
 
-    return JsonResponse({"status":"error", "message":"Invalid Request"})
+    return JsonResponse({"status":"error", "message":"Invalid Login Request"})
 
 
 # Generate a New OTP for Existing User To Reset the Password
