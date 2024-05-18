@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 
 class ReplyFileMessage extends StatefulWidget {
   const ReplyFileMessage(
@@ -22,9 +24,16 @@ class _ReplyFileMessage extends State<ReplyFileMessage> {
   var fileName;
   var fileLocation;
 
+  // Download the file from the server
+  void downloadFile(
+      String fileName, String fileURL, BuildContext userContext) async {
+    if (!await launchUrl(Uri.parse(fileURL))) {
+      throw Exception('Could not launch $fileURL');
+    }
+  }
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     // Prase Json Data
@@ -71,9 +80,25 @@ class _ReplyFileMessage extends State<ReplyFileMessage> {
                       ),
                       Align(
                         alignment: Alignment.centerLeft,
+
+                        /**
+                         * 
+                         * Button to Download the Message file
+                         * 
+                         */
                         child: ElevatedButton(
                           onPressed: () {
-                            // Download the file
+                            // Get the Server Data
+                            var server = ServerInfo();
+                            var fileURL =
+                                "${server.host}/static/" + fileLocation;
+
+                            // Now Start Downloading the File
+                            try {
+                              downloadFile(fileName, fileURL, context);
+                            } catch (e) {
+                              print(e);
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor:

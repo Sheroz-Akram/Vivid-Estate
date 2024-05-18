@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
-
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/widgets.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 
 class SendFileMessage extends StatefulWidget {
   const SendFileMessage(
@@ -21,6 +22,14 @@ class _SendFileMessage extends State<SendFileMessage> {
   // Variables to Store the Files Data
   var fileName;
   var fileLocation;
+
+  // Download the file from the server
+  void downloadFile(
+      String fileName, String fileURL, BuildContext userContext) async {
+    if (!await launchUrl(Uri.parse(fileURL))) {
+      throw Exception('Could not launch $fileURL');
+    }
+  }
 
   @override
   void initState() {
@@ -72,9 +81,24 @@ class _SendFileMessage extends State<SendFileMessage> {
                       ),
                       Align(
                         alignment: Alignment.centerLeft,
+                        /**
+                         * 
+                         * Button to Download the Message file
+                         * 
+                         */
                         child: ElevatedButton(
                           onPressed: () {
-                            // Download the file
+                            // Get the Server Data
+                            var server = ServerInfo();
+                            var fileURL =
+                                "${server.host}/static/" + fileLocation;
+
+                            // Now Start Downloading the File
+                            try {
+                              downloadFile(fileName, fileURL, context);
+                            } catch (e) {
+                              print(e);
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
