@@ -24,6 +24,8 @@ admin.site.register(ChatMessage)
 admin.site.register(Issue)
 admin.site.register(Property)
 admin.site.register(PropertyImage)
+admin.site.register(Favourite)
+admin.site.register(PropertyReport)
 
 
 urlpatterns = [

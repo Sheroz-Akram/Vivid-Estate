@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/Reply.dart';
+import 'package:vivid_estate_frontend_flutter/Chat/ReplyFileMessage.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/Send.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/SendFileMessage.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/User.dart';
@@ -268,11 +269,17 @@ class _ChatScreen extends State<ChatScreen> {
                                   message: messages[index]['Message'],
                                   time: messages[index]['Time'],
                                   status: messages[index]['Status'])
+                          :
                           // Display File Messages
-                          : SendFileMessage(
-                              message: messages[index]['Message'],
-                              time: messages[index]['Time'],
-                              status: messages[index]['Status']),
+                          messages[index]['Type'] == "Reply"
+                              ? ReplyFileMessage(
+                                  message: messages[index]['Message'],
+                                  time: messages[index]['Time'],
+                                  status: messages[index]['Status'])
+                              : SendFileMessage(
+                                  message: messages[index]['Message'],
+                                  time: messages[index]['Time'],
+                                  status: messages[index]['Status']),
                   itemCount: messages.length,
                 ),
               ),
@@ -312,7 +319,7 @@ class _ChatScreen extends State<ChatScreen> {
                         scrollToBottom(_scoll_controller);
                       },
                       icon: const Icon(Icons.attach_file_sharp),
-                      iconSize: MediaQuery.of(context).size.width * 0.10,
+                      iconSize: 50,
                       color: const Color(0xFF006E86),
                     ),
 
@@ -322,7 +329,7 @@ class _ChatScreen extends State<ChatScreen> {
                      * 
                      */
                     SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.80,
+                      width: MediaQuery.of(context).size.width - 80,
                       child: TextFormField(
                         controller: _send_controller,
                         keyboardType: TextInputType.multiline,
