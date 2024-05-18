@@ -35,8 +35,8 @@ class Buyer extends User {
     };
 
     // Send a Request to the Server
-    await server.sendPostRequest(userContext, "property_detail", requestBody,
-        (result) {
+    await serverHelper
+        .sendPostRequest(userContext, "property_detail", requestBody, (result) {
       // We get a successfull response
       if (result['status'] == "success") {
         // Now we Store the Data
@@ -82,7 +82,7 @@ class Buyer extends User {
     };
 
     // Send Our POST Requst to the Server
-    await server.sendPostRequest(
+    await serverHelper.sendPostRequest(
         userContext, "search_property", searchQueryData, (result) {
       if (result['status'] == "success") {
         for (var element in result['message']['SearchItems']) {
@@ -114,7 +114,7 @@ class Buyer extends User {
     };
 
     // Send Our POST Requst to the Server
-    await server.sendPostRequest(
+    await serverHelper.sendPostRequest(
         userContext, "search_property_all", searchQueryData, (result) {
       if (result['status'] == "success") {
         for (var element in result['message']['SearchItems']) {
@@ -141,8 +141,8 @@ class Buyer extends User {
     };
 
     // Send Request to Our Server
-    await server.sendPostRequest(userContext, "add_to_favourite", sendData,
-        (result) {
+    await serverHelper
+        .sendPostRequest(userContext, "add_to_favourite", sendData, (result) {
       // Check the Status of Our Request
       if (result['status'] == "success") {
         requestStatus = true;
@@ -169,8 +169,8 @@ class Buyer extends User {
     };
 
     // Send Request to Our Server
-    await server.sendPostRequest(userContext, "remove_from_favourite", sendData,
-        (result) {
+    await serverHelper.sendPostRequest(
+        userContext, "remove_from_favourite", sendData, (result) {
       // Check the Status of Our Request
       if (result['status'] == "success") {
         requestStatus = true;
@@ -200,7 +200,7 @@ class Buyer extends User {
     };
 
     // Send Request to Our Server
-    await server.sendPostRequest(userContext, "report_property", sendData,
+    await serverHelper.sendPostRequest(userContext, "report_property", sendData,
         (result) {
       // Check the Status of Our Request
       if (result['status'] == "success") {

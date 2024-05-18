@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/ChatScreen.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/Chat.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/ChatManager.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/DisplayHelper.dart';
 
 class ChatHome extends StatefulWidget {
   const ChatHome({super.key});
@@ -13,68 +16,42 @@ class ChatHome extends StatefulWidget {
 
 class _ChatHome extends State<ChatHome> {
   // Chats Data to Display
-  var names = [];
-  var messages = [];
-  var img = [];
-  var times = [];
-  var chatID = [];
-  var countMessages = [];
   var server = ServerInfo();
+
+  // All the Chat Availible
+  ChatManager chatManager = ChatManager();
+  var displayHelper = DisplayHelper();
+  var isFirst = true;
 
   @override
   void initState() {
     super.initState();
+
+    // Display Initial Loading Bar
+    displayHelper.displayLoadingbar();
     getAllChats(context);
 
-    // Get New Messages
+    // Periodic Chats Load After 2 Seconds Each
     Timer.periodic(const Duration(seconds: 2), (timer) {
       getAllChats(context);
     });
   }
 
-  void getAllChats(myContext) async {
-    // Get Our Auth Data
-    var authData = await server.getAuthData();
+  // Get All the Chats of the User from server
+  void getAllChats(BuildContext context) async {
+    // Get All the Chats from Server
+    List<Chat> list = await chatManager.loadChats(context, chatManager, server);
 
-    // Send Data to Our Server
-    server.sendPostRequest(myContext, "get_all_chats", authData, (result) {
-      print(result);
-      // Valid Request
-      if (result['status'] == "success") {
-        var data = result['message'];
-        if (data.length > names.length) {
-          for (var i = names.length; i < data.length; i++) {
-            setState(() {
-              names.add(data[i]['fullName']);
-              messages.add(data[i]['lastMessage']);
-              img.add("${server.host}/static/" + data[i]['profilePicture']);
-              times.add(data[i]['time']);
-              chatID.add(data[i]['chatID']);
-              countMessages.add(data[i]['count']);
-            });
-          }
-        } else if (data.length < names.length) {
-          setState(() {
-            names = [];
-            messages = [];
-            img = [];
-            times = [];
-            chatID = [];
-            countMessages = [];
-          });
-        } else {
-          for (var i = 0; i < data.length; i++) {
-            setState(() {
-              names[i] = data[i]['fullName'];
-              messages[i] = data[i]['lastMessage'];
-              times[i] = data[i]['time'];
-              chatID[i] = data[i]['chatID'];
-              countMessages[i] = data[i]['count'];
-            });
-          }
-        }
-      }
+    // Chat All Chat from Server
+    setState(() {
+      chatManager.setChatList(list);
     });
+
+    // Stop the Loading Bar
+    if (isFirst) {
+      isFirst = false;
+      displayHelper.stopLoadingBar(chatManager.getChatsLength() > 0);
+    }
   }
 
   @override
@@ -104,80 +81,106 @@ class _ChatHome extends State<ChatHome> {
           ),
         ],
       ),
-      body: ListView.builder(
-        itemBuilder: (context, index) {
-          return SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.all(8.0),
-              child: InkWell(
-                onTap: () => {
-                  // Move to the Chat Screen
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ChatScreen(
-                              title: names[index],
-                              ChatID: chatID[index],
-                              ProfilePicture: img[index],
-                              lastScene: times[index])))
-                },
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(img[index]),
-                    child: Column(
-                      children: [
-                        Container(
-                            margin: const EdgeInsets.only(top: 27, left: 26),
-                            height: 10,
-                            width: 10,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              color: Colors.green,
-                            )),
-                      ],
+      body: chatManager.getChatsLength() == 0
+          // Display Message for Not Chat Availible
+          ? const Center(
+              child: Text(
+              "No Chats Found",
+              style: TextStyle(
+                  fontSize: 30, color: Color.fromARGB(255, 77, 77, 77)),
+            ))
+          // Display All the Chats Availible
+          : ListView.builder(
+              itemBuilder: (context, index) {
+                return SingleChildScrollView(
+                  child: Container(
+                    padding: const EdgeInsets.all(8.0),
+                    // Tap to Open Chat
+                    child: InkWell(
+                      onTap: () => {
+                        // Navigate to Chat Screen
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ChatScreen(
+                                    title: chatManager
+                                        .getChatData(index)
+                                        .personName,
+                                    ChatID:
+                                        chatManager.getChatData(index).chatID,
+                                    ProfilePicture: chatManager
+                                        .getChatData(index)
+                                        .personImage,
+                                    lastScene: chatManager
+                                        .getChatData(index)
+                                        .lastTime)))
+                      },
+                      // Chat Informtaion Display
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage: NetworkImage(
+                              chatManager.getChatData(index).personImage),
+                          child: Column(
+                            children: [
+                              Container(
+                                  margin:
+                                      const EdgeInsets.only(top: 27, left: 26),
+                                  height: 10,
+                                  width: 10,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    color: Colors.green,
+                                  )),
+                            ],
+                          ),
+                        ),
+                        title: Text(
+                          chatManager.getChatData(index).personName,
+                          style: const TextStyle(
+                              fontSize: 17, fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          chatManager.getChatData(index).lastMessage,
+                          style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        trailing: Column(
+                          children: [
+                            Text(
+                              chatManager.getChatData(index).lastTime,
+                              style: const TextStyle(
+                                  fontSize: 12, fontWeight: FontWeight.bold),
+                            ),
+                            chatManager
+                                        .getChatData(index)
+                                        .unviewMessagesCount !=
+                                    0
+                                ? CircleAvatar(
+                                    radius: 8,
+                                    backgroundColor: Colors.green,
+                                    child: Text(
+                                      (chatManager
+                                              .getChatData(index)
+                                              .unviewMessagesCount)
+                                          .toString(),
+                                      style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  )
+                                : const Text("")
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                  title: Text(
-                    names[index],
-                    style: const TextStyle(
-                        fontSize: 17, fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Text(
-                    messages[index],
-                    style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  trailing: Column(
-                    children: [
-                      Text(
-                        times[index],
-                        style: const TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.bold),
-                      ),
-                      countMessages[index] != 0
-                          ? CircleAvatar(
-                              radius: 8,
-                              backgroundColor: Colors.green,
-                              child: Text(
-                                (countMessages[index]).toString(),
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 8,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            )
-                          : const Text("")
-                    ],
-                  ),
-                ),
-              ),
+                );
+              },
+              itemCount: chatManager.getChatsLength(),
             ),
-          );
-        },
-        itemCount: names.length,
-      ),
 
       // This trailing comma makes auto-formatting nicer for build methods.
     );

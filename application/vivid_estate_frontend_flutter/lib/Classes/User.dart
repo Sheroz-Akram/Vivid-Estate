@@ -9,6 +9,7 @@ import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/Welcome.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/DisplayHelper.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/InputValidator.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/SharedPreferencesHelper.dart';
 
 class User {
   // Attributes of our User
@@ -32,9 +33,10 @@ class User {
       InputValidator(); // Input Validator to Check if our input is valid or not
   var displayHelper =
       DisplayHelper(); // Helps to display correct message and reponse to the screen
+  var sharedPreferenceHelper =
+      SharedPreferencesHelper(); // Helps to Store and Get Information from Shared Preferences
 
-  // Object to Communicate with server
-  var server = ServerInfo();
+  var serverHelper = ServerInfo(); // Helps to Communicate with  server
 
   // Get a User Authentication Data
   dynamic getAuthData() async {
@@ -61,11 +63,12 @@ class User {
     var sendData = {"Email": emailAddress, "PrivateKey": privateKey};
 
     // Send Request to Our Server
-    await server.sendPostRequest(userContext, "profile_data", sendData,
+    await serverHelper.sendPostRequest(userContext, "profile_data", sendData,
         (result) {
       if (result['status'] == "success") {
         var data = result['message'];
-        profilePictureLocation = "${server.host}/static/" + data['profilePic'];
+        profilePictureLocation =
+            "${serverHelper.host}/static/" + data['profilePic'];
         fullName = data['userFullName'];
         username = data['userName'];
         cnicNumber = data['cnicNumber'];
@@ -85,7 +88,8 @@ class User {
     sendData['Password'] = userPassword;
 
     // Send Request to Our Server
-    server.sendPostRequest(userContext, "delete_account", sendData, (result) {
+    serverHelper.sendPostRequest(userContext, "delete_account", sendData,
+        (result) {
       // If Success Logout the User. Account is deleted in the Server
       if (result['status'] == "success") {
         logoutUser(userContext);
@@ -107,7 +111,8 @@ class User {
     sendData['IssueDetails'] = issueDetails;
 
     // Post Our request
-    server.sendPostRequest(userContext, "submit_issue", sendData, (result) {
+    serverHelper.sendPostRequest(userContext, "submit_issue", sendData,
+        (result) {
       if (result['status'] == "success") {
         Navigator.pop(userContext);
       }
@@ -125,7 +130,8 @@ class User {
     sendData['CnicDOB'] = cnicDob;
 
     // Post Our request
-    server.sendPostRequest(userContext, "update_profile", sendData, (result) {
+    serverHelper.sendPostRequest(userContext, "update_profile", sendData,
+        (result) {
       if (result['status'] == "success") {
         Navigator.pop(userContext);
       }
@@ -141,7 +147,8 @@ class User {
     sendData['Feedback'] = newFeedback.toString();
 
     // Post Our request
-    server.sendPostRequest(userContext, "update_feedback", sendData, (result) {
+    serverHelper.sendPostRequest(userContext, "update_feedback", sendData,
+        (result) {
       ScaffoldMessenger.of(userContext)
           .showSnackBar(SnackBar(content: Text(result['message'])));
     });
@@ -172,34 +179,22 @@ class User {
     displayHelper.displayLoadingbar();
 
     // 3.2 Perform Request to Server
-    await server.sendPostRequest(context, "login", sendData, (result) {
+    await serverHelper.sendPostRequest(context, "login", sendData, (result) {
       // 3.3 Store the Response Status
       responseStatus = result['status'] == "success";
 
       // 3.4 Success Response from Server
       if (responseStatus) {
         // 3.4.1 Get and Store Data from the Reponse
-        emailAddress = email;
-        this.password = password;
-        privateKey = result['privateKey'];
+        sharedPreferenceHelper.storeUserData(email, result['privateKey'],
+            result['userType'], result['profilePicture'], password);
+        // Store the Type of the User
         userType = result['userType'];
-        profilePictureLocation = result['profilePicture'];
       }
 
       // 3.5 Display Message to Screen
       displayHelper.displaySnackBar(result['message'], responseStatus, context);
     });
-
-    // *** 4. Store User Data in Shared Preferences ***
-    if (responseStatus) {
-      var prefs = await SharedPreferences.getInstance();
-      prefs.setBool("isLogin", true);
-      prefs.setString("userEmail", emailAddress);
-      prefs.setString("privateKey", privateKey);
-      prefs.setString("userType", userType);
-      prefs.setString("profilePic", profilePictureLocation);
-      prefs.setString("password", this.password);
-    }
 
     // Now Stop the Loading bar
     displayHelper.stopLoadingBar(responseStatus);
@@ -266,7 +261,8 @@ class User {
   }
 
   // Get the current location of the user
-  Future<void> getCityLocation(userContext) async {
+  Future<void> getCityLocation(context) async {
+    // Store Location Permissions
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -274,8 +270,8 @@ class User {
       // Check if Location Permission are enabled or not
       serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        ScaffoldMessenger.of(userContext).showSnackBar(
-            const SnackBar(content: Text("Please enable location service.")));
+        displayHelper.displaySnackBar(
+            "Please enable location service.", false, context);
         await Geolocator.openAppSettings();
       }
 
@@ -284,8 +280,8 @@ class User {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          ScaffoldMessenger.of(userContext).showSnackBar(const SnackBar(
-              content: Text("Request to access the location is denied")));
+          displayHelper.displaySnackBar(
+              "Request to access the location is denied", false, context);
         }
       }
 
