@@ -37,6 +37,11 @@ class Chat {
     return messageList[index];
   }
 
+  // Add New Message to our List
+  void AddNewMessage(Message newMessage) {
+    messageList.add(newMessage);
+  }
+
   // Get All the Messages
   Future<List<Message>> getMessages(BuildContext context) async {
     // Get Our Auth Data
@@ -135,6 +140,25 @@ class Chat {
     });
 
     return messageList;
+  }
+
+  // Delete Complete Chat data
+  Future<bool> deleteChat(BuildContext context) async {
+    // Variable to Check the Response Status of Our Request
+    var responseStatus = false;
+
+    // Get Our Auth Data
+    var authData = await server.getAuthData();
+    authData['ChatID'] = (chatID).toString();
+
+    // Send Data to Our Server
+    await server.sendPostRequest(context, "delete_chat", authData, (result) {
+      // Valid Request
+      if (result['status'] == "success") {
+        responseStatus = true;
+      }
+    });
+    return responseStatus;
   }
 }
 

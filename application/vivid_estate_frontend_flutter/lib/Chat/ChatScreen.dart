@@ -105,22 +105,16 @@ class _ChatScreen extends State<ChatScreen> {
   }
 
   // Delete User Chat Function
-  void deleteChat(myContext) async {
-    // Get Our Auth Data
-    var authData = await server.getAuthData();
-    authData['ChatID'] = (widget.ChatID).toString();
+  void DeleteChat(BuildContext context) async {
+    // Send Our Request to Server
+    if (await chat.deleteChat(context) == true) {
+      // Display Message To Our User
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Chat deleted successfully")));
 
-    // Send Data to Our Server
-    server.sendPostRequest(myContext, "delete_chat", authData, (result) {
-      // Valid Request
-      if (result['status'] == "success") {
-        ScaffoldMessenger.of(myContext).showSnackBar(
-            const SnackBar(content: Text("Chat deleted successfully")));
-
-        Navigator.pop(myContext);
-        Navigator.pop(myContext);
-      }
-    });
+      Navigator.pop(context);
+      Navigator.pop(context);
+    }
   }
 
   // Pick a file from the Menu
@@ -148,7 +142,7 @@ class _ChatScreen extends State<ChatScreen> {
                 value: "1",
                 child: InkWell(
                   onTap: () {
-                    deleteChat(context);
+                    DeleteChat(context);
                   },
                   child: const Text("Delete Chat"),
                 ),
@@ -261,8 +255,18 @@ class _ChatScreen extends State<ChatScreen> {
                             context);
 
                         // Now we Send a Message to Server
-                        sendMessage(context, responseMessage, _scoll_controller,
-                            "file");
+                        chat.AddNewMessage(Message(
+                            Status: "Send",
+                            MessageContent: responseMessage,
+                            MessageType: "file",
+                            Time: "now",
+                            Type: "Send"));
+
+                        // Now We Update Our State
+                        var messageList = chat.messageList;
+                        setState(() {
+                          chat.setMessages(messageList);
+                        });
 
                         // Scoll to the Bottom
                         scrollToBottom(_scoll_controller);
