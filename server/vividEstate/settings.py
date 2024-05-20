@@ -29,7 +29,7 @@ DEBUG = True
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-PROFILE_PIC_ROOT = os.path.join(BASE_DIR, "ProfilePics")
+FILESTORAGE = os.path.join(BASE_DIR, "FileStorage")
 
 ALLOWED_HOSTS = [
     '*'
@@ -139,8 +139,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / "ProfilePics",
-    BASE_DIR / "Images",
+    BASE_DIR / "FileStorage",
 ]
 
 # Default primary key field type

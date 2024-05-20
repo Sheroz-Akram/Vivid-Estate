@@ -109,8 +109,8 @@ class _ProfileHome extends State<ProfileHome> {
             margin: const EdgeInsets.only(top: 20),
             child: ListTile(
               leading: SizedBox(
-                  height: 70,
-                  width: 70,
+                  height: 50,
+                  width: 50,
                   child: CircleAvatar(
                       backgroundImage: NetworkImage(profilePicture))),
               title: Text(

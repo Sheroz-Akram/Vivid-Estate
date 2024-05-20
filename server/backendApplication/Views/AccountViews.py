@@ -51,20 +51,19 @@ def OcrCNIC(request):
                     return JsonResponse({"status":"error", "result": "CNIC data already saved"})
 
                 # Create or get an instance of FileSystemStorage to handle saving
-                fs = FileSystemStorage(location=settings.MEDIA_ROOT)
+                fs = FileSystemStorage(location=settings.FILESTORAGE)
 
                 # Save the file directly
-                fileNewName = str(uuid.uuid4()) + imageFile.name
+                fileNewName = "file_" + str(uuid.uuid4()) + imageFile.name
                 filename = fs.save(fileNewName, imageFile)
-                file_path = os.path.join(settings.MEDIA_ROOT, filename)
 
                 # Store the File Path
-                user.cnic_file = file_path
+                user.cnic_file = fileNewName
                 user.save()
 
                 # Perform the OCR Operation
                 result['status'] = "success"
-                result['result'] = getCnicDetails(file_path)
+                result['result'] = getCnicDetails(fileNewName)
 
                 print("OCR Completed!")
 
@@ -534,18 +533,17 @@ def updateProfilePicture(request):
         imageFile = request.FILES['cnicImage']
 
         # Create or get an instance of FileSystemStorage to handle saving
-        fs = FileSystemStorage(location=settings.PROFILE_PIC_ROOT)
+        fs = FileSystemStorage(location=settings.FILESTORAGE)
         
         # Save the file directly
-        fileNewName = str(uuid.uuid4()) + imageFile.name
+        fileNewName = "file_" + str(uuid.uuid4()) + imageFile.name
         filename = fs.save(fileNewName, imageFile)
-        file_path = os.path.join(settings.PROFILE_PIC_ROOT, filename)
 
         # Delete the previous profile picture of the user
         fs.delete(user.profile_pic)
 
         # Store the File Path
-        user.profile_pic = file_path
+        user.profile_pic = fileNewName
         user.save()
 
         return httpSuccessJsonResponse("Profile picture has been update successfully")

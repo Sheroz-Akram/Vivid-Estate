@@ -328,15 +328,14 @@ def StoreSendFile(request):
         ChatID = request.POST['ChatID']
 
         # Create or get an instance of FileSystemStorage to handle saving
-        fs = FileSystemStorage(location=settings.PROFILE_PIC_ROOT)
+        fs = FileSystemStorage(location=settings.FILESTORAGE)
         
         # Save the file directly
-        fileNewName = str(uuid.uuid4()) + sendFile.name
+        fileNewName = "file_" + str(uuid.uuid4()) + sendFile.name
         filename = fs.save(fileNewName, sendFile)
-        file_path = os.path.join(settings.PROFILE_PIC_ROOT, filename)
 
         # We add the store the file data into json format in message
-        UserMessage = json.dumps({"fileLocation": file_path, "fileName": sendFile.name})
+        UserMessage = json.dumps({"fileLocation": fileNewName, "fileName": sendFile.name})
 
         # Check the User Chat Access
         userChatAuth = validUserChatAccess(user=user, chatID=ChatID)

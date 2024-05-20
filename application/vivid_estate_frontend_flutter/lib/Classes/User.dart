@@ -305,6 +305,9 @@ class User {
     // Store the Response Message from the Server
     var responseMessage = "";
 
+    // Get the Auth Data
+    await getAuthData();
+
     // Our API End Point
     var host = ServerInfo().host;
     var url = Uri.parse("$host/send_file_message");
@@ -341,7 +344,7 @@ class User {
     } catch (e) {
       // An error has error in sending the file
       ScaffoldMessenger.of(userContext).showSnackBar(
-          const SnackBar(content: Text("A network error has occured")));
+          SnackBar(content: Text("A network error has occured $e")));
     }
 
     return responseMessage;

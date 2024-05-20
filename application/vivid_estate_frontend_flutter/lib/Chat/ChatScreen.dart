@@ -5,6 +5,7 @@ import 'package:vivid_estate_frontend_flutter/Chat/Reply.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/ReplyFileMessage.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/Send.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/SendFileMessage.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/Chat.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/User.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 import 'package:file_picker/file_picker.dart';
@@ -15,139 +16,92 @@ class ChatScreen extends StatefulWidget {
       required this.title,
       required this.ChatID,
       required this.ProfilePicture,
-      required this.lastScene});
+      required this.lastScene,
+      required this.chatInfo});
   final String title;
   final int ChatID;
   final String ProfilePicture;
   final String lastScene;
+
+  // Information About the Chat With Other User
+  final Chat chatInfo;
 
   @override
   State<ChatScreen> createState() => _ChatScreen();
 }
 
 class _ChatScreen extends State<ChatScreen> {
-  // Store all the Messages
-  var messages = [];
   final _send_controller = TextEditingController();
   final _scoll_controller = ScrollController();
   var server = ServerInfo();
 
   // Our User Object
   var user = User();
+  late Chat chat;
 
   @override
   void initState() {
     super.initState();
 
-    getAllMessages(context);
+    // Store Our Chat Information
+    chat = widget.chatInfo;
 
-    PageLoad();
+    // Get the Complete Messages of all the User
+    GetCompleteMessages(context, _scoll_controller);
+
+    // Get New Messages from the Server
+    Timer.periodic(const Duration(seconds: 2), (timer) {
+      // Periodic Update Our Message List
+      GetNewMessages(context, _scoll_controller);
+    });
+  }
+
+  // Get the Complete List of Messages from the Server
+  void GetCompleteMessages(
+      BuildContext context, ScrollController scrollController) async {
+    // Retrive All the Messages
+    List<Message> messageList = await chat.getMessages(context);
+
+    // Update Our Views
+    setState(() {
+      chat.setMessages(messageList);
+    });
 
     // Scoll to the Bottom
-    scrollToBottom(_scoll_controller);
-
-    // Get New Messages
-    Timer.periodic(const Duration(seconds: 2), (timer) {
-      getUnviewMessages(context);
-    });
+    scrollToBottom(scrollController);
   }
 
-  // Load All the Data of the Page
-  void PageLoad() async {
-    await user.getAuthData();
-  }
+  void GetNewMessages(
+      BuildContext context, ScrollController scrollController) async {
+    // Retrive All the Messages
+    List<Message> messageList = await chat.getNewMessages(context);
 
-  // Get all the Chat Messsages
-  void getAllMessages(myContext) async {
-    // Get Our Auth Data
-    var authData = await server.getAuthData();
-    authData['ChatID'] = (widget.ChatID).toString();
-
-    // Send Data to Our Server
-    server.sendPostRequest(myContext, "get_all_messages", authData, (result) {
-      // Valid Request
-      if (result['status'] == "success") {
-        var data = result['message'];
-        for (var i = 0; i < data.length; i++) {
-          setState(() {
-            messages = data;
-            _send_controller.text = "";
-          });
-        }
-        // Scoll to the Bottom
-        scrollToBottom(_scoll_controller);
-      }
+    // Update Our Views
+    setState(() {
+      chat.setMessages(messageList);
     });
+
+    // Scoll to the Bottom
+    scrollToBottom(scrollController);
   }
 
   // Send Message to the Other User
-  void getUnviewMessages(myContext) async {
-    // Get Our Auth Data
-    var authData = await server.getAuthData();
-    authData['ChatID'] = (widget.ChatID).toString();
+  void sendMessage(BuildContext context, String message,
+      ScrollController scrollController, String messageType) async {
+    // Now We Send Message to Our Server
+    List<Message> messageList =
+        await chat.sendMessage(context, message, messageType);
 
-    // Send Data to Our Server
-    server.sendPostRequest(myContext, "get_all_unview_messages", authData,
-        (result) {
-      // Valid Request
-      if (result['status'] == "success") {
-        var data = result['message'];
-        if (data.length > 0) {
-          var i = messages.length - 1;
-          while (messages[i]['Status'] == "Send") {
-            messages[i]['Status'] = "Viewed";
-            i--;
-          }
-        }
-        for (var i = 0; i < data.length; i++) {
-          setState(() {
-            messages.add({
-              "Status": data[i]['Status'],
-              "Message": data[i]['Message'],
-              "MessageType": data[i]['MessageType'],
-              "Time": data[i]['Time'],
-              "Type": data[i]['Type']
-            });
-          });
-        }
-        // Scoll to the Bottom
-        scrollToBottom(_scoll_controller);
-      }
+    // Now We Update Our State
+    setState(() {
+      chat.setMessages(messageList);
     });
-  }
 
-  // Send Message to the Other User
-  void sendMessage(myContext) async {
-    // Check if Message not empty
-    if (_send_controller.text == "") {
-      ScaffoldMessenger.of(myContext).showSnackBar(
-          const SnackBar(content: Text("Please Type as Message")));
-      return;
-    }
+    // Clear our text area
+    _send_controller.text = "";
 
-    // Get Our Auth Data
-    var authData = await server.getAuthData();
-    authData['ChatID'] = (widget.ChatID).toString();
-    authData['Message'] = _send_controller.text;
-
-    // Send Data to Our Server
-    server.sendPostRequest(myContext, "send_message", authData, (result) {
-      // Valid Request
-      if (result['status'] == "success") {
-        setState(() {
-          messages.add({
-            "Status": "Send",
-            "Message": _send_controller.text,
-            "MessageType": "text",
-            "Time": "now",
-            "Type": "Send"
-          });
-          _send_controller.text = "";
-        });
-        // Scoll to the Bottom
-        scrollToBottom(_scoll_controller);
-      }
-    });
+    // Scoll to the Bottom
+    scrollToBottom(scrollController);
   }
 
   // Delete User Chat Function
@@ -259,28 +213,31 @@ class _ChatScreen extends State<ChatScreen> {
                   itemBuilder: (context, index) =>
 
                       // Check Between Text Messages and Files
-                      messages[index]['MessageType'] == "text"
+                      chat.getMessage(index).MessageType == "text"
                           // Display Text Messages
-                          ? messages[index]['Type'] == "Reply"
+                          ? chat.getMessage(index).Type == "Reply"
                               ? Reply(
-                                  message: messages[index]['Message'],
-                                  time: messages[index]['Time'])
+                                  message:
+                                      chat.getMessage(index).MessageContent,
+                                  time: chat.getMessage(index).Time)
                               : Send(
-                                  message: messages[index]['Message'],
-                                  time: messages[index]['Time'],
-                                  status: messages[index]['Status'])
+                                  message:
+                                      chat.getMessage(index).MessageContent,
+                                  time: chat.getMessage(index).Time,
+                                  status: chat.getMessage(index).Status)
                           :
                           // Display File Messages
-                          messages[index]['Type'] == "Reply"
+                          chat.getMessage(index).Type == "Reply"
                               ? ReplyFileMessage(
-                                  message: messages[index]['Message'],
-                                  time: messages[index]['Time'],
-                                  status: messages[index]['Status'])
+                                  message:
+                                      chat.getMessage(index).MessageContent,
+                                  time: chat.getMessage(index).Time)
                               : SendFileMessage(
-                                  message: messages[index]['Message'],
-                                  time: messages[index]['Time'],
-                                  status: messages[index]['Status']),
-                  itemCount: messages.length,
+                                  message:
+                                      chat.getMessage(index).MessageContent,
+                                  time: chat.getMessage(index).Time,
+                                  status: chat.getMessage(index).Status),
+                  itemCount: chat.getTotalMessages(),
                 ),
               ),
               Align(
@@ -303,17 +260,9 @@ class _ChatScreen extends State<ChatScreen> {
                             (widget.ChatID).toString(),
                             context);
 
-                        // Add New Message to Our Status
-                        setState(() {
-                          messages.add({
-                            "Status": "Send",
-                            "Message": responseMessage,
-                            "MessageType": "file",
-                            "Time": "now",
-                            "Type": "Send"
-                          });
-                          _send_controller.text = "";
-                        });
+                        // Now we Send a Message to Server
+                        sendMessage(context, responseMessage, _scoll_controller,
+                            "file");
 
                         // Scoll to the Bottom
                         scrollToBottom(_scoll_controller);
@@ -341,7 +290,8 @@ class _ChatScreen extends State<ChatScreen> {
                               ),
                               onPressed: () {
                                 // Send a message to the User
-                                sendMessage(context);
+                                sendMessage(context, _send_controller.text,
+                                    _scoll_controller, "text");
                               },
                             ),
                             hintText: "Type a message",

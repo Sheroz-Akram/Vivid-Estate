@@ -103,17 +103,19 @@ class _ChatHome extends State<ChatHome> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => ChatScreen(
-                                    title: chatManager
-                                        .getChatData(index)
-                                        .personName,
-                                    ChatID:
-                                        chatManager.getChatData(index).chatID,
-                                    ProfilePicture: chatManager
-                                        .getChatData(index)
-                                        .personImage,
-                                    lastScene: chatManager
-                                        .getChatData(index)
-                                        .lastTime)))
+                                      title: chatManager
+                                          .getChatData(index)
+                                          .personName,
+                                      ChatID:
+                                          chatManager.getChatData(index).chatID,
+                                      ProfilePicture: chatManager
+                                          .getChatData(index)
+                                          .personImage,
+                                      lastScene: chatManager
+                                          .getChatData(index)
+                                          .lastTime,
+                                      chatInfo: chatManager.getChatData(index),
+                                    )))
                       },
                       // Chat Informtaion Display
                       child: ListTile(

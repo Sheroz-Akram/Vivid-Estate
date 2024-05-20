@@ -8,13 +8,9 @@ import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 
 class ReplyFileMessage extends StatefulWidget {
   const ReplyFileMessage(
-      {super.key,
-      required this.message,
-      required this.time,
-      required this.status});
+      {super.key, required this.message, required this.time});
   final String message;
   final String time;
-  final String status;
   @override
   State<ReplyFileMessage> createState() => _ReplyFileMessage();
 }

@@ -77,16 +77,15 @@ def StoreNewAd(request):
             imageFile = request.FILES['PropertyImage' + str(x)]
 
             # Create or get an instance of FileSystemStorage to handle saving
-            fs = FileSystemStorage(location=settings.PROFILE_PIC_ROOT)
+            fs = FileSystemStorage(location=settings.FILESTORAGE)
             
             # Save the file directly
-            fileNewName = str(uuid.uuid4()) + imageFile.name
+            fileNewName = "file_" + str(uuid.uuid4()) + imageFile.name
             filename = fs.save(fileNewName, imageFile)
-            file_path = os.path.join(settings.PROFILE_PIC_ROOT, filename)
 
             # Store the Property Image Location in the Server
             propertyImagesLocation = PropertyImage(
-                imageLocation = file_path,
+                imageLocation = fileNewName,
                 propertyID = propertyNew
             )
 
