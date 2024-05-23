@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
+import 'package:vivid_estate_frontend_flutter/BuyerScreens/ReviewPanel.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Buyer.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/Property.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 
 // ignore: must_be_immutable
@@ -20,39 +22,23 @@ class PostView extends StatefulWidget {
 
 /// Display The Preview of the Property
 class _PostView extends State<PostView> {
-  var Rs = ["7800000"];
-
   // The Index of the Image Display In Top Carousal
   var imageCarousalController = CarouselController();
   var images = [];
   var totalImages = 1;
   var imageIndex = 1;
-  var isFavourite = false;
 
+  // Report Issue Information
   var selectedReportType = 'Issue';
   final reportDetailsController = TextEditingController();
 
   // Our Server Object used to perform post request
   ServerInfo server = ServerInfo();
   var buyer = Buyer();
-  dynamic PropertyData = {
-    "Images": [],
-    "ImagesCount": 0,
-    "PropertyType": "",
-    "ListingType": "",
-    "Description": "",
-    "Location": "",
-    "Price": 0,
-    "Size": 0,
-    "Beds": 0,
-    "Floors": 0,
-    "Views": 0,
-    "Likes": 0,
-    "SellerPicture": "Default.jpg",
-    "SellerName": "",
-    "SellerEmail": "",
-    "IsFavourite": "False"
-  };
+
+  // Property Object To Store Property Details
+  Property property =
+      Property(propertyID: 0); // Varaible To Store Property Data
 
   @override
   void initState() {
@@ -63,47 +49,44 @@ class _PostView extends State<PostView> {
   }
 
   // Load the Details of the Property
-  void loadPageData(BuildContext userContext) async {
+  void loadPageData(BuildContext context) async {
     // First Get Our Auth Data
     await buyer.getAuthData();
 
-    // Now Get the Property Data
-    var responseData =
-        await buyer.getPropertyDetail(userContext, widget.PropertyID);
+    // Get the Property Details From Server
+    Property responseProperty =
+        await buyer.getPropertyDetail(context, widget.PropertyID);
 
-    // Update the State of our Property Data
+    // Now We Update Our State
     setState(() {
-      PropertyData = responseData;
-      if (PropertyData['IsFavourite'] == "False") {
-        isFavourite = false;
-      } else {
-        isFavourite = true;
-      }
+      property = responseProperty;
     });
   }
 
   // Add the property to the favourite list
   void addToFavourite(BuildContext context) async {
-    // Send our request to the server
-    var status = await buyer.addToFavourite(context, widget.PropertyID);
+    // Send A Reques to Add Property to Favourite
+    var requestStatus = await property.addToFavourite(
+        context, buyer.emailAddress, buyer.privateKey);
 
     // Make the Buttom Glow If Status is Success
-    if (status == true) {
+    if (requestStatus == true) {
       setState(() {
-        isFavourite = true;
+        property.isFavourite = true;
       });
     }
   }
 
   // Remove the Property from the Favourite List
   void removeFromFavourite(BuildContext context) async {
-    // Send our request to the server
-    var status = await buyer.removeFromFavourite(context, widget.PropertyID);
+    // Send A Reques to Add Property to Favourite
+    var requestStatus = await property.removeFromFavourite(
+        context, buyer.emailAddress, buyer.privateKey);
 
     // Make the Buttom Glow If Status is Success
-    if (status == true) {
+    if (requestStatus == true) {
       setState(() {
-        isFavourite = false;
+        property.isFavourite = true;
       });
     }
   }
@@ -133,7 +116,7 @@ class _PostView extends State<PostView> {
               InkWell(
                   onTap: () {
                     // When User Click the Favourite Button
-                    if (isFavourite == false) {
+                    if (property.isFavourite == false) {
                       // Send Request to Add to Favourite
                       addToFavourite(context);
                     } else {
@@ -142,9 +125,13 @@ class _PostView extends State<PostView> {
                     }
                   },
                   child: Icon(
-                    isFavourite ? Icons.star : Icons.star_border_outlined,
+                    property.isFavourite
+                        ? Icons.star
+                        : Icons.star_border_outlined,
                     size: 30,
-                    color: isFavourite ? Colors.amber : const Color(0XFF00627C),
+                    color: property.isFavourite
+                        ? Colors.amber
+                        : const Color(0XFF00627C),
                   )),
               const SizedBox(
                 width: 10,
@@ -296,14 +283,14 @@ class _PostView extends State<PostView> {
                         borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(15.0),
                             topRight: Radius.circular(15.0)),
-                        child: PropertyData['ImagesCount'] != 0
+                        child: property.imagesCount != 0
                             ? // Display the Images of the Properties in Carousel Slider
                             CarouselSlider.builder(
                                 carouselController: imageCarousalController,
-                                itemCount: PropertyData['ImagesCount'],
+                                itemCount: property.imagesCount,
                                 itemBuilder: (context, index, pageviewIndex) {
                                   return Image.network(
-                                    "${server.host}/static/${PropertyData['Images'][index]}",
+                                    "${server.host}/static/${property.images[index]}",
                                     fit: BoxFit.fill,
                                     height: 300,
                                     width: MediaQuery.of(context).size.width,
@@ -349,7 +336,7 @@ class _PostView extends State<PostView> {
                                 width: 5,
                               ),
                               Text(
-                                "${imageIndex.toString()}/${PropertyData['ImagesCount'].toString()}",
+                                "${imageIndex.toString()}/${property.imagesCount.toString()}",
                                 style: const TextStyle(color: Colors.white),
                               )
                             ],
@@ -368,7 +355,7 @@ class _PostView extends State<PostView> {
                                 duration: Durations.long1);
                             if (imageIndex - 1 == 0) {
                               setState(() {
-                                imageIndex = PropertyData['ImagesCount'];
+                                imageIndex = property.imagesCount;
                               });
                             } else {
                               setState(() {
@@ -395,7 +382,7 @@ class _PostView extends State<PostView> {
                             // Display Next Picture
                             imageCarousalController.nextPage(
                                 duration: Durations.long1);
-                            if (imageIndex + 1 > PropertyData['ImagesCount']) {
+                            if (imageIndex + 1 > property.imagesCount) {
                               setState(() {
                                 imageIndex = 1;
                               });
@@ -434,7 +421,7 @@ class _PostView extends State<PostView> {
                             children: [
                               // Price of the Property
                               Text(
-                                "RS ${formatNumber(PropertyData['Price'])}",
+                                "RS ${formatNumber(property.price)}",
                                 style: const TextStyle(
                                     color: Color(0XFF5F5F5F),
                                     fontWeight: FontWeight.bold,
@@ -477,7 +464,7 @@ class _PostView extends State<PostView> {
                                   width: 5,
                                 ),
                                 Text(
-                                  formatNumber(PropertyData['Likes']),
+                                  formatNumber(property.likes),
                                   style: const TextStyle(color: Colors.white),
                                 )
                               ],
@@ -499,7 +486,7 @@ class _PostView extends State<PostView> {
                           children: [
                             // Display Location
                             Text(
-                              PropertyData['Location'],
+                              property.location,
                               style: const TextStyle(
                                   color: Color(0XFF8D8D8D),
                                   fontWeight: FontWeight.bold,
@@ -516,7 +503,7 @@ class _PostView extends State<PostView> {
                                       fontSize: 16),
                                 ),
                                 Text(
-                                  PropertyData['PropertyType'],
+                                  property.propertyType,
                                   style: const TextStyle(
                                       color: Color(0XFF8D8D8D),
                                       fontWeight: FontWeight.bold,
@@ -535,7 +522,7 @@ class _PostView extends State<PostView> {
                                       fontSize: 16),
                                 ),
                                 Text(
-                                  PropertyData['ListingType'],
+                                  property.listingType,
                                   style: const TextStyle(
                                       color: Color(0XFF8D8D8D),
                                       fontWeight: FontWeight.bold,
@@ -565,7 +552,7 @@ class _PostView extends State<PostView> {
                                 width: 5,
                               ),
                               Text(
-                                formatNumber(PropertyData['Views']),
+                                formatNumber(property.views),
                                 style: const TextStyle(color: Colors.white),
                               )
                             ],
@@ -586,7 +573,7 @@ class _PostView extends State<PostView> {
                             width: 70,
                             child: CircleAvatar(
                               backgroundImage: NetworkImage(
-                                  "${server.host}/static/${PropertyData['SellerPicture']}"),
+                                  "${server.host}/static/${property.sellerPicture}"),
                             ),
                           ),
                           SizedBox(
@@ -597,7 +584,7 @@ class _PostView extends State<PostView> {
                                   alignment: Alignment.centerLeft,
                                   child: Container(
                                     margin: const EdgeInsets.only(left: 15),
-                                    child: Text(PropertyData['SellerName'],
+                                    child: Text(property.sellerName,
                                         style: const TextStyle(
                                             color: Color(0XFF5F5F5F),
                                             fontSize: 28)),
@@ -684,7 +671,7 @@ class _PostView extends State<PostView> {
                               height: 5,
                             ),
                             Text(
-                              "${PropertyData['Beds']} Beds",
+                              "${property.beds} Beds",
                               style: const TextStyle(
                                   color: Color(0XFF8D8D8D),
                                   fontSize: 18,
@@ -704,7 +691,7 @@ class _PostView extends State<PostView> {
                               height: 5,
                             ),
                             Text(
-                              "${PropertyData['Size']} m",
+                              "${property.size} m",
                               style: const TextStyle(
                                   color: Color(0XFF8D8D8D),
                                   fontSize: 18,
@@ -724,7 +711,7 @@ class _PostView extends State<PostView> {
                               height: 5,
                             ),
                             Text(
-                              "${PropertyData['Floors']} Floors",
+                              "${property.floors} Floors",
                               style: const TextStyle(
                                   color: Color(0XFF8D8D8D),
                                   fontSize: 18,
@@ -751,102 +738,21 @@ class _PostView extends State<PostView> {
                   width: MediaQuery.of(context).size.width,
                   margin: const EdgeInsets.only(left: 20, right: 20),
                   child: Text(
-                    PropertyData['Description'],
+                    property.description,
                     style:
                         const TextStyle(color: Color(0XFF8D8D8D), fontSize: 16),
                     maxLines: 10,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                      left: 20, right: 20, top: 20, bottom: 30),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0XFF00627C),
-                                side: const BorderSide(width: 3),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0))),
-                            onPressed: () {},
-                            child: Row(
-                              children: [
-                                Image.asset(
-                                  "assets/images/Image 17@1x (2).png",
-                                  width: 20,
-                                  height: 40,
-                                  color: Colors.white,
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                const Text(
-                                  "2D Layout",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 20),
-                                )
-                              ],
-                            )),
-                      ),
-                      Container(
-                        child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0XFF00627C),
-                                side: const BorderSide(width: 3),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0))),
-                            onPressed: () {},
-                            child: Row(
-                              children: [
-                                Image.asset(
-                                  "assets/images/Image 17@1x (6).png",
-                                  width: 20,
-                                  height: 40,
-                                  color: Colors.white,
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                const Text(
-                                  "Map",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 20),
-                                )
-                              ],
-                            )),
-                      ),
-                      Container(
-                        child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0XFF00627C),
-                                side: const BorderSide(width: 3),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0))),
-                            onPressed: () {},
-                            child: Row(
-                              children: [
-                                Image.asset(
-                                  "assets/images/Image 17@1x (3).png",
-                                  width: 20,
-                                  height: 40,
-                                  color: Colors.white,
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                const Text(
-                                  "360*",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 20),
-                                )
-                              ],
-                            )),
-                      ),
-                    ],
-                  ),
-                )
+
+                /**
+                 * 
+                 * Display Reviews Of Our Property
+                 * 
+                 */
+                ReviewPanel(
+                  propertyID: widget.PropertyID,
+                ),
               ],
             ),
           ),

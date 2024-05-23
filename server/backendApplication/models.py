@@ -113,6 +113,15 @@ class PropertyImage(models.Model):
     imageLocation = models.CharField(max_length=255)
     propertyID = models.ForeignKey(Property, on_delete=models.CASCADE)
 
+# Store Reviews of our property
+class PropertyReviews(models.Model):
+    propertyID = models.ForeignKey(Property, on_delete=models.CASCADE)
+    reviewPerson = models.ForeignKey(ApplicationUser, on_delete=models.CASCADE)
+    comment = models.TextField()
+    rating = models.IntegerField()
+    timestamp = models.DateTimeField(auto_now_add=True) 
+
+
 # Store the Favourite Properties of the User
 class Favourite(models.Model):
     propertyID = models.ForeignKey(Property, on_delete=models.CASCADE)

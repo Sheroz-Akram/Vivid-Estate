@@ -109,8 +109,6 @@ def SearchLocationProperty(request):
         # Get all the Data
         Query = request.POST['Query']
 
-        print(request.POST['Filter'])
-
         # Search
         results = Property.objects.filter(Q(location__icontains=Query))
 
@@ -187,7 +185,7 @@ def DetailSearchQuery(request):
     
     # Something wrong just happen the process
     except Exception as e:
-        return httpErrorJsonResponse("Error: Invalid Request")
+        return httpErrorJsonResponse("Error: Invalid Request" + str(e))
 
     
 # Get the complete detail of the property
@@ -233,9 +231,9 @@ def GetPropertyDetail(request):
 
         # Check if the Property is Added to Favourite or Not
         existing_favorite = Favourite.objects.filter(propertyID=result, user=user).first()
-        isFavourite = "False"
+        isFavourite = False
         if existing_favorite:
-            isFavourite = "True"
+            isFavourite = True
 
         # Update the View Count
         result.views = result.views + 1
@@ -265,6 +263,103 @@ def GetPropertyDetail(request):
     except Exception as e:
         return httpErrorJsonResponse("Error: Invalid Request")
 
+
+# Get the complete detail of the property
+@csrf_exempt
+def GetPropertyReviews(request):
+
+    # Check the User Authentications
+    authResult = checkUserLogin(request=request)
+    if authResult[0] == False:
+        return httpErrorJsonResponse(authResult[1])
+
+    # Now We Perform Our Operation
+    try:
+
+        # Get all the Data
+        PropertyID = request.POST['PropertyID']
+
+        try:
+            # Search The Property using its ID
+            result = Property.objects.get(pk=PropertyID)
+        except Exception as e:
+            return httpErrorJsonResponse("Error: Invalid Request. Property Not Found.")
+
+        # Now Send the Details of the Property Back to Client
+        message = {
+            "PropertyID": PropertyID,
+        }
+
+        # Now We Get All The Reviews of the Property
+        reviews = PropertyReviews.objects.filter(propertyID=result).order_by('-timestamp')
+        message['Reviews'] = []
+        message['ReviewsCount'] = 0
+
+        # Store The Reviews In Message
+        if reviews.count() > 0:
+            message['ReviewsCount'] = reviews.count()
+            
+            # Loop Through All The Reviews and Store them One by One
+            for review in reviews:
+                message['Reviews'].append({
+                    "ReviewID": review.id,
+                    "PersonName": review.reviewPerson.full_name,
+                    "PersonImage": review.reviewPerson.profile_pic,
+                    "ReviewTime": review.timestamp.strftime("%m/%d/%Y"),
+                    "ReviewRating": review.rating,
+                    "ReviewComment": review.comment
+                })
+
+        # Send JSON data back to the client
+        return httpSuccessJsonResponse(message)
+    
+    # Something wrong just happen the process
+    except Exception as e:
+        return httpErrorJsonResponse("Error: Invalid Request")
+
+# Store the Review of the Property in server
+@csrf_exempt
+def StorePropertyReview(request):
+
+    # Check the User Authentications
+    authResult = checkUserLogin(request=request)
+    if authResult[0] == False:
+        return httpErrorJsonResponse(authResult[1])
+    
+    # Now we Get the User
+    user = authResult[1]
+
+    # Now We Perform Our Operation
+    try:
+
+        # Get all the Data
+        PropertyID = request.POST['PropertyID']
+        ReviewComment = request.POST['ReviewComment']
+        ReviewRating = request.POST['ReviewRating']
+
+        try:
+            # Search The Property using its ID
+            result = Property.objects.get(pk=PropertyID)
+        except Exception as e:
+            return httpErrorJsonResponse("Error: Invalid Request. Property Not Found.")
+
+        # Now We Create another Review. As Property and User Verified
+        review = PropertyReviews(
+            propertyID=result, 
+            reviewPerson=user,
+            comment= ReviewComment,
+            rating= ReviewRating
+        )
+
+        # Save the Review To Database
+        review.save()
+
+        # Send JSON data back to the client
+        return httpSuccessJsonResponse("Review for the property is saved.")
+    
+    # Something wrong just happen the process
+    except Exception as e:
+        return httpErrorJsonResponse("Error: Invalid Request")
 
 # API to Add the Property to Favourite List by Buyer
 @csrf_exempt
