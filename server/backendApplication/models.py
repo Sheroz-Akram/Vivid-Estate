@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib import admin
+from django.utils import timezone
 
 # User model that store the data of both Buyer and Seller
 class ApplicationUser(models.Model):
@@ -104,9 +105,15 @@ class Property(models.Model):
     floors = models.IntegerField()
     views = models.IntegerField()
     likes = models.IntegerField()
+    timestamp = models.DateTimeField(auto_now_add=True) 
 
     def __str__(self):
         return "ID: " + str(self.id) + ">>\t\tDescription: " + ' '.join(self.description.split()[:5]) + "..." + "\t|\tType: " + self.propertyType + "\t|\tPrice: " + str(self.price)
+
+    def days_ago(self):
+        now = timezone.now()
+        difference = now - self.timestamp
+        return difference.days
 
 # Store the images of the location
 class PropertyImage(models.Model):

@@ -444,6 +444,57 @@ def RemoveFromFavourite(request):
         return httpErrorJsonResponse("Error: Invalid Request")
 
 
+# Get the list of favourite properties
+@csrf_exempt
+def GetFavouritePropertiesList(request):
+
+    # Check the User Authentications
+    authResult = checkUserLogin(request=request)
+    if authResult[0] == False:
+        return httpErrorJsonResponse(authResult[1])
+
+    # Now we Get the User
+    user = authResult[1]
+
+    # Now We Find the List and Send Data Back To Client
+    try:
+
+        # Find all the Favourite Properties
+
+        # Check if the user has already favorited the property
+        favourite_properties = Favourite.objects.filter(user=user)
+
+        # Now We Prase Each Favourite Property and Get Usefull Information
+        message = {
+            "PropertiesCount": favourite_properties.count(),
+            "Properties" : []
+        }
+        if favourite_properties.count() > 0:
+            # Loop Through Each Property
+            for favourite in favourite_properties:
+
+                # Get the Image of the Property
+                picture = PropertyImage.objects.filter(propertyID=favourite.propertyID).first()
+
+                # Store in Our Message
+                message['Properties'].append({
+                    "PropertyID": favourite.propertyID.id,
+                    "Image": picture.imageLocation,
+                    "Price": picture.propertyID.price,
+                    "Location": favourite.propertyID.abstractLocation,
+                    "TimeAgo": favourite.propertyID.days_ago(),
+                    "Views": favourite.propertyID.views,
+                    "Likes": favourite.propertyID.likes
+                })
+
+        return httpSuccessJsonResponse(message)
+
+    # Something wrong just happen the process
+    except Exception as e:
+        
+        return httpErrorJsonResponse("Error: Invalid Request" + str(e))
+
+
 # Store the Report of the User regarding Property
 @csrf_exempt
 def StorePropertyReport(request):

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
@@ -45,6 +46,46 @@ class Buyer extends User {
         context, emailAddress, privateKey, comment, rating);
 
     return requestStatus;
+  }
+
+  // Get the Favourite List From Server
+  Future<List<dynamic>> getFavouriteList(BuildContext context) async {
+    // Make A Payload to Send to the Server
+    var requestPayload = {
+      "Email": emailAddress,
+      "PrivateKey": privateKey,
+    };
+
+    // Store the Result Data
+    var favouriteProperties = [];
+
+    // Send Request to Our Server
+    await serverHelper.sendPostRequest(
+        context, "get_all_favourites", requestPayload, (result) {
+      print(result);
+      // Check the Status of Our Request
+      if (result['status'] == "success") {
+        // Loop Through All The favourites from the list
+        for (var i = 0; i < result['message']['PropertiesCount']; i++) {
+          // Add Each Property to our result
+          favouriteProperties.add({
+            "PropertyID": result['message']['Properties'][i]['PropertyID'],
+            "Image":
+                "${serverHelper.host}/static/${result['message']['Properties'][i]['Image']}",
+            "Price": displayHelper
+                .formatNumber(result['message']['Properties'][i]['Price']),
+            "Location": result['message']['Properties'][i]['Location'],
+            "TimeAgo": result['message']['Properties'][i]['TimeAgo'],
+            "Views": displayHelper
+                .formatNumber(result['message']['Properties'][i]['Views']),
+            "Likes": displayHelper
+                .formatNumber(result['message']['Properties'][i]['Likes']),
+          });
+        }
+      }
+    });
+
+    return favouriteProperties;
   }
 
   // Perform the Search Operation on Location Based on User Query

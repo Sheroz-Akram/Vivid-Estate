@@ -56,6 +56,7 @@ urlpatterns = [
     path("property_detail", view=AdvertisementAPI.GetPropertyDetail, name="Complete Detail of the property"),
     path("add_to_favourite", view=AdvertisementAPI.AddToFavourite, name="Add Property to Favourite List"),
     path("remove_from_favourite", view=AdvertisementAPI.RemoveFromFavourite, name="Remove Property from Favourite List"),
+    path("get_all_favourites", view=AdvertisementAPI.GetFavouritePropertiesList, name="Get the List of favourite properties"),
     path("report_property", view=AdvertisementAPI.StorePropertyReport, name="Buyer Report Property to Admin"),
     path("get_all_reviews", view=AdvertisementAPI.GetPropertyReviews, name="Get All The Reviews of the Property"),
     path("submit_review", view=AdvertisementAPI.StorePropertyReview, name="Store the new review of property"),

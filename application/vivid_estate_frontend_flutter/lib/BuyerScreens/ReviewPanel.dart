@@ -4,9 +4,9 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Buyer.dart';
-import 'package:vivid_estate_frontend_flutter/Classes/DisplayHelper.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Review.dart';
 
+// ignore: must_be_immutable
 class ReviewPanel extends StatefulWidget {
   ReviewPanel({super.key, required this.propertyID});
 
