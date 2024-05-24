@@ -24,7 +24,7 @@ def InitiateChat(request):
     try:
         
         # Get the other data files
-        Email = request.POST['Email']
+        Email = user.email_address
         SellerEmail = request.POST["SellerEmail"]
 
         # Check If Seller Email is not equal to Buyer Email
@@ -45,12 +45,10 @@ def InitiateChat(request):
         chat_room.unviewPerson = seller
         chat_room.save()
 
-        # Create a new greeting message with Buyer and Seller
-        message = ChatMessage(ChatRoom=chat_room, Sender=user, Message= "Hey! " + seller.full_name, Status="Send")
-        message.save()
+        responseMessage = {"fullName":chat_room.Seller.full_name, "profilePicture": chat_room.Seller.profile_pic ,"email":chat_room.Seller.email_address,"lastMessage":chat_room.LastMessage, "time": chat_room.modified.strftime("%H:%M %p"), "chatID": chat_room.id, "count": 0}
 
         # Display Message to the User
-        return httpSuccessJsonResponse("Chat is successfully initiated!")
+        return httpSuccessJsonResponse(responseMessage)
             
     # Something wrong just happen the process
     except Exception as e:

@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/Chat.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Property.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Review.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/User.dart';
@@ -181,5 +182,47 @@ class Buyer extends User {
     });
 
     return requestStatus;
+  }
+
+  // Initiate a Chat with a Property Seller
+  Future<Chat> initiateChatWithSeller(
+      BuildContext context, String sellerEmailAddress) async {
+    // Variable to Store the Status of our request
+    var requestStatus = false;
+
+    // Now Set the request payload
+    var sendData = {
+      "Email": emailAddress,
+      "PrivateKey": privateKey,
+      "SellerEmail": sellerEmailAddress,
+    };
+
+    // Our Chat Object That We want to Send Back To User
+    Chat chat = Chat(0, "", "", "", "", "");
+
+    // Send Request to Our Server
+    await serverHelper.sendPostRequest(context, "initiate_chat", sendData,
+        (result) {
+      // Check the Status of Our Request
+      if (result['status'] == "success") {
+        requestStatus = true;
+
+        var data = result['message'];
+
+        // Now We Populate our Chat Information
+        chat = Chat(
+            data['chatID'],
+            data['fullName'],
+            "${serverHelper.host}/static/" + data['profilePicture'],
+            data['lastMessage'],
+            data['time'],
+            data['count']);
+      }
+
+      // Display a Message on Screen
+      displayHelper.displaySnackBar(result['message'], requestStatus, context);
+    });
+
+    return chat;
   }
 }

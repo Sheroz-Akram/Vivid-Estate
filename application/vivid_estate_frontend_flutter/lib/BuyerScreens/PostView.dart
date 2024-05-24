@@ -5,7 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerScreens/ReviewPanel.dart';
+import 'package:vivid_estate_frontend_flutter/Chat/ChatScreen.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Buyer.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/Chat.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Property.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 
@@ -96,6 +98,29 @@ class _PostView extends State<PostView> {
       String ReportType, String ReportDetails) async {
     // Send our request to the server
     await buyer.submitReport(context, propertyID, ReportType, ReportDetails);
+  }
+
+  // Initiate A Chat With Seller and Move To Chat Screen
+  void chatWithSeller(BuildContext context, String sellerEmailAddress) async {
+    // Request to Perform Chat Initiation with Seller
+    Chat userChat =
+        await buyer.initiateChatWithSeller(context, sellerEmailAddress);
+
+    // Move To Chat Screen If Status Okays
+    if (userChat.personName.toString().isNotEmpty) {
+      Navigator.push(
+          context,
+
+          // Open The Chat For the User
+          MaterialPageRoute(
+              builder: (context) => ChatScreen(
+                    title: userChat.personName,
+                    ChatID: userChat.chatID,
+                    ProfilePicture: userChat.personImage,
+                    lastScene: userChat.lastTime,
+                    chatInfo: userChat,
+                  )));
+    }
   }
 
   @override
@@ -313,35 +338,38 @@ class _PostView extends State<PostView> {
                                 height: 300,
                                 width: MediaQuery.of(context).size.width,
                               )),
-                    Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10.0),
-                          color: Colors.black,
-                        ),
-                        width: 100,
-                        height: 30,
-                        margin: EdgeInsets.only(
-                            left: MediaQuery.of(context).size.width * 0.7,
-                            top: 260,
-                            right: 15),
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 20, right: 20),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.camera_alt,
-                                color: Colors.white,
+                    Row(
+                      children: [
+                        const Spacer(),
+                        Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              color: Colors.black,
+                            ),
+                            width: 100,
+                            height: 30,
+                            margin: const EdgeInsets.only(top: 260, right: 15),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 20, right: 20),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.camera_alt,
+                                    color: Colors.white,
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    "${imageIndex.toString()}/${property.imagesCount.toString()}",
+                                    style: const TextStyle(color: Colors.white),
+                                  )
+                                ],
                               ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              Text(
-                                "${imageIndex.toString()}/${property.imagesCount.toString()}",
-                                style: const TextStyle(color: Colors.white),
-                              )
-                            ],
-                          ),
-                        )),
+                            )),
+                      ],
+                    ),
 
                     // Left Arrow Buttom to Move to Next Image
                     SizedBox(
@@ -442,8 +470,7 @@ class _PostView extends State<PostView> {
                             ],
                           )),
                       Container(
-                        width: 100,
-                        margin: const EdgeInsets.only(right: 15),
+                        padding: const EdgeInsets.all(10),
                         child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0XFF00627C),
@@ -533,8 +560,7 @@ class _PostView extends State<PostView> {
                           ],
                         )),
                     Container(
-                      width: 100,
-                      margin: const EdgeInsets.only(right: 15),
+                      padding: const EdgeInsets.all(10),
                       child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0XFF00627C),
@@ -560,93 +586,109 @@ class _PostView extends State<PostView> {
                     ),
                   ],
                 ),
+
+                // Display Information Of Seller
                 Container(
-                  margin: const EdgeInsets.only(top: 15, bottom: 15),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  margin: const EdgeInsets.only(top: 20, bottom: 20),
+                  child: Column(
                     children: [
+                      const Divider(
+                        thickness: 3,
+                      ),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            margin: const EdgeInsets.only(left: 15),
-                            height: 70,
-                            width: 70,
-                            child: CircleAvatar(
-                              backgroundImage: NetworkImage(
-                                  "${server.host}/static/${property.sellerPicture}"),
-                            ),
+                          Row(
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(left: 15),
+                                height: 70,
+                                width: 70,
+                                child: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      "${server.host}/static/${property.sellerPicture}"),
+                                ),
+                              ),
+                              SizedBox(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Container(
+                                        margin: const EdgeInsets.only(left: 15),
+                                        child: Text(property.sellerName,
+                                            style: const TextStyle(
+                                                color: Color(0XFF5F5F5F),
+                                                fontSize: 28,
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 3,
+                                    ),
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Container(
+                                        margin: const EdgeInsets.only(left: 15),
+                                        width: 150,
+                                        child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    const Color(0XFF00627C),
+                                                side:
+                                                    const BorderSide(width: 3),
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10.0))),
+                                            onPressed: () {
+                                              // Initiate Chat with Seller
+                                              chatWithSeller(context,
+                                                  property.sellerEmail);
+                                            },
+                                            child: const Text("Start chat",
+                                                style: TextStyle(
+                                                    color: Colors.white))),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.4,
-                            child: Column(
-                              children: [
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    margin: const EdgeInsets.only(left: 15),
-                                    child: Text(property.sellerName,
-                                        style: const TextStyle(
-                                            color: Color(0XFF5F5F5F),
-                                            fontSize: 28)),
+                          InkWell(
+                            child: Container(
+                              margin: const EdgeInsets.only(right: 30),
+                              child: const Column(
+                                children: [
+                                  Text(
+                                    " View",
+                                    style: TextStyle(
+                                        color: Color(0XFF006E86),
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold),
                                   ),
-                                ),
-                                const SizedBox(
-                                  height: 3,
-                                ),
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    margin: const EdgeInsets.only(left: 15),
-                                    width: 110,
-                                    child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                const Color(0XFF00627C),
-                                            side: const BorderSide(width: 3),
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        10.0))),
-                                        onPressed: () {
-                                          // Initiate Chat with Seller
-                                          print("Iniate Chat with Seller");
-                                        },
-                                        child: const Text("Start chat",
-                                            style: TextStyle(
-                                                color: Colors.white))),
-                                  ),
-                                ),
-                              ],
+                                  Text(
+                                    " Profile",
+                                    style: TextStyle(
+                                        color: Color(0XFF006E86),
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold),
+                                  )
+                                ],
+                              ),
                             ),
+                            onTap: () {
+                              // Open the Profile of Seller
+                              print("View Profile");
+                            },
                           ),
                         ],
                       ),
-                      InkWell(
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 30),
-                          child: const Column(
-                            children: [
-                              Text(
-                                " View",
-                                style: TextStyle(
-                                    color: Color(0XFF006E86),
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              Text(
-                                " Profile",
-                                style: TextStyle(
-                                    color: Color(0XFF006E86),
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold),
-                              )
-                            ],
-                          ),
-                        ),
-                        onTap: () {
-                          // Open the Profile of Seller
-                          print("View Profile");
-                        },
+                      const Divider(
+                        thickness: 3,
                       ),
                     ],
                   ),
