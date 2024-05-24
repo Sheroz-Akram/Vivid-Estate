@@ -133,6 +133,13 @@ class PropertyReviews(models.Model):
 class Favourite(models.Model):
     propertyID = models.ForeignKey(Property, on_delete=models.CASCADE)
     user = models.ForeignKey(ApplicationUser, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True) 
+
+# Store the Likes of the Property and By Whom
+class Like(models.Model):
+    propertyID = models.ForeignKey(Property, on_delete=models.CASCADE)
+    user = models.ForeignKey(ApplicationUser, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True) 
 
 # Store the Report Request of the Buyer to Admin
 class PropertyReport(models.Model):

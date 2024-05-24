@@ -88,7 +88,37 @@ class _PostView extends State<PostView> {
     // Make the Buttom Glow If Status is Success
     if (requestStatus == true) {
       setState(() {
-        property.isFavourite = true;
+        property.isFavourite = false;
+      });
+    }
+  }
+
+  // Likes This Property by the Buyer
+  void likeProperty(BuildContext context) async {
+    // Send A Request to Like the Property
+    var requestStatus = await property.likeProperty(
+        context, buyer.emailAddress, buyer.privateKey);
+
+    // Make the Buttom Glow If Status is Success
+    if (requestStatus == true) {
+      setState(() {
+        property.isLike = true;
+        property.likes++;
+      });
+    }
+  }
+
+  // Un Likes This Property by the Buyer
+  void unLikeProperty(BuildContext context) async {
+    // Send A Request to Like the Property
+    var requestStatus = await property.unlikesProperty(
+        context, buyer.emailAddress, buyer.privateKey);
+
+    // Make the Buttom Glow If Status is Success
+    if (requestStatus == true) {
+      setState(() {
+        property.isLike = false;
+        property.likes--;
       });
     }
   }
@@ -478,13 +508,22 @@ class _PostView extends State<PostView> {
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10.0))),
                             onPressed: () {
-                              // Likes the Property
-                              print("Likes Property");
+                              // Likes the Property Button
+                              if (property.isLike == false) {
+                                // Likes The Property
+                                likeProperty(context);
+                              } else {
+                                // UnLikes the Property
+                                unLikeProperty(context);
+                              }
                             },
                             child: Row(
                               children: [
-                                const Icon(
-                                  Icons.favorite,
+                                // Display The Property Like Icon
+                                Icon(
+                                  property.isLike == true
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
                                   color: Colors.white,
                                 ),
                                 const SizedBox(

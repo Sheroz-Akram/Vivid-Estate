@@ -235,6 +235,12 @@ def GetPropertyDetail(request):
         if existing_favorite:
             isFavourite = True
 
+        # Check if the Property is Added to Favourite or Not
+        existing_like = Like.objects.filter(propertyID=result, user=user).first()
+        isLike = False
+        if existing_like:
+            isLike = True
+
         # Update the View Count
         result.views = result.views + 1
         result.save()
@@ -254,6 +260,7 @@ def GetPropertyDetail(request):
         message['SellerName'] = seller.full_name
         message['SellerEmail'] = seller.email_address
         message['IsFavourite'] = isFavourite
+        message['IsLike'] = isLike
 
 
         # Send JSON data back to the client
@@ -384,24 +391,67 @@ def AddToFavourite(request):
             # Search The Property using its ID
             result = Property.objects.get(pk=PropertyID)
         except Exception as e:
-            return httpErrorJsonResponse("Error: Property Not Found")
+            return httpErrorJsonResponse("Property Not Found")
 
         # Check if the user has already favorited the property
         existing_favorite = Favourite.objects.filter(propertyID=result, user=user).first()
 
         if existing_favorite:
             # If the user has already favorited the property, return a response indicating it
-            return httpSuccessJsonResponse('Error: Property already added')
+            return httpSuccessJsonResponse('Property already added')
         else:
             # Add new favorite to the list
             favouriteProperty = Favourite(propertyID=result, user=user)
             favouriteProperty.save()
-            return httpSuccessJsonResponse('Success: Property added to favorites')
+            return httpSuccessJsonResponse('Property added to favorites')
 
     # Something wrong just happen the process
     except Exception as e:
-        
-        return httpErrorJsonResponse("Error: Invalid Request")
+        return httpErrorJsonResponse("Invalid Request")
+
+
+# Likes the Property by the Buyer
+@csrf_exempt
+def LikeProperty(request):
+
+    # Check the User Authentications
+    authResult = checkUserLogin(request=request)
+    if authResult[0] == False:
+        return httpErrorJsonResponse(authResult[1])
+
+    # Now we Get the User
+    user = authResult[1]
+
+    # Now We Add the Property to our List
+    try:
+        # Get the POST Data from user
+        PropertyID = request.POST['PropertyID']
+
+        # Now We get the property through its id
+        try:
+            # Search The Property using its ID
+            result = Property.objects.get(pk=PropertyID)
+        except Exception as e:
+            return httpErrorJsonResponse("Property Not Found")
+
+        # Check if the user has already likes the property
+        existing_favorite = Like.objects.filter(propertyID=result, user=user).first()
+
+        if existing_favorite:
+            # If the user has already favorited the property, return a response indicating it
+            return httpSuccessJsonResponse('Property already liked')
+        else:
+            # Decrease the Like Counter of our Property
+            result.likes = result.likes + 1
+            result.save()
+            # Add new favorite to the list
+            favouriteProperty = Like(propertyID=result, user=user)
+            favouriteProperty.save()
+            return httpSuccessJsonResponse('Property is Liked')
+
+    # Something wrong just happen the process
+    except Exception as e:
+        return httpErrorJsonResponse("Invalid Request")
 
 # API to Remove the Property from Favourite List
 @csrf_exempt
@@ -426,7 +476,7 @@ def RemoveFromFavourite(request):
             # Search The Property using its ID
             result = Property.objects.get(pk=PropertyID)
         except Exception as e:
-            return httpErrorJsonResponse("Error: Property Not Found")
+            return httpErrorJsonResponse("Property Not Found")
 
         # Check if the user has already favorited the property
         existing_favorite = Favourite.objects.filter(propertyID=result, user=user).first()
@@ -434,14 +484,61 @@ def RemoveFromFavourite(request):
         # Is the Property is List Exists
         if existing_favorite:
             existing_favorite.delete()
-            return httpSuccessJsonResponse('Success: Property Remove from Favourite List')
+            return httpSuccessJsonResponse('Property Remove from Favourite List')
         else:
-            return httpErrorJsonResponse('Error: Property is not in Favourite List')
+            return httpErrorJsonResponse('Property is not in Favourite List')
 
     # Something wrong just happen the process
     except Exception as e:
         
-        return httpErrorJsonResponse("Error: Invalid Request")
+        return httpErrorJsonResponse("Invalid Request")
+
+
+# API to Remove the Property from Favourite List
+@csrf_exempt
+def UnLikeProperty(request):
+
+    # Check the User Authentications
+    authResult = checkUserLogin(request=request)
+    if authResult[0] == False:
+        return httpErrorJsonResponse(authResult[1])
+
+    # Now we Get the User
+    user = authResult[1]
+
+    # Now We Add the Property to our List
+    try:
+
+        # Get the POST Data from user
+        PropertyID = request.POST['PropertyID']
+
+        # Now We get the property through its id
+        try:
+            # Search The Property using its ID
+            result = Property.objects.get(pk=PropertyID)
+        except Exception as e:
+            return httpErrorJsonResponse("Property Not Found")
+
+        # Check if the user has already likes the property
+        existing_like = Like.objects.filter(propertyID=result, user=user).first()
+
+        
+
+        # If the Property is Already Liked
+        if existing_like:
+            # Decrease the Like Counter of our Property
+            result.likes = result.likes - 1
+            result.save()
+            # Remove the likes data
+            existing_like.delete()
+            return httpSuccessJsonResponse('Property is unliked.')
+        else:
+            return httpErrorJsonResponse('Property is not Liked Previously.')
+
+    # Something wrong just happen the process
+    except Exception as e:
+        
+        return httpErrorJsonResponse("Invalid Request")
 
 
 # Get the list of favourite properties

@@ -83,12 +83,13 @@ class _ChatHome extends State<ChatHome> {
       ),
       body: chatManager.getChatsLength() == 0
           // Display Message for Not Chat Availible
-          ? const Center(
+          ? const Align(
+              alignment: Alignment.center,
               child: Text(
-              "No Chats Found",
-              style: TextStyle(
-                  fontSize: 30, color: Color.fromARGB(255, 77, 77, 77)),
-            ))
+                "No Chat Found",
+                style: TextStyle(fontSize: 20),
+              ),
+            )
           // Display All the Chats Availible
           : ListView.builder(
               itemBuilder: (context, index) {

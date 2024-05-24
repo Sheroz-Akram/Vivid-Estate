@@ -31,6 +31,7 @@ class Property {
   var sellerName = "";
   var sellerEmail = "";
   var isFavourite = false;
+  var isLike = false;
 
   // Helper Classes
   var serverHelper = ServerInfo(); // Helps to Communicate with the Server
@@ -68,6 +69,7 @@ class Property {
         sellerName = result['message']['SellerName'];
         sellerEmail = result['message']['SellerEmail'];
         isFavourite = result['message']['IsFavourite'];
+        isLike = result['message']['IsLike'];
       }
 
       print(result['message']['IsFavourite']);
@@ -103,6 +105,35 @@ class Property {
     return requestStatus;
   }
 
+  // Add a Property To Favourtite List
+  Future<bool> likeProperty(
+      BuildContext context, String emailAddress, String privateKey) async {
+    // Variable to Check Status Of Our Request
+    var requestStatus = false;
+
+    // Make A Payload to Send to the Server
+    var requestPayload = {
+      "Email": emailAddress,
+      "PrivateKey": privateKey,
+      "PropertyID": propertyID
+    };
+
+    // Send Request to Our Server
+    await serverHelper
+        .sendPostRequest(context, "likes_property", requestPayload, (result) {
+      // Check the Status of Our Request
+      if (result['status'] == "success") {
+        requestStatus = true;
+      }
+
+      // Display a Status Message to the User
+      displayHelper.displaySnackBar(
+          result['message'], result['status'] == "success", context);
+    });
+
+    return requestStatus;
+  }
+
   // Remove A Property From The Favourite List
   Future<bool> removeFromFavourite(
       BuildContext context, String emailAddress, String privateKey) async {
@@ -123,6 +154,37 @@ class Property {
       if (result['status'] == "success") {
         requestStatus = true;
       }
+      // Display a Status Message to the User
+      displayHelper.displaySnackBar(
+          result['message'], result['status'] == "success", context);
+    });
+
+    return requestStatus;
+  }
+
+  // Remove A Property From The Favourite List
+  Future<bool> unlikesProperty(
+      BuildContext context, String emailAddress, String privateKey) async {
+    // Variable to Check Status Of Our Request
+    var requestStatus = false;
+
+    // Make A Payload to Send to the Server
+    var requestPayload = {
+      "Email": emailAddress,
+      "PrivateKey": privateKey,
+      "PropertyID": propertyID
+    };
+
+    // Send Request to Our Server
+    await serverHelper
+        .sendPostRequest(context, "unlikes_property", requestPayload, (result) {
+      // Check the Status of Our Request
+      if (result['status'] == "success") {
+        requestStatus = true;
+      }
+      // Display a Status Message to the User
+      displayHelper.displaySnackBar(
+          result['message'], result['status'] == "success", context);
     });
 
     return requestStatus;
