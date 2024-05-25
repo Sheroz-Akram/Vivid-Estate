@@ -89,7 +89,7 @@ class _FavouriteProperty extends State<FavouriteProperty> {
                   // Favourite Property Title Information
                   Row(
                     children: [
-                      Text((widget.Price).toString(),
+                      Text("RS ${(widget.Price)}",
                           style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,

@@ -14,6 +14,9 @@ import string
 from geopy.geocoders import Nominatim
 import json
 
+# Import Application Components
+from ..Components.UserComponent import *
+
 
 # Create your views here.
 
@@ -230,48 +233,34 @@ def verifyPasswordResetOTP(request):
 # Generate a New OTP for Existing User
 @csrf_exempt
 def resendOTP(request):
-    print("NEW OTP Generation Request")
+    
+    # Log The Terminal
+    print(f"=> Resend OTP Request | IP: {request.META.get('REMOTE_ADDR')}")
 
     try:
-        # Make Sure it is POST Request
-        if request.method == "POST":
 
-            # Get the other data files
-            Email = request.POST['Email']
-            Password = request.POST['Password']
+        # Get the other data files
+        email = request.POST['Email']
+        password = request.POST['Password']
 
-            # Get the User
-            try:
-                # Find the User with Email Address
-                user = ApplicationUser.objects.get(email_address=Email)
+        # Generate a new OTP 
+        newOTPCode = str(random.randint(1000, 9999))
 
-                # Check the User Password
-                if user.password != Password:
-                    return JsonResponse({"status":"error", "message": "Password not correct"})
+        # Create instance of User Component
+        userComponent = UserComponent()
 
-                # Generate a new OTP 
-                otp = str(random.randint(1000, 9999))
-                print("OTP Generated: " + otp)
-
-                # Store the new OTP in Data Base
-                user.otp_code = otp
-                user.verification_status = "No"
-                user.save()
-
-                # Send OTP Through Mail Service
-                send_email(subject="Resend OTP - Vivid Estate", body="New OTP Generated! Please enter the following otp in Vivid Estate: " + otp, recipients=[Email])
-
-                # Display Message to the User
-                return JsonResponse({"status":"success", "message":"New OTP Send Successfully!"})
-            
-            # If User not found        
-            except ApplicationUser.DoesNotExist as e:
-                return JsonResponse({"status":"error", "message": "User not found"})
+        # Now Perform the Resend OTP Request
+        result = userComponent.resendOTP(email,password, newOTPCode)
+        
+        # Check the Status of our Request
+        if result[0] == True:
+            return httpSuccessJsonResponse(result[1])
+        else:
+            return httpErrorJsonResponse(result[1])
 
     except Exception as e:
-        return JsonResponse({"status":"error", "message": "User not found"})
+        return JsonResponse({"status":"error", "message": "Invalid Request"})
 
-    return JsonResponse({"status":"error", "message":"Invalid Request"})
 
 
 # Reset a User Password with a new password
@@ -318,45 +307,48 @@ def passwordReset(request):
 @csrf_exempt
 def loginUser(request):
 
-    # Perform Log
-    print("\nNew Login Request. ")
+    # Log The Terminal
+    print(f"=> Login Request | IP: {request.META.get('REMOTE_ADDR')}")
 
     try:
         # Make Sure it is POST Request
         if request.method == "POST":
 
             # Get the other data files
-            Email = request.POST['Email']
-            Password = request.POST['Password']
+            email = request.POST['Email']
+            password = request.POST['Password']
 
-            # Display User Info
-            print(json.dumps({"Email": Email, "Password": Password}))
-            print()
+            # Create a User Object
+            userComponent = UserComponent()
 
-            # Get the User
-            try:
-                # Find the User with Email Address
-                user = ApplicationUser.objects.get(email_address=Email)
+            # Perform the Login Request
+            result = userComponent.login(email, password, generate_random_string(50))
 
-                # Check the User Password
-                if user.password != Password:
-                    return JsonResponse({"status":"error", "message": "Enter Password is not Correct. Please try again"})
+            # If Request is Success
+            if result[0] == True:
 
-                # Store the New User Password as Password
-                user.private_key = generate_random_string(50)
-                user.save()
-
-                # Display Message to the User
-                return JsonResponse({"status":"success", "message":"Account Login is Successfull", "privateKey" : user.private_key, "userType" : user.user_type, "profilePicture": user.profile_pic})
+                # Response the User Data Back To Client
+                return JsonResponse(
+                    {
+                        "status":"success",
+                        "message":"Account Login is Successfull", 
+                        "privateKey" : userComponent.getPrivateKey(), 
+                        "userType" : userComponent.getUserType(), 
+                        "profilePicture": userComponent.getProfilePicture()
+                    })
             
-            # If User not found        
-            except ApplicationUser.DoesNotExist as e:
-                return JsonResponse({"status":"error", "message": "User does not exist"})
+            else:
+                # Response an Error to User
+                return JsonResponse(
+                    {
+                        "status":"error", 
+                        "message": result[1]
+                    })
 
+    # Something Wrong Happens in the Request
     except Exception as e:
-        return JsonResponse({"status":"error", "message": "User does not exist"})
-
-    return JsonResponse({"status":"error", "message":"Invalid Login Request"})
+        print(e)
+        return JsonResponse({"status":"error", "message": "Invalid Request"})
 
 
 # Generate a New OTP for Existing User To Reset the Password
@@ -458,38 +450,79 @@ def storeCNICData(request):
 @csrf_exempt
 def deleteAccount(request):
 
-    # Check the User Authentications
-    authResult = checkUserLogin(request=request)
-    if authResult[0] == False:
-        return httpErrorJsonResponse(authResult[1])
-    
-    # Now we Get the User
-    user = authResult[1]
+    # Log The Terminal
+    print(f"=> Account Deletion Request | IP: {request.META.get('REMOTE_ADDR')}")
 
-    # Now we check user Password and Delete his account
     try:
 
-        # Get Password from POST
-        UserPassword = request.POST['Password']
+        # Get Data from Post Request
+        email = request.POST['Email']
+        password = request.POST['Password']
+        privateKey = request.POST['PrivateKey']
 
-        # Now Verify the User Password
-        if UserPassword != user.password:
-            return httpErrorJsonResponse("Given user password not correct. Please enter correct password.")
+        # Create User Component Object
+        userComponent = UserComponent()
 
-        # Now our user password is verified. Now we delete the user account
-        user.delete()
+        # Perform the Deleteion Operation
+        result = userComponent.deleteAccount(email, password, privateKey)
 
-        # Give the User a success reponse
-        return httpSuccessJsonResponse("User account is deleted successfully!")
+        # Check The Status Of our response
+        if result[0] == True:
+            return httpSuccessJsonResponse("User Account Deleted Successfully")
+        else:
+            return httpErrorJsonResponse(result[1])
 
     # Something wrong just happen the process
     except Exception as e:
-        return httpErrorJsonResponse("Error in the server or an invalid request")
+        return httpErrorJsonResponse("Invalid Request")
 
 # Get the profile data of a User
 @csrf_exempt
 def getUserProfileData(request):
 
+    # Log The Terminal
+    print(f"=> User Profile Data Request | IP: {request.META.get('REMOTE_ADDR')}")
+
+    try:
+
+        # Get the Data from Post Request
+        email = request.POST['Email']
+        privateKey = request.POST['PrivateKey']
+
+        # Create Instance of User Component
+        userComponent = UserComponent()
+
+        # Perform the User Authenticate
+        result = userComponent.authenticateUser(email, privateKey)
+
+        # Check the Status of our Response
+        if result[0] == True:
+
+            # Get the User Model Object
+            userModel = result[2]
+
+            # Get Our Profile Picture
+            return httpSuccessJsonResponse({
+                "profilePic": userModel.profile_pic,
+                "userFullName": userModel.full_name,
+                "userName": userModel.user_name,
+                "cnicNumber": userModel.cnic_number,
+                "dob": userModel.cnic_dob,
+                "feedbackRating": userModel.feedback
+            })
+
+        else:
+            return httpErrorJsonResponse(result[1])
+
+    # Something wrong just happen the process
+    except Exception as e:
+        return httpErrorJsonResponse("Error in the server or an invalid request")
+
+
+# Get the profile data of a Seller
+@csrf_exempt
+def getSellerProfileData(request):
+
     # Check the User Authentications
     authResult = checkUserLogin(request=request)
     if authResult[0] == False:
@@ -498,16 +531,45 @@ def getUserProfileData(request):
     # Now we Get the User
     user = authResult[1]
 
-    # Now we get our profile picture
+    # Now We Perform Our Operations
     try:
+
+        # Get the Payload
+        SellerID = request.POST['SellerID']
+
+        # Now We Find Seller By Its ID
+        seller = ApplicationUser.objects.get(id=SellerID)
+
+        # Now Find All The Ads of the Seller
+        seller_ads = Property.objects.filter(seller=seller)
+
+        # Store The Data of Seller Property
+        seller_ads_data = []
+
+        # Check If We Have More Than One Property
+        if seller_ads.count() > 0:
+
+            # Now We Looop Through Each Property
+            for ad in seller_ads:
+
+                # Get the First Image Of the Property
+                picture = PropertyImage.objects.filter(propertyID=ad).first()
+
+                # Get The Details of the Property
+                seller_ads_data.append({
+                    "PropertyID": ad.id,
+                    "PropertyImage": picture.imageLocation,
+                    "Price": ad.price,
+                    "Location": ad.abstractLocation,
+                    "TimeAgo": ad.days_ago()
+                })
+
         # Get Our Profile Picture
         return httpSuccessJsonResponse({
-            "profilePic": user.profile_pic,
-            "userFullName": user.full_name,
-            "userName": user.user_name,
-            "cnicNumber": user.cnic_number,
-            "dob": user.cnic_dob,
-            "feedbackRating": user.feedback
+            "SellerName": seller.full_name,
+            "TotalAdsPublish": seller_ads.count(),
+            "SellerEmail": seller.email_address,
+            "ProfilePicture": seller.profile_pic,
         })
 
     # Something wrong just happen the process

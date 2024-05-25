@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerScreens/ReviewPanel.dart';
+import 'package:vivid_estate_frontend_flutter/BuyerScreens/SellerProfile.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/ChatScreen.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Buyer.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Chat.dart';
@@ -551,12 +552,20 @@ class _PostView extends State<PostView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Display Location
-                            Text(
-                              property.location,
-                              style: const TextStyle(
-                                  color: Color(0XFF8D8D8D),
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16),
+                            Row(
+                              children: [
+                                const Icon(Icons.location_on_sharp),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                Text(
+                                  property.location,
+                                  style: const TextStyle(
+                                      color: Color(0XFF8D8D8D),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16),
+                                ),
+                              ],
                             ),
                             // Display Property Type
                             Row(
@@ -721,7 +730,11 @@ class _PostView extends State<PostView> {
                             ),
                             onTap: () {
                               // Open the Profile of Seller
-                              print("View Profile");
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => SellerProfile(
+                                          sellerID: property.sellerID)));
                             },
                           ),
                         ],

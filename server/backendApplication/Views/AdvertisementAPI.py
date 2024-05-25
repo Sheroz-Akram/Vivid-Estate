@@ -257,6 +257,7 @@ def GetPropertyDetail(request):
         message['Views'] = result.views
         message['Likes'] = result.likes
         message['SellerPicture'] = seller.profile_pic
+        message['SellerID'] = seller.id
         message['SellerName'] = seller.full_name
         message['SellerEmail'] = seller.email_address
         message['IsFavourite'] = isFavourite

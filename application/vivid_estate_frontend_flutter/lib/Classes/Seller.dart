@@ -4,9 +4,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/Property.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/User.dart';
 
 class Seller extends User {
+  // Store All The Publish Properties of the Seller
+  List<Property> properties = [];
+
   // Create a new Property Ad in the Server
   void submitNewPropertyAdd(BuildContext userContext,
       List<dynamic> propertyImages, Map<String, Object> PropertyData) async {
@@ -60,5 +64,56 @@ class Seller extends User {
       ScaffoldMessenger.of(userContext).showSnackBar(
           const SnackBar(content: Text("A network error has occured")));
     }
+  }
+
+  // Return The List of All The Properties of Seller
+  Future<List<Property>> getAllProperties(BuildContext context) async {
+    return [];
+  }
+
+  // Get The Profile Data Of Seller
+  dynamic getSellerProfileData(BuildContext context, int sellerID,
+      String buyerEmail, String buyerPrivateKey) async {
+    // Now Set the request payload
+    var requestPayload = {
+      "Email": buyerEmail,
+      "PrivateKey": buyerPrivateKey,
+      "SellerID": sellerID.toString()
+    };
+
+    // Varaible to Check Status of Request
+    bool requestStatus = false;
+
+    // Seller Json Data Object
+    var sellerData = {
+      "SellerName": "No Name",
+      "TotalAdsPublish": 0,
+      "SellerEmail": "no email",
+      "ProfilePicture": "",
+      "Ads": []
+    };
+
+    // Send Request to Our Server
+    await serverHelper.sendPostRequest(
+        context, "seller_profile_data", requestPayload, (result) {
+      if (result['status'] == "success") {
+        var data = result['message'];
+        requestStatus = true;
+
+        // Now We Store the Data From Server
+        sellerData = {
+          "SellerName": data['SellerName'],
+          "TotalAdsPublish": data['TotalAdsPublish'],
+          "SellerEmail": data['SellerEmail'],
+          "ProfilePicture":
+              "${serverHelper.host}/static/${data['ProfilePicture']}",
+          "Ads": data['Ads']
+        };
+      }
+
+      displayHelper.displaySnackBar(result['message'], false, context);
+    });
+
+    return sellerData;
   }
 }

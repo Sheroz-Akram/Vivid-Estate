@@ -27,6 +27,7 @@ class Property {
   var likes = 0;
 
   // Seller Information
+  var sellerID = 0;
   var sellerPicture = "";
   var sellerName = "";
   var sellerEmail = "";
@@ -66,6 +67,7 @@ class Property {
         views = result['message']['Views'];
         likes = result['message']['Likes'];
         sellerPicture = result['message']["SellerPicture"];
+        sellerID = result['message']['SellerID'];
         sellerName = result['message']['SellerName'];
         sellerEmail = result['message']['SellerEmail'];
         isFavourite = result['message']['IsFavourite'];
