@@ -85,7 +85,7 @@ class Seller extends User {
     bool requestStatus = false;
 
     // Seller Json Data Object
-    var sellerData = {
+    dynamic sellerData = {
       "SellerName": "No Name",
       "TotalAdsPublish": 0,
       "SellerEmail": "no email",

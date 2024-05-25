@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/ChatScreen.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Buyer.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Chat.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Seller.dart';
+import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 
 class SellerProfile extends StatefulWidget {
   SellerProfile({super.key, required this.sellerID});
@@ -24,8 +26,11 @@ class _SellerProfile extends State<SellerProfile> {
   // Seller Class
   Seller seller = Seller();
 
+  // Server Helper
+  var serverHelper = ServerInfo();
+
   // Seller Json Data Object
-  var sellerData = {
+  dynamic sellerData = {
     "SellerName": "No Name",
     "TotalAdsPublish": 0,
     "SellerEmail": "no email",
@@ -55,6 +60,8 @@ class _SellerProfile extends State<SellerProfile> {
     setState(() {
       sellerData = responseData;
     });
+
+    print(sellerData);
   }
 
   // Initiate A Chat With Seller and Move To Chat Screen
@@ -183,7 +190,11 @@ class _SellerProfile extends State<SellerProfile> {
                 ),
               ),
 
-              // Display All Seller Properties
+              /**
+               * 
+               * Show All the Seller Properties in Grid View
+               * 
+               */
               Expanded(
                 child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -202,28 +213,38 @@ class _SellerProfile extends State<SellerProfile> {
                           elevation: 15,
                           margin: const EdgeInsets.only(left: 15, right: 15),
                           shadowColor: Colors.black,
+
+                          /**
+                           * 
+                           * Card to Display Information of the Property in Seller Profile
+                           * 
+                           */
                           child: Container(
                             child: SingleChildScrollView(
                               child: Column(
                                 children: [
+                                  // Dispplay Image of the Property
                                   Container(
                                       decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(30.00)),
-                                      child: const Image(
-                                        image: AssetImage("assets/house.jpg"),
+                                      child: Image(
+                                        image: NetworkImage(
+                                            "${serverHelper.host}/static/${sellerData['Ads'][index]['PropertyImage']}"),
                                         fit: BoxFit.fitWidth,
                                       )),
-                                  const Padding(
-                                    padding: EdgeInsets.only(
+
+                                  // Display Price of the Property
+                                  Padding(
+                                    padding: const EdgeInsets.only(
                                         left: 10, right: 10.0, top: 10),
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          "Rs 10000",
-                                          style: TextStyle(
+                                          "Rs ${formatNumber(sellerData['Ads'][index]['Price'])}",
+                                          style: const TextStyle(
                                               color: Color(
                                                 0XFF00627C,
                                               ),
@@ -233,45 +254,91 @@ class _SellerProfile extends State<SellerProfile> {
                                       ],
                                     ),
                                   ),
-                                  const Align(
+
+                                  // Display Property Location
+                                  Container(
+                                    margin: const EdgeInsets.only(left: 10),
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.location_on_rounded),
+                                        Align(
+                                          alignment: Alignment.topLeft,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 5, right: 10),
+                                            child: Text(
+                                              "${sellerData['Ads'][index]['Location']}",
+                                              style: const TextStyle(
+                                                  color: Color(0XFF00627C),
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 15),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  // Display Property Post Time Ago in Days
+                                  Align(
                                     alignment: Alignment.topLeft,
                                     child: Padding(
-                                      padding:
-                                          EdgeInsets.only(left: 10, right: 10),
+                                      padding: const EdgeInsets.only(
+                                          left: 10, right: 10),
                                       child: Text(
-                                        "Brand New 5 marla house",
-                                        style: TextStyle(
-                                            color: Color(0XFF00627C),
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16),
+                                        "${sellerData['Ads'][index]['TimeAgo']} days ago",
+                                        style: const TextStyle(fontSize: 14),
                                       ),
                                     ),
                                   ),
-                                  const Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Padding(
-                                      padding:
-                                          EdgeInsets.only(left: 10, right: 10),
-                                      child: Text(
-                                        "NIshtar Colony ",
-                                        style: TextStyle(
-                                            color: Color(0XFF00627C),
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 12),
-                                      ),
+
+                                  /***
+                                   * Display Property Likes and Views
+                                   */
+                                  Container(
+                                    margin: const EdgeInsets.only(
+                                        left: 10, top: 10),
+                                    child: Row(
+                                      children: [
+                                        // Display Views
+                                        Row(children: [
+                                          const Icon(Icons.remove_red_eye),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text(
+                                              sellerData['Ads'][index]['Views']
+                                                  .toString(),
+                                              style: const TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Color(0xFF5F5F5F)))
+                                        ]),
+
+                                        const SizedBox(
+                                          width: 20,
+                                        ),
+
+                                        // Display Hearts
+                                        Row(
+                                          children: [
+                                            const Icon(Icons.favorite),
+                                            const SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text(
+                                                sellerData['Ads'][index]
+                                                        ['Likes']
+                                                    .toString(),
+                                                style: const TextStyle(
+                                                    fontSize: 13,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Color(0xFF5F5F5F)))
+                                          ],
+                                        )
+                                      ],
                                     ),
-                                  ),
-                                  const Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Padding(
-                                      padding:
-                                          EdgeInsets.only(left: 10, right: 10),
-                                      child: Text(
-                                        "5 hour ago",
-                                        style: TextStyle(fontSize: 14),
-                                      ),
-                                    ),
-                                  ),
+                                  )
                                 ],
                               ),
                             ),

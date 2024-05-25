@@ -561,7 +561,9 @@ def getSellerProfileData(request):
                     "PropertyImage": picture.imageLocation,
                     "Price": ad.price,
                     "Location": ad.abstractLocation,
-                    "TimeAgo": ad.days_ago()
+                    "TimeAgo": ad.days_ago(),
+                    "Views": ad.views,
+                    "Likes": ad.likes
                 })
 
         # Get Our Profile Picture
@@ -570,6 +572,7 @@ def getSellerProfileData(request):
             "TotalAdsPublish": seller_ads.count(),
             "SellerEmail": seller.email_address,
             "ProfilePicture": seller.profile_pic,
+            "Ads": seller_ads_data
         })
 
     # Something wrong just happen the process
