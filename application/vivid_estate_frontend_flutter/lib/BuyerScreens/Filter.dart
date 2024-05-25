@@ -33,8 +33,8 @@ class _FilterPage extends State<FilterPage> {
     priceUpper.text = widget.filterData['Price']['Upper'];
     sizeUpper.text = widget.filterData['Size']['Upper'];
     sizeLower.text = widget.filterData['Size']['Lower'];
-    noFloorsDropDown.text = widget.filterData['NoBeds'];
-    noBedsDropDown.text = widget.filterData['NoFloors'];
+    noFloorsDropDown.text = widget.filterData['NoFloors'];
+    noBedsDropDown.text = widget.filterData['NoBeds'];
   }
 
   // Clear All the Settings of the filter
@@ -55,6 +55,7 @@ class _FilterPage extends State<FilterPage> {
   void applyFilters(BuildContext userContext) {
     // Data Need to be Send to Previous Screen
     var FilterData = {
+      "ListingType": widget.filterData['ListingType'],
       "PropertyType": selectedPropertyType,
       "Price": {"Lower": priceLower.text, "Upper": priceUpper.text},
       "Size": {"Lower": sizeLower.text, "Upper": sizeUpper.text},

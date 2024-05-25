@@ -82,7 +82,7 @@ listingTypes = (
 
 # Property Types
 propertyTypes = {
-    ("House", "Hosue"),
+    ("House", "House"),
     ("Appartment", "Appartment"),
     ("Hostel", "Hostel"),
     ("Room", "Room"),

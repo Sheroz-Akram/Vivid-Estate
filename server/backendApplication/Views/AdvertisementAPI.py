@@ -15,6 +15,8 @@ from geopy.geocoders import Nominatim
 import json
 from django.db.models import Q
 
+# Import our Components
+from ..Components.PropertyManager import *
 
 # Create your views here.
 
@@ -103,14 +105,19 @@ def StoreNewAd(request):
 @csrf_exempt
 def SearchLocationProperty(request):
 
+    # Log The Terminal
+    print(f"=> Simple Property Search Request | IP: {request.META.get('REMOTE_ADDR')}")
+
     # Perform the Search Operation
     try:
 
         # Get all the Data
         Query = request.POST['Query']
+        Filter = json.loads(request.POST['Filter'])
 
-        # Search
-        results = Property.objects.filter(Q(location__icontains=Query))
+        # Perform Search Operation For Properties
+        propertyManager = PropertyManager()
+        results = propertyManager.propertySearch(Query, Filter)
 
         # Now Combine all the Data Into Json Response
         SearchData = {}
@@ -138,6 +145,7 @@ def SearchLocationProperty(request):
     
     # Something wrong just happen the process
     except Exception as e:
+        print(e)
         return httpErrorJsonResponse("Error: Invalid Request")
 
 
@@ -145,15 +153,19 @@ def SearchLocationProperty(request):
 @csrf_exempt
 def DetailSearchQuery(request):
 
+    # Log The Terminal
+    print(f"=> Detail Property Search Request | IP: {request.META.get('REMOTE_ADDR')}")
+
     # Perform the Search Operation
     try:
 
         # Get all the Data
         Query = request.POST['Query']
-        Filter = request.POST['Filter']
+        Filter = json.loads(request.POST['Filter'])
 
-        # Search
-        results = Property.objects.filter(Q(location__icontains=Query))
+        # Perform Search Operation For Properties
+        propertyManager = PropertyManager()
+        results = propertyManager.propertySearch(Query, Filter)
 
         # Now Combine all the Data Into Json Response
         SearchData = {}
