@@ -148,7 +148,7 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width * 0.6,
                           child: const Text(
-                            "Create New Property",
+                            "New Property",
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
@@ -207,25 +207,28 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
               Container(
                 padding: const EdgeInsets.only(
                     left: 15, top: 10, bottom: 15, right: 15),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: ['House', 'Apartment', 'Hostel', 'Room']
-                      .map((type) => ChoiceChip(
-                          label: Text(type),
-                          selected: selectedPropertyType == type,
-                          onSelected: (bool selected) {
-                            setState(() {
-                              selectedPropertyType = type;
-                            });
-                          },
-                          selectedColor: const Color(0xFF006E86),
-                          checkmarkColor: Colors.white,
-                          labelStyle: TextStyle(
-                            color: selectedPropertyType == type
-                                ? Colors.white
-                                : Colors.black, // Adjust 'black' if needed
-                          )))
-                      .toList(),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: ['House', 'Apartment', 'Hostel', 'Room']
+                        .map((type) => ChoiceChip(
+                            label: Text(type),
+                            selected: selectedPropertyType == type,
+                            onSelected: (bool selected) {
+                              setState(() {
+                                selectedPropertyType = type;
+                              });
+                            },
+                            selectedColor: const Color(0xFF006E86),
+                            checkmarkColor: Colors.white,
+                            labelStyle: TextStyle(
+                              color: selectedPropertyType == type
+                                  ? Colors.white
+                                  : Colors.black, // Adjust 'black' if needed
+                            )))
+                        .toList(),
+                  ),
                 ),
               ),
               /**
@@ -260,7 +263,9 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                           width: MediaQuery.of(context).size.width * 0.4,
                           child: Row(
                             children: [
-                              Container(
+                              SizedBox(
+                                width:
+                                    MediaQuery.of(context).size.width * 0.2 - 5,
                                 child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: listingType == 'Sell'
@@ -279,13 +284,15 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                                           color: listingType == 'Sell'
                                               ? Colors.white
                                               : Colors.black,
-                                          fontWeight: FontWeight.bold),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 10),
                                     )),
                               ),
                               const SizedBox(
                                 width: 5,
                               ),
-                              Container(
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.2,
                                 child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: listingType == 'Rent'
@@ -303,7 +310,8 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                                             color: listingType == 'Rent'
                                                 ? Colors.white
                                                 : Colors.black,
-                                            fontWeight: FontWeight.bold))),
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 10))),
                               ),
                             ],
                           ),
@@ -322,7 +330,7 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                           const Align(
                             alignment: Alignment.topLeft,
                             child: Text(
-                              "Select Location",
+                              "Location",
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -806,7 +814,7 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width,
                     child: const Text(
-                      "Optional",
+                      "Optional Features",
                       style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -839,8 +847,7 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                               color: const Color(0xFFECECEC),
                               borderRadius: BorderRadius.circular(10.0),
                               boxShadow: getBoxShadow()),
-                          margin: const EdgeInsets.only(
-                              left: 20.0, right: 20.0, top: 15),
+                          margin: const EdgeInsets.only(top: 15),
                           width: MediaQuery.of(context).size.width,
                           child: Row(
                             children: [
@@ -878,8 +885,7 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                               color: const Color(0xFFECECEC),
                               borderRadius: BorderRadius.circular(10.0),
                               boxShadow: getBoxShadow()),
-                          margin: const EdgeInsets.only(
-                              left: 20.0, right: 20.0, top: 15),
+                          margin: const EdgeInsets.only(top: 15),
                           width: MediaQuery.of(context).size.width,
                           child: Row(
                             children: [
@@ -891,7 +897,7 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                                       Icons.vrpano_sharp,
                                       size: 30,
                                     ),
-                                    title: Text("Create 360 Virtual Visit",
+                                    title: Text("Create Virtual Visit",
                                         style: TextStyle(fontSize: 16)),
                                     trailing: InkWell(
                                         child: Icon(Icons.arrow_forward_ios)),

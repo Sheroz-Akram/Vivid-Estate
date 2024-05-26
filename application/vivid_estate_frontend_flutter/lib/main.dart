@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:device_preview/device_preview.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/Welcome.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerMain.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/User.dart';
 import 'package:vivid_estate_frontend_flutter/SellerMain.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(DevicePreview(
+    enabled: true,
+    builder: (context) => const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -18,6 +22,25 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Vivid Estate',
       debugShowCheckedModeBanner: false,
+      useInheritedMediaQuery: true,
+      locale: DevicePreview.locale(context),
+      builder: DevicePreview.appBuilder,
+      theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF006E86)),
+          useMaterial3: true,
+          inputDecorationTheme: InputDecorationTheme(
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: Colors.pink, width: 4)))),
+      home: const MyHomePage(),
+    );
+  }
+}
+
+/*
+
+title: 'Vivid Estate',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF006E86)),
           useMaterial3: true,
@@ -27,9 +50,8 @@ class MyApp extends StatelessWidget {
                   borderSide: const BorderSide(color: Colors.pink, width: 4)))),
       home: const MyHomePage(),
       builder: EasyLoading.init(),
-    );
-  }
-}
+
+*/
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});

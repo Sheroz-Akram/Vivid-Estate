@@ -49,7 +49,7 @@ class _BuyerHome extends State<BuyerHome> {
     {
       "ProfilePic": "assets/house.jpg",
       "Name": "Faizan Hassan",
-      "Title": "So much better than other sites",
+      "Title": "So much better than other",
       "Date": "10/11/2023",
       "Rating": 4.0,
       "Text":
@@ -817,8 +817,8 @@ class _BuyerHome extends State<BuyerHome> {
                     ),
                   ),
                   options: CarouselOptions(
-                    height: 230,
-                    enlargeCenterPage: true,
+                    height: 240,
+                    enlargeCenterPage: false,
                     autoPlay: true,
                     autoPlayCurve: Curves.fastOutSlowIn,
                     enableInfiniteScroll: true,

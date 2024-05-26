@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerScreens/ReviewPanel.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerScreens/SellerProfile.dart';
@@ -292,8 +293,10 @@ class _PostView extends State<PostView> {
                 width: 10,
               ),
               InkWell(
+                  // Share the Data on Social Media
                   onTap: () {
-                    print(" share ");
+                    Share.share(
+                        "${property.propertyType} Property is availible at ${property.location} to ${property.listingType} for RS ${formatNumber(property.price)}. The property have ${property.beds} Beds and ${property.floors} Floors. The area of property is ${property.size} metre squares. Seller Email: ${property.sellerEmail}, Seller Name: ${property.sellerName}.\n\nVivid Estate - Your Path to Real Residence");
                   },
                   child: const Icon(
                     Icons.share,
@@ -669,7 +672,7 @@ class _PostView extends State<PostView> {
                                         child: Text(property.sellerName,
                                             style: const TextStyle(
                                                 color: Color(0XFF5F5F5F),
-                                                fontSize: 28,
+                                                fontSize: 20,
                                                 fontWeight: FontWeight.bold)),
                                       ),
                                     ),
@@ -680,7 +683,7 @@ class _PostView extends State<PostView> {
                                       alignment: Alignment.centerLeft,
                                       child: Container(
                                         margin: const EdgeInsets.only(left: 15),
-                                        width: 150,
+                                        width: 120,
                                         child: ElevatedButton(
                                             style: ElevatedButton.styleFrom(
                                                 backgroundColor:

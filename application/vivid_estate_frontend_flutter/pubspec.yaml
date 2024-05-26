@@ -38,7 +38,7 @@ dependencies:
   image_cropper: ^1.5.1
   flutter_launcher_icons: ^0.13.1
   shared_preferences: ^2.2.2
-  intl: ^0.19.0
+  intl: ^0.18.1
   carousel_slider: ^4.2.1
   flutter_rating_bar: ^4.0.1
   geolocator: ^10.1.0
@@ -51,6 +51,10 @@ dependencies:
   url_launcher: ^6.2.1
   universal_html: ^2.2.4
   file_picker: ^6.1.1
+  share_plus: ^9.0.0
+
+  # Used to Check the Responsive of the UI on Differet Screen Size
+  device_preview: ^1.1.0
 
 
   # The following adds the Cupertino Icons font to your application.

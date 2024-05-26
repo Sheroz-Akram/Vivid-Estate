@@ -120,7 +120,7 @@ class _PropertySearch extends State<PropertySearch> {
             ),
             Container(
               margin: const EdgeInsets.only(left: 15, right: 15),
-              height: MediaQuery.of(context).size.height - 280,
+              height: MediaQuery.of(context).size.height - 320,
               child: ListView.builder(
                 itemBuilder: (context, index) {
                   return Column(

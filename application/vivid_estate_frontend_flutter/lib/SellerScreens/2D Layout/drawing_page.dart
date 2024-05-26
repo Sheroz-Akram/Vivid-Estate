@@ -54,9 +54,11 @@ class DrawingPage extends HookWidget {
                         color: Color(0XFF006E86),
                       ),
                     ),
+                    // Move to the Previous Screen
                     CloseButton(
                       onPressed: () {
-                        print('cancel');
+                        // POP The Current Screen from Navigator
+                        Navigator.pop(context);
                       },
                       color: const Color(0XFF006E86),
                     ),

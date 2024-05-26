@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
@@ -160,29 +161,33 @@ dynamic generalReview(profilePic, name, title, rating, date, text, widthSize) {
               ),
             ],
           ),
-          Container(
-            margin: const EdgeInsets.only(top: 10),
-            child: Row(
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(left: 10),
-                  child: RatingBarIndicator(
-                    rating: rating,
-                    itemBuilder: (context, index) => const Icon(
-                      Icons.star,
-                      color: Color(0xFF006E86),
-                    ),
-                    itemCount: 5,
-                    itemSize: 15.0,
-                    direction: Axis.horizontal,
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Container(
+              margin: const EdgeInsets.only(top: 10),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.bold),
                   ),
-                ),
-              ],
+                  Container(
+                    child: RatingBarIndicator(
+                      rating: rating,
+                      itemBuilder: (context, index) => const Icon(
+                        Icons.star,
+                        color: Color(0xFF006E86),
+                      ),
+                      itemCount: 5,
+                      itemSize: 15.0,
+                      direction: Axis.horizontal,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           Container(
