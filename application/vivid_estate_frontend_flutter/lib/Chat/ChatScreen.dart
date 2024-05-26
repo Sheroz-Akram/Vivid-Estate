@@ -120,9 +120,15 @@ class _ChatScreen extends State<ChatScreen> {
   // Pick a file from the Menu
   dynamic pickFile() async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles();
-      PlatformFile file = result!.files.first;
-      return file;
+      FilePickerResult? result =
+          await FilePicker.platform.pickFiles(withData: true);
+
+      if (result != null && result.files.isNotEmpty) {
+        PlatformFile file = result.files.first;
+        return file;
+      } else {
+        return null; // No file selected or result is null
+      }
     } catch (e) {
       print('Error picking file: $e');
       return null;

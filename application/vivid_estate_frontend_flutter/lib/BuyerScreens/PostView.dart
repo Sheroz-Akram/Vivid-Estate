@@ -556,17 +556,24 @@ class _PostView extends State<PostView> {
                           children: [
                             // Display Location
                             Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 const Icon(Icons.location_on_sharp),
                                 const SizedBox(
                                   width: 5,
                                 ),
-                                Text(
-                                  property.location,
-                                  style: const TextStyle(
-                                      color: Color(0XFF8D8D8D),
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16),
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.5,
+                                  child: Text(
+                                    softWrap: true,
+                                    property.location,
+                                    style: const TextStyle(
+                                        color: Color(0XFF8D8D8D),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16),
+                                  ),
                                 ),
                               ],
                             ),

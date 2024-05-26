@@ -111,7 +111,7 @@ def SignUp(request):
 
             # Locate the location of the user
             geolocator = Nominatim(user_agent="VividEstate")
-            location = geolocator.reverse((Langitude, Longitude),language="en")
+            location = geolocator.reverse((Langitude, Longitude),language="en", timeout=10)
             address = location.raw['address']
 
 

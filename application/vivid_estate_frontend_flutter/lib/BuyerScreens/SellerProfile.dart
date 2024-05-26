@@ -4,6 +4,7 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
+import 'package:vivid_estate_frontend_flutter/BuyerScreens/PostView.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/ChatScreen.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Buyer.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Chat.dart';
@@ -219,127 +220,141 @@ class _SellerProfile extends State<SellerProfile> {
                            * Card to Display Information of the Property in Seller Profile
                            * 
                            */
-                          child: Container(
-                            child: SingleChildScrollView(
-                              child: Column(
-                                children: [
-                                  // Dispplay Image of the Property
-                                  Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(30.00)),
-                                      child: Image(
-                                        image: NetworkImage(
-                                            "${serverHelper.host}/static/${sellerData['Ads'][index]['PropertyImage']}"),
-                                        fit: BoxFit.fitWidth,
-                                      )),
+                          child: InkWell(
+                            onTap: () {
+                              // Open the Post View of the Property
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => PostView(
+                                          PropertyID: sellerData['Ads'][index]
+                                                  ['PropertyID']
+                                              .toString())));
+                            },
+                            child: Container(
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    // Dispplay Image of the Property
+                                    Container(
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(30.00)),
+                                        child: Image(
+                                          image: NetworkImage(
+                                              "${serverHelper.host}/static/${sellerData['Ads'][index]['PropertyImage']}"),
+                                          fit: BoxFit.fitWidth,
+                                        )),
 
-                                  // Display Price of the Property
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 10, right: 10.0, top: 10),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "Rs ${formatNumber(sellerData['Ads'][index]['Price'])}",
-                                          style: const TextStyle(
-                                              color: Color(
-                                                0XFF00627C,
-                                              ),
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 20),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-
-                                  // Display Property Location
-                                  Container(
-                                    margin: const EdgeInsets.only(left: 10),
-                                    child: Row(
-                                      children: [
-                                        const Icon(Icons.location_on_rounded),
-                                        Align(
-                                          alignment: Alignment.topLeft,
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 5, right: 10),
-                                            child: Text(
-                                              "${sellerData['Ads'][index]['Location']}",
-                                              style: const TextStyle(
-                                                  color: Color(0XFF00627C),
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 15),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-
-                                  // Display Property Post Time Ago in Days
-                                  Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Padding(
+                                    // Display Price of the Property
+                                    Padding(
                                       padding: const EdgeInsets.only(
-                                          left: 10, right: 10),
-                                      child: Text(
-                                        "${sellerData['Ads'][index]['TimeAgo']} days ago",
-                                        style: const TextStyle(fontSize: 14),
+                                          left: 10, right: 10.0, top: 10),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "Rs ${formatNumber(sellerData['Ads'][index]['Price'])}",
+                                            style: const TextStyle(
+                                                color: Color(
+                                                  0XFF00627C,
+                                                ),
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 20),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ),
 
-                                  /***
-                                   * Display Property Likes and Views
-                                   */
-                                  Container(
-                                    margin: const EdgeInsets.only(
-                                        left: 10, top: 10),
-                                    child: Row(
-                                      children: [
-                                        // Display Views
-                                        Row(children: [
-                                          const Icon(Icons.remove_red_eye),
-                                          const SizedBox(
-                                            width: 5,
+                                    // Display Property Location
+                                    Container(
+                                      margin: const EdgeInsets.only(left: 10),
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.location_on_rounded),
+                                          Align(
+                                            alignment: Alignment.topLeft,
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 5, right: 10),
+                                              child: Text(
+                                                "${sellerData['Ads'][index]['Location']}",
+                                                style: const TextStyle(
+                                                    color: Color(0XFF00627C),
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 15),
+                                              ),
+                                            ),
                                           ),
-                                          Text(
-                                              sellerData['Ads'][index]['Views']
-                                                  .toString(),
-                                              style: const TextStyle(
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Color(0xFF5F5F5F)))
-                                        ]),
+                                        ],
+                                      ),
+                                    ),
 
-                                        const SizedBox(
-                                          width: 20,
+                                    // Display Property Post Time Ago in Days
+                                    Align(
+                                      alignment: Alignment.topLeft,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 10, right: 10),
+                                        child: Text(
+                                          "${sellerData['Ads'][index]['TimeAgo']} days ago",
+                                          style: const TextStyle(fontSize: 14),
                                         ),
+                                      ),
+                                    ),
 
-                                        // Display Hearts
-                                        Row(
-                                          children: [
-                                            const Icon(Icons.favorite),
+                                    /***
+                                     * Display Property Likes and Views
+                                     */
+                                    Container(
+                                      margin: const EdgeInsets.only(
+                                          left: 10, top: 10),
+                                      child: Row(
+                                        children: [
+                                          // Display Views
+                                          Row(children: [
+                                            const Icon(Icons.remove_red_eye),
                                             const SizedBox(
                                               width: 5,
                                             ),
                                             Text(
                                                 sellerData['Ads'][index]
-                                                        ['Likes']
+                                                        ['Views']
                                                     .toString(),
                                                 style: const TextStyle(
                                                     fontSize: 13,
                                                     fontWeight: FontWeight.bold,
                                                     color: Color(0xFF5F5F5F)))
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  )
-                                ],
+                                          ]),
+
+                                          const SizedBox(
+                                            width: 20,
+                                          ),
+
+                                          // Display Hearts
+                                          Row(
+                                            children: [
+                                              const Icon(Icons.favorite),
+                                              const SizedBox(
+                                                width: 5,
+                                              ),
+                                              Text(
+                                                  sellerData['Ads'][index]
+                                                          ['Likes']
+                                                      .toString(),
+                                                  style: const TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Color(0xFF5F5F5F)))
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
                           ),

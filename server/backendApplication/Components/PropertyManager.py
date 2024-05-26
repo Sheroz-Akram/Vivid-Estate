@@ -79,5 +79,7 @@ class PropertyManager:
         # Search query
         print(f"-> Query: {query}")
 
+        print(results)
+
         return results
 

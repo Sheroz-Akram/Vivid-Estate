@@ -17,6 +17,7 @@ from django.db.models import Q
 
 # Import our Components
 from ..Components.PropertyManager import *
+from ..Components.FileHandler import *
 
 # Create your views here.
 
@@ -48,7 +49,7 @@ def StoreNewAd(request):
 
         # Locate the location of the property
         geolocator = Nominatim(user_agent="VividEstate")
-        location = geolocator.reverse((LocationLatitude, LocationLongitude),language="en")
+        location = geolocator.reverse((LocationLatitude, LocationLongitude),language="en", timeout=10)
         address = location.raw['address']
         littleLocation = address['suburb'] + ", " + address['district'] + ", " + address['state']
 
@@ -78,16 +79,13 @@ def StoreNewAd(request):
             # Get the Image Data
             imageFile = request.FILES['PropertyImage' + str(x)]
 
-            # Create or get an instance of FileSystemStorage to handle saving
-            fs = FileSystemStorage(location=settings.FILESTORAGE)
-            
-            # Save the file directly
-            fileNewName = "file_" + str(uuid.uuid4()) + imageFile.name
-            filename = fs.save(fileNewName, imageFile)
+            # Store the File in File Storage
+            fileHandler = FileHandler()
+            filePath = fileHandler.storeFile(fileData=imageFile)
 
             # Store the Property Image Location in the Server
             propertyImagesLocation = PropertyImage(
-                imageLocation = fileNewName,
+                imageLocation = filePath,
                 propertyID = propertyNew
             )
 
@@ -97,7 +95,6 @@ def StoreNewAd(request):
 
     # Something wrong just happen the process
     except Exception as e:
-        
         return httpErrorJsonResponse("Error: Invalid Request")
 
 

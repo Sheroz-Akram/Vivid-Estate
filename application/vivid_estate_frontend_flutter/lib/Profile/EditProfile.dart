@@ -41,12 +41,12 @@ class _EditProfileState extends State<EditProfile> {
         compressFormat: ImageCompressFormat.png,
         compressQuality: 100,
         androidUiSettings: const AndroidUiSettings(
-            toolbarTitle: 'Crop CNIC',
+            toolbarTitle: 'Crop Profile Picture',
             toolbarColor: Colors.blue,
             toolbarWidgetColor: Colors.white,
             lockAspectRatio: false),
         iosUiSettings: const IOSUiSettings(
-          title: 'Crop CNIC',
+          title: 'Crop Profile Picture',
         ),
       );
 

@@ -57,12 +57,12 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
         compressFormat: ImageCompressFormat.png,
         compressQuality: 100,
         androidUiSettings: const AndroidUiSettings(
-            toolbarTitle: 'Crop CNIC',
+            toolbarTitle: 'Crop Image',
             toolbarColor: Colors.blue,
             toolbarWidgetColor: Colors.white,
             lockAspectRatio: false),
         iosUiSettings: const IOSUiSettings(
-          title: 'Crop CNIC',
+          title: 'Crop Image',
         ),
       );
 
@@ -97,8 +97,7 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
       displaySnackBar(userContext, "Please enter the price of the property.");
     } else if (propertySize.text.isEmpty) {
       displaySnackBar(userContext, "Please enter the size of the property.");
-    }
-    if (noBeds == "") {
+    } else if (noBeds == "") {
       displaySnackBar(
           userContext, "Please Select the number of bed in the house.");
     } else if (noFloors == "") {
@@ -110,25 +109,27 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
       displaySnackBar(userContext, "Provide the details the property.");
     }
 
-    // Combine Our Data into Single Variable
-    var propertyData = {
-      "PropertyType": selectedPropertyType,
-      "ListingType": listingType,
-      "Location": {
-        "Latitude": propertyLocationData['latitude'],
-        "Longitude": propertyLocationData['longitude']
-      },
-      "Price": propertyPrice.text,
-      "Size": propertySize.text,
-      "Beds": noBeds,
-      "Floors": noFloors,
-      "Description": propertyDescription.text
-    };
+    // We have pass all our checks
+    else {
+      var propertyData = {
+        "PropertyType": selectedPropertyType,
+        "ListingType": listingType,
+        "Location": {
+          "Latitude": propertyLocationData['latitude'],
+          "Longitude": propertyLocationData['longitude']
+        },
+        "Price": propertyPrice.text,
+        "Size": propertySize.text,
+        "Beds": noBeds,
+        "Floors": noFloors,
+        "Description": propertyDescription.text
+      };
 
-    // As we checked the data. Now we submit it to the server
-    var seller = Seller();
-    await seller.getAuthData();
-    seller.submitNewPropertyAdd(userContext, propertyImages, propertyData);
+      // As we checked the data. Now we submit it to the server
+      var seller = Seller();
+      await seller.getAuthData();
+      seller.submitNewPropertyAdd(userContext, propertyImages, propertyData);
+    }
   }
 
   @override

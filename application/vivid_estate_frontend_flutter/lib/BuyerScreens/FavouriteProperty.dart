@@ -46,7 +46,7 @@ class _FavouriteProperty extends State<FavouriteProperty> {
       // Display our Property on the Favorite List
       child: Container(
         width: MediaQuery.of(context).size.width,
-        height: 120,
+        height: 150,
         margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
         decoration: const BoxDecoration(
             color: Color(0XFFE2E2E2),
@@ -65,7 +65,7 @@ class _FavouriteProperty extends State<FavouriteProperty> {
             // Place the Image Of Our Property
             SizedBox(
               width: (MediaQuery.of(context).size.width * 0.5) - 40,
-              height: 120,
+              height: 150,
               child: ClipRRect(
                 borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(10),
@@ -83,39 +83,51 @@ class _FavouriteProperty extends State<FavouriteProperty> {
             Container(
               width: (MediaQuery.of(context).size.width * 0.5) - 50,
               margin: const EdgeInsets.only(left: 10),
-              height: 200,
+              height: 150,
               child: Column(
                 children: [
                   // Favourite Property Title Information
-                  Row(
-                    children: [
-                      Text("RS ${(widget.Price)}",
-                          style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(255, 59, 59, 59))),
-                      const Spacer(),
-                      // Remove Property Button
-                      IconButton(
-                          onPressed: () {
-                            // Remove the Property From Favourite List
-                            widget.onCrossPressed(widget.PropertyID);
-                          },
-                          icon: const Icon(Icons.close))
-                    ],
+                  Container(
+                    margin: const EdgeInsets.only(top: 5),
+                    child: Row(
+                      children: [
+                        Text("RS ${(widget.Price)}",
+                            style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Color.fromARGB(255, 59, 59, 59))),
+                        const Spacer(),
+                        // Remove Property Button
+                        Container(
+                          margin: const EdgeInsets.only(right: 5),
+                          child: InkWell(
+                              onTap: () {
+                                // Remove the Property From Favourite List
+                                widget.onCrossPressed(widget.PropertyID);
+                              },
+                              child: const Icon(Icons.close)),
+                        )
+                      ],
+                    ),
                   ),
+
+                  // Give Space Between
+                  const Spacer(),
 
                   // Display Other Information
 
                   // Display Location
                   Align(
-                    alignment: Alignment.centerLeft,
+                    alignment: Alignment.topLeft,
                     child: Text(widget.Location,
                         style: const TextStyle(
-                            fontSize: 15,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF5F5F5F))),
                   ),
+
+                  // Give Space Between
+                  const Spacer(),
 
                   // Display Time
                   Align(
@@ -126,8 +138,9 @@ class _FavouriteProperty extends State<FavouriteProperty> {
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF5F5F5F))),
                   ),
-                  // Give Space Between
+
                   const Spacer(),
+
                   // Display The Stats of our Favourite Property
                   Container(
                     margin: const EdgeInsets.only(bottom: 10),

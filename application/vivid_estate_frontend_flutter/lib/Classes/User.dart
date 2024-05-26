@@ -318,6 +318,8 @@ class User {
       var fileToUpload = http.MultipartFile.fromBytes('SendFile', fileBytes,
           filename: fileName);
 
+      print(fileToUpload);
+
       var request = http.MultipartRequest('POST', url);
 
       // Add our file to upload
