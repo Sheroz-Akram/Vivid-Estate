@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:device_preview/device_preview.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/Welcome.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerMain.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/User.dart';
 import 'package:vivid_estate_frontend_flutter/SellerMain.dart';
+import 'package:vivid_estate_frontend_flutter/SellerScreens/360%20Virtual%20Visit/VirtualVisitCapture.dart';
 
 void main() {
-  runApp(DevicePreview(
-    enabled: true,
-    builder: (context) => const MyApp(),
-  ));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -22,9 +19,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Vivid Estate',
       debugShowCheckedModeBanner: false,
-      useInheritedMediaQuery: true,
-      locale: DevicePreview.locale(context),
-      builder: DevicePreview.appBuilder,
       theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF006E86)),
           useMaterial3: true,
@@ -33,6 +27,7 @@ class MyApp extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(color: Colors.pink, width: 4)))),
       home: const MyHomePage(),
+      builder: EasyLoading.init(),
     );
   }
 }
@@ -51,6 +46,21 @@ title: 'Vivid Estate',
       home: const MyHomePage(),
       builder: EasyLoading.init(),
 
+
+      title: 'Vivid Estate',
+      debugShowCheckedModeBanner: false,
+      useInheritedMediaQuery: true,
+      locale: DevicePreview.locale(context),
+      builder: DevicePreview.appBuilder,
+      theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF006E86)),
+          useMaterial3: true,
+          inputDecorationTheme: InputDecorationTheme(
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: Colors.pink, width: 4)))),
+      home: const MyHomePage(),
+
 */
 
 class MyHomePage extends StatefulWidget {
@@ -64,6 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+
     loadHomePage(context);
   }
 
@@ -82,6 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
     await delayTime();
 
     // Now we move the user to its destinated screen
+
     if (userAuthData == true) {
       if (user.userType == "Buyer") {
         Navigator.pushReplacement(myContext,

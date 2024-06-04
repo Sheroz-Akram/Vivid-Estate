@@ -87,7 +87,7 @@ class _SignUpPage extends State<SignUpPage> {
         'User': username,
         'Password': password,
         'Type': userType,
-        'Langitude': lang,
+        'Latitude': lang,
         'Longitude': long
       });
 
@@ -148,9 +148,13 @@ class _SignUpPage extends State<SignUpPage> {
   */
   void createAccount(BuildContext context) {
     // Check Email is Valid or Not
+    if (_email_controller.text == "") {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please enter an Email Address.")));
+    }
     if (!isEmailValid(_email_controller.text)) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("Entered email is invalid! Check email")));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Entered email is invalid.")));
     } else if (_full_name_controller.text == "") {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Please enter your full name")));
@@ -160,6 +164,9 @@ class _SignUpPage extends State<SignUpPage> {
     } else if (_user_name_controller.text == "") {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Please enter user name")));
+    } else if (_password_controller.text == "") {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please enter password.")));
     } else if (!isPasswordStrong(_password_controller.text)) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Password is weak. Enter Strong Password")));

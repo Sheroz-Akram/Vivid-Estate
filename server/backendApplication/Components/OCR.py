@@ -68,4 +68,7 @@ def getCnicDetails(image_path):
         answer = list(min(output_dict.items(), key=lambda x: x[1]))[0]
         dict_data[key] = answer 
 
+    # Display Log to Terminal
+    print(f"-> CNIC OCR Complete | Result: {str(dict_data)}")
+
     return dict_data

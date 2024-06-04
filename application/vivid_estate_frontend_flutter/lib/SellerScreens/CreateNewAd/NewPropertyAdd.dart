@@ -13,6 +13,7 @@ import 'package:open_street_map_search_and_pick/open_street_map_search_and_pick.
 import 'package:vivid_estate_frontend_flutter/Classes/Seller.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 import 'package:vivid_estate_frontend_flutter/SellerScreens/2D%20Layout/drawing_page.dart';
+import 'package:vivid_estate_frontend_flutter/SellerScreens/360%20Virtual%20Visit/VirtualVisitCapture.dart';
 
 class NewPropertyAd extends StatefulWidget {
   const NewPropertyAd({super.key});
@@ -877,7 +878,11 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                     InkWell(
                       onTap: () {
                         // To Be Implemented
-                        print("Open 360 Virtual Visit Creation");
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const VirtualVisitCapture()));
                       },
                       child: Container(
                           padding: const EdgeInsets.only(

@@ -17,3 +17,23 @@ class InputValidator:
 
             # Pattern Not Able to Match
             return False
+
+    # Validate the Password of the User
+    def validatePassword(self, password):
+        
+        # Check if Password is empty
+        if not password:
+            return False
+
+        # Length Requirement
+        if len(password) < 8:
+            return False
+
+        # Capital Letter Requirement
+        has_capital = any(char.isupper() for char in password)
+
+        # Check if Has Capital Letter or not
+        if not has_capital:
+            return False
+
+        return True

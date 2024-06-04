@@ -13,6 +13,9 @@ class FileHandler:
         # Now We Delete the File From Storage
         fs.delete(fileName)
 
+        # Display Log to Terminal
+        print(f"-> File Deleted | Location: {fileName}")
+
     # Store New File In Storage System
     def storeFile(self, fileData: any):
 
@@ -24,6 +27,9 @@ class FileHandler:
 
         # Store the Files in Server
         fs.save(fileNewName, fileData)
+
+        # Display Log to Terminal
+        print(f"-> File Stored | Location: {fileNewName}")
 
         # Return the name of File
         return fileNewName

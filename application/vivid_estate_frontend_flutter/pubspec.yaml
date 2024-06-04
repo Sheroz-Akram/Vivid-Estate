@@ -52,9 +52,14 @@ dependencies:
   universal_html: ^2.2.4
   file_picker: ^6.1.1
   share_plus: ^9.0.0
+  camera: ^0.9.4+18
+  path_provider: ^2.0.9
+  path: ^1.8.0
 
   # Used to Check the Responsive of the UI on Differet Screen Size
   device_preview: ^1.1.0
+
+  
 
 
   # The following adds the Cupertino Icons font to your application.

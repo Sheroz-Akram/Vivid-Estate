@@ -99,7 +99,7 @@ class _CnicPageState extends State<CnicPage> {
 
         // If the Result is Success
         if (result['status'] == "success") {
-          var extractedFields = extractFields((result['result']).toString());
+          var extractedFields = extractFields((result['message']).toString());
           print(extractedFields['Name']);
 
           // Get Our Values
@@ -126,7 +126,7 @@ class _CnicPageState extends State<CnicPage> {
 
         // Error in OCR
         else {
-          EasyLoading.showError(result['result']);
+          EasyLoading.showError(result['message']);
         }
       } else {
         // Allow User to move back

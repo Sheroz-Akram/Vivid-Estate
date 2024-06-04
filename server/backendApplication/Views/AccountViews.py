@@ -23,68 +23,36 @@ from ..Components.UserComponent import *
 # API to OCR the CNIC card and return the results
 @csrf_exempt
 def OcrCNIC(request):
-    print("NEW CNIC OCR Request!!!!")
-    # Check If Request of of POST Type
-    if request.method == "POST":
-        
-        try:
 
-            # Store the OCR Result Data
-            result = {}
+    # Log The Terminal
+    print(f"=> CNIC OCR Request | IP: {request.META.get('REMOTE_ADDR')}")
 
-            # Get the Image Data
-            imageFile = request.FILES['cnicImage']
+    try:
 
-            # Get the other data files
-            Email = request.POST['Email']
-            Password = request.POST['Password']
+        # Get the CNIC Image File From Request
+        cnicImageFile = request.FILES['cnicImage']
 
-            # Get the User
-            try:
+        # Get Authentication Data of User
+        UserEmail = request.POST['Email']
+        UserPassword = request.POST['Password']
 
-                # Find the User with Email Address
-                user = ApplicationUser.objects.get(email_address=Email)
+        # Create a new User Component
+        userComponent = UserComponent()
 
-                # Check the User Password
-                if user.password != Password:
-                    return JsonResponse({"status":"error", "result": "Password not correct"})
+        # Perform the OCR Operation
+        result = userComponent.ocrCNIC(email=UserEmail, password=UserPassword, cnicImage=cnicImageFile)
 
-                # Check if CNIC Data is Already Saved
-                if user.cnic_name != "":
-                    return JsonResponse({"status":"error", "result": "CNIC data already saved"})
+        # Evaluate our Result Response
+        if not result[0]:
+            return httpErrorJsonResponse(result[1])
 
-                # Create or get an instance of FileSystemStorage to handle saving
-                fs = FileSystemStorage(location=settings.FILESTORAGE)
+        # Send our OCR Data Back to User
+        return httpSuccessJsonResponse(result[2])
 
-                # Save the file directly
-                fileNewName = "file_" + str(uuid.uuid4()) + imageFile.name
-                filename = fs.save(fileNewName, imageFile)
+    except Exception as e:
+        print(f"-> Exception | {str(e)}")
+        return JsonResponse({"status":"error", "message":"Invalid Request"})
 
-                # Store the File Path
-                user.cnic_file = fileNewName
-                user.save()
-
-                # Perform the OCR Operation
-                result['status'] = "success"
-                result['result'] = getCnicDetails(fileNewName)
-
-                print("OCR Completed!")
-
-                # Successfully OCR the CNIC Card Details
-                return JsonResponse(result)
-
-            # If User not found        
-            except ApplicationUser.DoesNotExist as e:
-                return JsonResponse({"status":"error", "result": "User not found"})
-
-        # Any Error in Operation
-        except Exception as e:
-            result['status'] = "error"
-            result['result'] = {"Take cnic image only or crop."}
-            return JsonResponse(result)
-
-    #Invalid Request
-    return HttpResponse("Invalid Request..")
 
 # Generate 50 Characters Random Private Key
 def generate_random_string(length):
@@ -92,73 +60,98 @@ def generate_random_string(length):
   result = ''.join(random.choice(characters) for i in range(length))
   return result
 
-
 # Registor a new user to the application
 @csrf_exempt
 def SignUp(request):
+
+    # Log The Terminal
+    print(f"=> Sign Up Request | IP: {request.META.get('REMOTE_ADDR')}")
+
     try:
-        
-        if request.method == "POST":
 
-            # Get All the Data
-            FullName = request.POST['FullName']
-            Email = request.POST['Email']
-            User = request.POST['User']
-            Password = request.POST['Password']
-            Type = request.POST['Type']
-            Langitude = request.POST['Langitude']
-            Longitude = request.POST['Longitude']
+        # Get Data from POST Request
+        FullName = request.POST['FullName']
+        Email = request.POST['Email']
+        UserName = request.POST['User']
+        Password = request.POST['Password']
+        UserType = request.POST['Type']
+        Latitude = request.POST['Latitude']
+        Longitude = request.POST['Longitude']
 
-            # Locate the location of the user
-            geolocator = Nominatim(user_agent="VividEstate")
-            location = geolocator.reverse((Langitude, Longitude),language="en", timeout=10)
-            address = location.raw['address']
+        # Create User Component
+        userComponent = UserComponent()
 
+        # Perform User Sign Up
+        result = userComponent.signUp(FullName, Email, UserName, Password, UserType, Latitude, Longitude)
 
-            ## Save the Data to our database
-            try:
-
-                # Generate a OTP
-                otp = str(random.randint(1000, 9999))
-                print("**New SignUp Request**")
-
-                # Random Private Key
-                privateKey = generate_random_string(50)
-                
-                # Create Accounts
-                user = ApplicationUser(
-                        private_key=privateKey,
-                        profile_pic="Default.jpg",
-                        full_name=FullName,
-                        email_address=Email,
-                        user_name=User,
-                        password=Password,
-                        otp_code=str(otp),
-                        verification_status="No",
-                        feedback=0,
-                        location= ', '.join(address.values()),
-                        user_type=Type,
-                        langitude=Langitude,
-                        longitude=Longitude
-                ) 
-
-                print("OTP Generated: "+ otp)
-
-                user.save()
-
-                # Send OTP Through Mail Service
-                send_email(subject="Verify Email Address - Vivid Estate", body="Verify your email address! Please enter the following otp in Vivid Estate: " + otp, recipients=[Email])
-
-                # Display Message to the User
-                return JsonResponse({"status":"success", "message":"Great Done"})
-            
-            except Exception as e:
-                return JsonResponse({"status":"error", "message":"User existed already" + str(e)})
-
+        # Evaluate the Result
+        if not result[0]:
+            return httpErrorJsonResponse(result[1])
+        return httpSuccessJsonResponse(result[1])
+    
     except Exception as e:
+        print(f"-> Exception | {str(e)}")
         return JsonResponse({"status":"error", "message":"Invalid Request"})
 
-    return JsonResponse({"status":"error", "message":"Invalid Request"})
+
+# Verify a User OTP from POST Request
+@csrf_exempt
+def verify_otp(request):
+
+    # Log The Terminal
+    print(f"=> OTP Verification Request | IP: {request.META.get('REMOTE_ADDR')}")
+
+    try:
+
+        # Get Data From Post Request
+        UserEmail = request.POST['Email']
+        RequestOTPCode = request.POST['OTP']
+
+        # Mark a Object of User Component
+        userComponent = UserComponent()
+
+        # Verify the OTP of User
+        result = userComponent.verifyUser(email=UserEmail, otpCode=RequestOTPCode)
+        
+        # Evaluate the Result
+        if not result[0]:
+            return httpErrorJsonResponse(result[1])
+        return httpSuccessJsonResponse(result[1])
+
+    except Exception as e:
+        print(f"-> Exception | {str(e)}")
+        return JsonResponse({"status":"error", "message":"Invalid Request"})
+
+
+# Generate a New OTP for Existing User
+@csrf_exempt
+def resendOTP(request):
+    
+    # Log The Terminal
+    print(f"=> Resend OTP Request | IP: {request.META.get('REMOTE_ADDR')}")
+
+    try:
+
+        # Get the other data files
+        UserEmail = request.POST['Email']
+        UserPassword = request.POST['Password']
+
+        # Create instance of User Component
+        userComponent = UserComponent()
+
+        # Now Perform the Resend OTP Request
+        result = userComponent.resendOTP(email=UserEmail,password=UserPassword)
+        
+        # Check the Status of our Request
+        if result[0] == True:
+            return httpSuccessJsonResponse(result[1])
+        else:
+            return httpErrorJsonResponse(result[1])
+
+    except Exception as e:
+        print(f"-> Exception | {str(e)}")
+        return JsonResponse({"status":"error", "message":"Invalid Request"})
+
 
 # Mark OTP as Verified or NOT
 def markVerified(user, otp):
@@ -175,31 +168,6 @@ def markVerified(user, otp):
     except:
         return {"status":"error", "message": "user not found"}
 
-
-
-# Verify a User OTP from POST Request
-@csrf_exempt
-def verify_otp(request):
-    print("NEW OTP VERIFY Request!!!!")
-    try:
-        # Make Sure it is POST Request
-        if request.method == "POST":
-            # Get All the Data
-            Email = request.POST['Email']
-            Otp = request.POST['OTP']
-
-            # Now need to verify the OTP
-                
-            # Get the Required Buyer
-            user = ApplicationUser.objects.get(email_address=Email)
-
-            # Mark the OTP as verified
-            return JsonResponse(markVerified(user=user, otp=Otp))
-
-    except Exception as e:
-        return JsonResponse({"status":"error", "message": "User not found"})
-
-    return JsonResponse({"status":"error", "message":"Invalid Request"})
 
 # Verify a User OTP from POST Request
 @csrf_exempt
@@ -230,77 +198,35 @@ def verifyPasswordResetOTP(request):
 
     return JsonResponse({"status":"error", "message":"Invalid Request"})
 
-# Generate a New OTP for Existing User
-@csrf_exempt
-def resendOTP(request):
-    
-    # Log The Terminal
-    print(f"=> Resend OTP Request | IP: {request.META.get('REMOTE_ADDR')}")
-
-    try:
-
-        # Get the other data files
-        email = request.POST['Email']
-        password = request.POST['Password']
-
-        # Generate a new OTP 
-        newOTPCode = str(random.randint(1000, 9999))
-
-        # Create instance of User Component
-        userComponent = UserComponent()
-
-        # Now Perform the Resend OTP Request
-        result = userComponent.resendOTP(email,password, newOTPCode)
-        
-        # Check the Status of our Request
-        if result[0] == True:
-            return httpSuccessJsonResponse(result[1])
-        else:
-            return httpErrorJsonResponse(result[1])
-
-    except Exception as e:
-        return JsonResponse({"status":"error", "message": "Invalid Request"})
-
-
-
 # Reset a User Password with a new password
 @csrf_exempt
 def passwordReset(request):
-    print("NEW PASSWORD RESET REQUEST")
+
+    # Log The Terminal
+    print(f"=> Login Request | IP: {request.META.get('REMOTE_ADDR')}")
 
     try:
-        # Make Sure it is POST Request
-        if request.method == "POST":
+        # Get User Data from POST Request
+        Email = request.POST['Email']
+        Password = request.POST['Password']
+        NewPassword = request.POST['NewPassword']
 
-            # Get the other data files
-            Email = request.POST['Email']
-            Password = request.POST['Password']
-            NewPassword = request.POST['NewPassword']
+        # Create a User Component
+        userComponent = UserComponent()
 
-            # Get the User
-            try:
-                # Find the User with Email Address
-                user = ApplicationUser.objects.get(email_address=Email)
+        # Update the Password of the User
+        result = userComponent.resetPassword(Email, Password, NewPassword)
 
-                # Check the User Password
-                if user.password != Password:
-                    return JsonResponse({"status":"error", "message": "Password not correct"})
-
-                # Store the New User Password as Password
-                user.password = NewPassword
-                user.save()
-
-                # Display Message to the User
-                return JsonResponse({"status":"success", "message":"User Password is reset. Now Login"})
-            
-            # If User not found        
-            except ApplicationUser.DoesNotExist as e:
-                return JsonResponse({"status":"error", "message": "User not found"})
+        # Evaluate the Result
+        if not result[0]:
+            return httpErrorJsonResponse(result[1])
+        return httpSuccessJsonResponse(result[1])
 
     except Exception as e:
-        return JsonResponse({"status":"error", "message": "User not found"})
+        print(f"-> Exception | {str(e)}")
+        return JsonResponse({"status":"error", "message":"Invalid Request"})
 
-    return JsonResponse({"status":"error", "message":"Invalid Request"})
+
 
 
 # Login to user account
@@ -322,33 +248,30 @@ def loginUser(request):
             userComponent = UserComponent()
 
             # Perform the Login Request
-            result = userComponent.login(email, password, generate_random_string(50))
+            result = userComponent.login(email, password)
 
             # If Request is Success
             if result[0] == True:
+
+                # Get our User Object
+                user = result[2]
 
                 # Response the User Data Back To Client
                 return JsonResponse(
                     {
                         "status":"success",
-                        "message":"Account Login is Successfull", 
-                        "privateKey" : userComponent.getPrivateKey(), 
-                        "userType" : userComponent.getUserType(), 
-                        "profilePicture": userComponent.getProfilePicture()
+                        "message": result[1], 
+                        "privateKey" : user.private_key, 
+                        "userType" : user.user_type, 
+                        "profilePicture": user.profile_pic
                     })
             
             else:
-                # Response an Error to User
-                return JsonResponse(
-                    {
-                        "status":"error", 
-                        "message": result[1]
-                    })
+                return httpErrorJsonResponse(result[1])
 
-    # Something Wrong Happens in the Request
     except Exception as e:
-        print(e)
-        return JsonResponse({"status":"error", "message": "Invalid Request"})
+        print(f"-> Exception | {str(e)}")
+        return JsonResponse({"status":"error", "message":"Invalid Request"})
 
 
 # Generate a New OTP for Existing User To Reset the Password
@@ -395,56 +318,32 @@ def forgotPassword(request):
 # Store the CNIC Data for Existing User
 @csrf_exempt
 def storeCNICData(request):
-    print("NEW CNIC Data UPDATE REQUEST")
+    
+    # Log The Terminal
+    print(f"=> CNIC Data Update Request | IP: {request.META.get('REMOTE_ADDR')}")
 
     try:
-        # Make Sure it is POST Request
-        if request.method == "POST":
+        # Get User Submit Data from POST Request
+        UserEmail = request.POST['Email']
+        UserPassword = request.POST['Password']
+        cnicNumber = request.POST['cnicNumber']
+        cnicName = request.POST['cnicName']
+        cnicFather = request.POST['cnicFather']
+        cnicDob = request.POST['cnicDob']
 
-            # Get the other data files
-            Email = request.POST['Email']
-            Password = request.POST['Password']
-            cnicNumber = request.POST['cnicNumber']
-            cnicName = request.POST['cnicName']
-            cnicFather = request.POST['cnicFather']
-            cnicDob = request.POST['cnicDob']
-            
+        # Create User Component Object
+        userComponent = UserComponent()
+        result = userComponent.storeCNICInformation(UserEmail, UserPassword, cnicNumber, cnicName, cnicFather, cnicDob)
 
-            # Get the User
-            try:
-                # Find the User with Email Address
-                user = ApplicationUser.objects.get(email_address=Email)
-
-                # Check the User Password
-                if user.password != Password:
-                    return JsonResponse({"status":"error", "message": "Password not correct"})
-
-                # Check if CNIC Data is Already Saved
-                if user.cnic_name != "":
-                    return JsonResponse({"status":"error", "message": "CNIC data already saved"})
-
-                # Store the User CNIC Data
-                user.cnic_name = cnicName
-                user.cnic_father_name = cnicFather
-                user.cnic_number = cnicNumber
-                user.cnic_dob = cnicDob
-
-                user.save()
-
-                # Send OTP Through Mail Service
-                send_email(subject="CNIC Data Stored - Vivid Estate", body="Your account is created and under verification. Please wait while we verify and approve you account. It would take some time.", recipients=[Email])
-
-                # Display Message to the User
-                return JsonResponse({"status":"success", "message":"CNIC Data Stored"})
-            
-            # If User not found        
-            except ApplicationUser.DoesNotExist as e:
-                return JsonResponse({"status":"error", "message": "User not found"})
+        # Check the Status of our Request
+        if not result[0]:
+            return httpErrorJsonResponse(result[1])
+        return httpSuccessJsonResponse(result[1])
 
     except Exception as e:
-        return JsonResponse({"status":"error", "message": "User not found"})
+        print(f"-> Exception | {str(e)}")
+        return JsonResponse({"status":"error", "message":"Invalid Request"})
 
-    return JsonResponse({"status":"error", "message":"Invalid Request"})
 
 # Delete the User Account
 @csrf_exempt
@@ -467,14 +366,13 @@ def deleteAccount(request):
         result = userComponent.deleteAccount(email, password, privateKey)
 
         # Check The Status Of our response
-        if result[0] == True:
-            return httpSuccessJsonResponse("User Account Deleted Successfully")
-        else:
+        if not result[0]:
             return httpErrorJsonResponse(result[1])
+        return httpSuccessJsonResponse("User Account Deleted")
 
-    # Something wrong just happen the process
     except Exception as e:
-        return httpErrorJsonResponse("Invalid Request")
+        print(f"-> Exception | {str(e)}")
+        return JsonResponse({"status":"error", "message":"Invalid Request"})
 
 # Get the profile data of a User
 @csrf_exempt
@@ -489,11 +387,9 @@ def getUserProfileData(request):
         email = request.POST['Email']
         privateKey = request.POST['PrivateKey']
 
-        # Create Instance of User Component
-        userComponent = UserComponent()
-
-        # Perform the User Authenticate
-        result = userComponent.authenticateUser(email, privateKey)
+        # Authenticate the User
+        authentication = AuthenticationSystem()
+        result = authentication.authenticateEmailPrivateKey(email,privateKey)
 
         # Check the Status of our Response
         if result[0] == True:
@@ -514,9 +410,9 @@ def getUserProfileData(request):
         else:
             return httpErrorJsonResponse(result[1])
 
-    # Something wrong just happen the process
     except Exception as e:
-        return httpErrorJsonResponse("Error in the server or an invalid request")
+        print(f"-> Exception | {str(e)}")
+        return JsonResponse({"status":"error", "message":"Invalid Request"})
 
 
 # Get the profile data of a Seller
@@ -584,72 +480,62 @@ def getSellerProfileData(request):
 @csrf_exempt
 def updateProfilePicture(request):
 
-    # Check the User Authentications
-    authResult = checkUserLogin(request=request)
-    if authResult[0] == False:
-        return httpErrorJsonResponse(authResult[1])
+    # Log The Terminal
+    print(f"=> Update Profile Picture Request | IP: {request.META.get('REMOTE_ADDR')}")
 
-    # Now we Get the User
-    user = authResult[1]
-
-    # Now we get update our profile picture
     try:
-        # Get the Image Data
-        imageFile = request.FILES['cnicImage']
 
-        # Create or get an instance of FileSystemStorage to handle saving
-        fs = FileSystemStorage(location=settings.FILESTORAGE)
-        
-        # Save the file directly
-        fileNewName = "file_" + str(uuid.uuid4()) + imageFile.name
-        filename = fs.save(fileNewName, imageFile)
+         # Get User Data from POST Request
+        UserEmailAddress = request.POST['Email']
+        UserPrivateKey = request.POST['PrivateKey']
+        NewProfilePicture = request.FILES['cnicImage']
 
-        # Delete the previous profile picture of the user
-        fs.delete(user.profile_pic)
+        # Create a User Component
+        userComponent = UserComponent()
 
-        # Store the File Path
-        user.profile_pic = fileNewName
-        user.save()
+        # Update the Profile Picture
+        result = userComponent.updateProfilePicture(UserEmailAddress, UserPrivateKey, NewProfilePicture)
 
-        return httpSuccessJsonResponse("Profile picture has been update successfully")
+        # Evaluate the Result
+        if not result[0]:
+            return httpErrorJsonResponse(result[1])
+        return httpSuccessJsonResponse(result[1])
 
-    # Something wrong just happen the process
     except Exception as e:
-        return httpErrorJsonResponse("Error in the server or an invalid request")
-
+        print(f"-> Exception | {str(e)}")
+        return JsonResponse({"status":"error", "message":"Invalid Request"})
 
 
 # Update the profile data of a user in the server
 @csrf_exempt
 def updateProfileData(request):
 
-    # Check the User Authentications
-    authResult = checkUserLogin(request=request)
-    if authResult[0] == False:
-        return httpErrorJsonResponse(authResult[1])
+    # Log The Terminal
+    print(f"=> Update Profile Picture Request | IP: {request.META.get('REMOTE_ADDR')}")
 
-    # Now we Get the User
-    user = authResult[1]
-
-    # Now we get update our profile data
     try:
 
-        # Get the Data to Update for the User
+         # Get User Data from POST Request
+        UserEmailAddress = request.POST['Email']
+        UserPrivateKey = request.POST['PrivateKey']
         fullName = request.POST['FullName']
         cnicNumber = request.POST['CnicNumber']
         cnicDob = request.POST['CnicDOB']
 
+        # Create a User Component
+        userComponent = UserComponent()
+
         # Update the Data of the User
-        user.full_name = fullName
-        user.cnic_number = cnicNumber
-        user.cnic_dob = cnicDob
-        user.save()
+        result = userComponent.updateProfileData(UserEmailAddress, UserPrivateKey, fullName, cnicNumber, cnicDob)
 
-        return httpSuccessJsonResponse("Profile Data has been updated successfully")
+        # Evaluate the Result
+        if not result[0]:
+            return httpErrorJsonResponse(result[1])
+        return httpSuccessJsonResponse(result[1])
 
-    # Something wrong just happen the process
     except Exception as e:
-        return httpErrorJsonResponse("Error in the server or an invalid request")
+        print(f"-> Exception | {str(e)}")
+        return JsonResponse({"status":"error", "message":"Invalid Request"})
 
 
 
@@ -657,27 +543,26 @@ def updateProfileData(request):
 @csrf_exempt
 def updateFeedback(request):
 
-    # Check the User Authentications
-    authResult = checkUserLogin(request=request)
-    if authResult[0] == False:
-        return httpErrorJsonResponse(authResult[1])
+    # Log The Terminal
+    print(f"=> Update Feedback Rating Request | IP: {request.META.get('REMOTE_ADDR')}")
 
-    # Now we Get the User
-    user = authResult[1]
-
-    # Now we get update our user feedback
     try:
 
-        # Get the Data to Update for the User
-        feedback = request.POST['Feedback']
+        # Get User Data from POST Request
+        UserEmailAddress = request.POST['Email']
+        UserPrivateKey = request.POST['PrivateKey']
+        NewFeedbackRating = request.POST['Feedback']
 
-        # Update the Data of the User
-        user.feedback = feedback
-        user.save()
+        # Create User Component
+        userComponent = UserComponent()
+        result = userComponent.updateFeedbackRating(email=UserEmailAddress, privateKey=UserPrivateKey, newRating=NewFeedbackRating)
 
-        return httpSuccessJsonResponse("Feedbac has been updated successfully")
+        # Evaluate the Result
+        if not result[0]:
+            return httpErrorJsonResponse(result[1])
+        return httpSuccessJsonResponse(result[1])
 
-    # Something wrong just happen the process
     except Exception as e:
-        return httpErrorJsonResponse("Error in the server or an invalid request")
+        print(f"-> Exception | {str(e)}")
+        return JsonResponse({"status":"error", "message":"Invalid Request"})
 
