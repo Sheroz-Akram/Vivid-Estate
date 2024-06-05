@@ -21,56 +21,76 @@ class UserComponent:
         self.userAuthenticator = AuthenticationSystem()
         self.fileHandler = FileHandler()
 
+    # Authenticate the User With Email And Password
+    def authenticateEmailPassword(self, email: str, password: str):
+
+        # Authenticate the User with Email and Private Key
+        result = self.userAuthenticator.authenticateEmailPassword(email, password)
+
+        # Evaluate the Result
+        if not result[0]:
+            raise Exception(result[1])
+        
+        # Store the User Model
+        self.user = result[2]
+
+    # Authenticate the User With Email And Private Key
+    def authenticateEmailPrivateKey(self, email: str, privateKey: str):
+
+        # Authenticate the User with Email and Private Key
+        result = self.userAuthenticator.authenticateEmailPrivateKey(email, privateKey)
+
+        # Evaluate the Result
+        if not result[0]:
+            raise Exception(result[1])
+
+        # Store the User Model
+        self.user = result[2]
+
     # Find the User from Email Address
     def findUser(self, email:str):
 
         # Validate Email Address
         if not self.inputValidator.validateEmailAddress(email=email):
-            return False, "Email is not valid."
+            raise Exception("Email not valid")
 
         try:
             # Find the User from Email Address
             user = ApplicationUser.objects.get(email_address=email)
             
-            # Pass the User Back
-            return True, "User is found", user
+            # Store the User Information
+            self.user = user
 
         except Exception as e:
-            return False, "User not found"
+            raise Exception("User not found")
 
     # Login A User With His Email And Password
-    def login(self, email: str, password: str):
-
-        # Authenticate the Email and Password
-        result = self.userAuthenticator.authenticateEmailPassword(email, password)
-
-        # Evaluate the Result
-        if not result[0]:
-            return result
-        user = result[2]
+    def login(self):
         
-        # Update The Private Key Of User
-        user.private_key = self.generateRandomPrivateKey()
-        user.save()
+        try:
+            # Update The Private Key Of User
+            self.user.private_key = self.generateRandomPrivateKey()
+            self.user.save()
+        except Exception as e:
+            raise Exception("Unable to Login")
 
-        return True, "User Login Successfully", user
 
     # Sign Up a new User to Server
     def signUp(self, fullName: str, email: str, userName : str, password: str, userType: str, latitude: str, longitude: str):
 
         # Validate Email Address
         if not self.inputValidator.validateEmailAddress(email=email):
-            return False, "Email is not valid."
+            raise Exception("Email Address not valid")
         
         # Validate Password
         if not self.inputValidator.validatePassword(password=password):
-            return False, "Password is not Valid"
+            raise Exception("Password not valid")
 
         # Now Get the Detail Location of the User
         try:
             location = self.geoInfomation.detailLocation(latitude, longitude)
         except:
-            return False, "Error in Location Service"
+            raise Exception("Location Service Error")
 
         # Now Generate OTP and Private Key for User
         otpCode = self.generateRandomOTP()
@@ -82,7 +102,7 @@ class UserComponent:
         try:
             mailService.sendOTP(otpCode)
         except:
-            return False, "Mail can't be delivered"
+            raise Exception("Error in Mail Service")
 
         # Create Account and Save Data in Server
         try:
@@ -103,238 +123,210 @@ class UserComponent:
             )
             newUser.save()
         except:
-            return False, "User already exists"
+            raise Exception("User Already Exists")
+        
+        # Store the User
+        self.user = newUser
 
         # Display Log to Terminal
         print(f"-> Account Created | Name: {newUser.full_name} | Email: {newUser.email_address} | Type: {newUser.user_type}")
-        return True, "Account Created Successfully", newUser
 
     # Reset the Password of the User
-    def resetPassword(self, email: str, oldPassword: str, newPassword: str):
+    def resetPassword(self, newPassword: str):
 
-        # Authenticate the User with Email and Private Key
-        result = self.userAuthenticator.authenticateEmailPassword(email, oldPassword)
-
-        # Evaluate the Result
-        if not result[0]:
-            return result
-        user = result[2]
-
-        # Update the Password of the User
-        user.password = newPassword
-        user.private_key = self.generateRandomPrivateKey()
-        user.save()
-
-        return True, "Password updated", user
+        try:
+            # Update the Password of the User
+            self.user.password = newPassword
+            self.user.private_key = self.generateRandomPrivateKey()
+            self.user.save()
+        except:
+            raise Exception("Unable to Store Password in database")
     
 
     # Update the Profile Picture of the User
-    def updateProfilePicture(self, email: str, privateKey: str, newProfilePicture):
-
-        # Authenticate the User with Email and Private Key
-        result = self.userAuthenticator.authenticateEmailPrivateKey(email, privateKey)
-
-        # Evaluate the Result
-        if not result[0]:
-            return result
-        user = result[2]
+    def updateProfilePicture(self, newProfilePicture):
 
         try:
             # Delete the Previous Picture of the User
-            self.fileHandler.deleteFile(user.profile_pic)
+            self.fileHandler.deleteFile(self.user.profile_pic)
 
             # Store the New Profile Picture
             fileName = self.fileHandler.storeFile(newProfilePicture)
 
             # Update the File Name in Server
-            user.profile_pic = fileName
-            user.save()
+            self.user.profile_pic = fileName
+            self.user.save()
+
         except:
-            return False, "Error in storing profile picture"
-        
-        return True, "Profile Picture Updated", user
+            raise Exception("Error in File Storage Server")
 
     # Update the Profile Picture of the User
-    def updateProfileData(self, email: str, privateKey: str, fullName, cnicNumber, cnicDob):
+    def updateProfileData(self, fullName, cnicNumber, cnicDob):
 
-        # Authenticate the User with Email and Private Key
-        result = self.userAuthenticator.authenticateEmailPrivateKey(email, privateKey)
+        try:
+            # Update the Data of Our User
+            self.user.full_name = fullName
+            self.user.cnic_number = cnicNumber
+            self.user.cnic_dob = cnicDob
+            self.user.save()
 
-        # Evaluate the Result
-        if not result[0]:
-            return result
-        user = result[2]
-
-        # Update the Data of Our User
-        user.full_name = fullName
-        user.cnic_number = cnicNumber
-        user.cnic_dob = cnicDob
-        user.save()
-
-        return True, "Profile Data Updated", user
-
+        except:
+            raise Exception("Error in database. Unable to update")
 
     # Verify the User Through its OTP Code
     def verifyUser(self, email: str, otpCode):
 
         # Find the User Through Its Email Address
-        result = self.findUser(email)
-
-        # Evaluate the Result
-        if not result[0]:
-            return result
-        user = result[2]
+        self.findUser(email)
 
         # Verify the status of User
-        if not user.verification_status == "No":
-            return False, "User already verified"
+        if not self.user.verification_status == "No":
+            raise Exception("User already verified")
         
         # Verify the OTP
-        if not user.otp_code == otpCode:
-            return False, "OTP Code is invalid"
+        if not self.user.otp_code == otpCode:
+            raise Exception("OTP Code is Invalid")
         
         # Mark User as Verified
-        user.verification_status = "Yes"
-        user.save()
-
-        return True, "User OTP is Verified", user
+        self.user.verification_status = "Yes"
+        self.user.save()
 
 
     # Resend OTP of the User
-    def resendOTP(self, email: str, password: str):
-
-        # Authenticate the Email and Password
-        result = self.userAuthenticator.authenticateEmailPassword(email, password)
-
-        # Evaluate the Result
-        if not result[0]:
-            return result
-        user = result[2]
+    def resendOTP(self):
 
         # Generate New OTP for the User
         otpCode = self.generateRandomOTP()
 
         # Send OTP to User by Email
         mailService = Mail("Vivid Estate - OTP Resend")
-        mailService.addRecipients(email)
+        mailService.addRecipients(self.user.email_address)
         try:
             mailService.sendOTP(otpCode)
         except:
             return False, "Mail can't be delivered"
 
         # Mark the User a Unverified
-        user.verification_status = "No"
-        user.otp_code = otpCode
-        user.save()
-
-        return True, "OTP is Resend to Email Address", user
+        try:
+            self.user.verification_status = "No"
+            self.user.otp_code = otpCode
+            self.user.save()
+        except:
+            raise Exception("Unable to Save OTP to Database")
 
     # OCR the CNIC Card and Extract all Information
-    def ocrCNIC(self, email: str, password: str, cnicImage):
+    def ocrCNIC(self, cnicImage):
 
-        # Authenticate the Email and Password
-        result = self.userAuthenticator.authenticateEmailPassword(email, password)
 
-        # Evaluate the Result
-        if not result[0]:
-            return result
-        user = result[2]
-
-        # Store the CNIC Image File in Server Storage
-        cnicFileLocation = self.fileHandler.storeFile(cnicImage)
+        try:
+            # Store the CNIC Image File in Server Storage
+            cnicFileLocation = self.fileHandler.storeFile(cnicImage)
+        except:
+            raise Exception("Error in File Storage while CNIC Image Storage")
 
         # Perfom CNIC OCR
         try:
             ocrResult = getCnicDetails(settings.FILESTORAGE + f"/{cnicFileLocation}")
         except Exception as e:
-            print(str(e))
-            return False, "Error in CNIC OCR"
+            raise Exception("Error in CNIC OCR")
 
         # Store File Location in Database
-        user.cnic_file = cnicFileLocation
-        user.save()
+        try:
+            self.user.cnic_file = cnicFileLocation
+            self.user.save()
+        except:
+            raise Exception("Error in CNIC OCR Database Storage")
 
-        return True, "CNIC OCR Successfull", ocrResult
+        return ocrResult
 
     # Store the Information of CNIC of User
-    def storeCNICInformation(self, email: str, password: str, cnicNumber, cnicName, cnicFather, cnicDob):
+    def storeCNICInformation(self, cnicNumber, cnicName, cnicFather, cnicDob):
 
-        # Authenticate the Email and Password
-        result = self.userAuthenticator.authenticateEmailPassword(email, password)
+        try:
+            # Update the CNIC Data of the User
+            self.user.cnic_name = cnicName
+            self.user.cnic_father_name = cnicFather
+            self.user.cnic_number = cnicNumber
+            self.user.cnic_dob = cnicDob
+            self.user.save()
+        except:
+            raise Exception("Uable to Store CNIC Data")
 
-        # Evaluate the Result
-        if not result[0]:
-            return result
-        user = result[2]
+        try:
+            # Send Email to User
+            mailService = Mail("Vivid Estate - CNIC Data Updated")
+            mailService.addRecipients(self.user.email_address)
+            mailService.setBody("CNIC Data of the your account has been updated. Our team will review your provided information and let you know about your account status shortly. Thank You!")
+            mailService.sendMail()
+        except:
+            raise Exception("Unable to send mail")
 
-        # Update the CNIC Data of the User
-        user.cnic_name = cnicName
-        user.cnic_father_name = cnicFather
-        user.cnic_number = cnicNumber
-        user.cnic_dob = cnicDob
-        user.save()
+    # User Forgot the Password. Genereate New OTP
+    def forgotPassword(self, email: str):
 
-        # Send Email to User
-        mailService = Mail("Vivid Estate - CNIC Data Updated")
-        mailService.addRecipients(email)
-        mailService.setBody("CNIC Data of the your account has been updated. Our team will review your provided information and let you know about your account status shortly. Thank You!")
-        mailService.sendMail()
+        # Find the User
+        self.findUser(email)
 
-        return True, "CNIC Data Updated", user
-    
+        # Generate new OTP Code
+        newOTPCode = self.generateRandomOTP()
+
+        # Mail The New OTP To User Email Address
+        try:
+            mailService = Mail("Vivid Estate - Password Reset OTP")
+            mailService.addRecipients(self.user.email_address)
+            mailService.sendOTP(newOTPCode)
+        except:
+            raise Exception("Unable to Send OTP to User")
+
+        # Mark the User as Unverified and Reset OTP
+        try:
+            self.user.otp_code = newOTPCode
+            self.user.verification_status = "No"
+            self.user.save()
+        except:
+            raise Exception("Unable to Save OTP in Database")
+        
 
     # Delete the Account of User With Profile Picture
     def deleteAccount(self, email:str, password:str, privateKey: str):
-        
-        # Store the User Input Data
-        self.email = email
-        self.password = password
-        self.privateKey = privateKey
 
         # Validate The Email Address
         inputValidator = InputValidator()
-        if inputValidator.validateEmailAddress(self.email) == False:
-            return False, "Email is Not Valid"
+        if inputValidator.validateEmailAddress(email) == False:
+            raise Exception("Email is Not Valid")
         
         # Find the User with Email Address
         try:
-            user = ApplicationUser.objects.get(email_address=self.email)
+            user = ApplicationUser.objects.get(email_address=email)
         except Exception as e:
-            return False, "User Not Found"
+            raise Exception("User not found")
 
         # Check the User Password
-        if user.password != self.password:
-            return False, "Password Not Correct"
+        if user.password != password:
+            raise Exception("Password not correct")
         
         # Check the Private Key
-        if user.private_key != self.privateKey:
-            return False, "Private Key Not Matched"
+        if user.private_key != privateKey:
+            raise Exception("Private Key Not Matched")
 
-        # Delete the User Profile Picture
-        fileHandler = FileHandler()
-        fileHandler.deleteFile(user.profile_pic)
-        
+        try:
+            # Delete the User Profile Picture
+            fileHandler = FileHandler()
+            fileHandler.deleteFile(user.profile_pic)
+        except:
+            raise Exception("Profile Picture not able to Delete")
+
         # Delete The User Account
         user.delete()
 
-        return True, "Account Deleted"
-
     # Update the Feedback Rating of the User
-    def updateFeedbackRating(self, email: str, privateKey: str, newRating):
-
-        # Authenticate the User with Email and Private Key
-        result = self.userAuthenticator.authenticateEmailPrivateKey(email, privateKey)
-
-        # Evaluate the Result
-        if not result[0]:
-            return result
-        user = result[2]
-
-        # Update the Feedback Rating
-        user.feedback = newRating
-        user.save()
-
-        return True, "Feedback Rating Updated", user
+    def updateFeedbackRating(self, newRating):
+        try:
+            # Update the Feedback Rating
+            self.user.feedback = newRating
+            self.user.save()
+        except:
+            raise Exception("Unable to store feedback")
     
     # Generate New Private Key
     def generateRandomPrivateKey(self):
@@ -348,5 +340,6 @@ class UserComponent:
         otp = str(random.randint(1000, 9999))
         return otp
 
-
-
+    # Get the User Model
+    def getUserModel(self):
+        return self.user
