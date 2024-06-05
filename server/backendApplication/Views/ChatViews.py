@@ -1,11 +1,6 @@
 from ..modules.helper import *
 from django.views.decorators.csrf import csrf_exempt
 from ..models import *
-from django.core.files.storage import FileSystemStorage
-from django.conf import settings
-import uuid
-import os
-import json
 
 # Import Application Components
 from ..Components.UserComponent import *
@@ -146,42 +141,60 @@ def StoreSendFile(request):
 @csrf_exempt
 def get_all_user_chat(request):
 
-    # Check the User Authentications
-    authResult = checkUserLogin(request=request)
-    if authResult[0] == False:
-        return httpErrorJsonResponse(authResult[1])
+    # Log The Terminal
+    print(f"=> User Chats Information Request | IP: {request.META.get('REMOTE_ADDR')}")
 
-    # Now we Get the User
-    user = authResult[1]
-
-    # User is Authenticated. Now move to our request
     try:
-        # Now Get the Chat Room User is in
-        chatsData = []
-        responseData = []
-        if user.user_type == "Buyer":
-            chatsData = Chat.objects.filter(Buyer=user)
-            for chatData in chatsData:
-                if chatData.unviewPerson.email_address != user.email_address:
-                    unviews = 0
-                else:
-                    unviews = chatData.unviewCount
-                responseData.append({"fullName":chatData.Seller.full_name, "profilePicture": chatData.Seller.profile_pic ,"email":chatData.Seller.email_address,"lastMessage":chatData.LastMessage, "time": chatData.modified.strftime("%H:%M %p"), "chatID": chatData.id, "count": unviews})
-        else:
-            chatsData = Chat.objects.filter(Seller=user)
-            for chatData in chatsData:
-                if chatData.unviewPerson.email_address != user.email_address:
-                    unviews = 0
-                else:
-                    unviews = chatData.unviewCount
-                responseData.append({"fullName":chatData.Buyer.full_name, "profilePicture": chatData.Buyer.profile_pic ,"email":chatData.Buyer.email_address,"lastMessage":chatData.LastMessage , "time": chatData.modified.strftime("%H:%M %p"), "chatID": chatData.id, "count": unviews})
 
-        # Display Message to the User
-        return httpSuccessJsonResponse(responseData)
+        # Get Data From POST Request
+        Email = request.POST['Email']
+        PrivateKey = request.POST['PrivateKey']
+
+        try:
+            # Create User Component for User
+            userComponent = UserComponent()
+
+            # Authenticate the Sender
+            userComponent.authenticateEmailPrivateKey(Email, PrivateKey)
+
+            # Create Chat Component and Get Chat Room
+            chatSystem = ChatSystem()
+
+            # Get All the Chats
+            chats = chatSystem.chats(userComponent.getUserModel())
+
+            # Response Message Deliver to Client
+            responseMessage = []
+
+            # Loop Through Each Chat and Gather Information
+            for chat in chats:
+
+                # Get the Other Person For the Chat
+                otherPerson = chat.otherPerson(userComponent.getUserModel())
+                
+                # Add to Response Message
+                responseMessage.append({
+        
+                    "fullName": otherPerson.full_name,
+                    "profilePicture": otherPerson.profile_pic,
+                    "email": otherPerson.email_address,
+                    "lastMessage":chat.LastMessage,
+                    "time": chat.modified.strftime("%H:%M %p"),
+                    "chatID": chat.id,
+                    "count": chat.unViewCount(userComponent.getUserModel())
+        
+                })
             
-    # Something wrong just happen the process
+            # Display Message to the User
+            return httpSuccessJsonResponse(responseMessage)
+
+        except Exception as e:
+            print(str(e))
+            return httpErrorJsonResponse(str(e))
+            
     except Exception as e:
-        return httpErrorJsonResponse("Error in the server or an invalid request")
+        print(f"-> Exception | {str(e)}")
+        return JsonResponse({"status":"error", "message":"Invalid Request"})
 
 
 # Get the Chat Messages for a corresponding chat
@@ -243,60 +256,55 @@ def get_all_chat_messages(request):
 @csrf_exempt
 def get_all_unview_messages(request):
 
-    # Check the User Authentications
-    authResult = checkUserLogin(request=request)
-    if authResult[0] == False:
-        return httpErrorJsonResponse(authResult[1])
+    # Log The Terminal
+    print(f"=> Unview Messages Request | IP: {request.META.get('REMOTE_ADDR')}")
 
-    # Now we Get the User
-    user = authResult[1]
-    
-    # User is Authenticated. Now we process our request
     try:
 
-        # Get Chat ID of where user want new messages
+        # Get Data From POST Request
+        Email = request.POST['Email']
+        PrivateKey = request.POST['PrivateKey']
         ChatID = request.POST['ChatID']
 
-        # Check the User Chat Access
-        userChatAuth = validUserChatAccess(user=user, chatID=ChatID)
-        if userChatAuth[0] == False:
-            # User is not Allowed ot Chat does not Exists
-            return httpErrorJsonResponse(userChatAuth[1])
-        
-        # User is Allowed in this Chat
-        chatRoom = userChatAuth[1]
-        
-        # Now we Get All the Messages in the Chat box
-        messages = ChatMessage.objects.filter(ChatRoom=chatRoom)
+        try:
+            # Create User Component for Sender
+            userComponent = UserComponent()
 
-        # Now we Make the JSON Data
-        MessagesData = []
-        for message in messages:
-            if message.Sender.email_address != user.email_address and message.Status == "Send":
-                data = {
-                        "Status": message.Status,
-                        "Message": message.Message,
-                        "MessageType": message.Type,
-                        "Time": message.timestamp.strftime("%H:%M %p")
-                }
-                data['Type'] = "Reply"
-                message.Status = "Viewed"
-                message.save()
-                
-                MessagesData.append(data)
+            # Authenticate the Sender
+            userComponent.authenticateEmailPrivateKey(Email, PrivateKey)
 
-        # Make the Unview Counter to 0
-        if chatRoom.unviewPerson.email_address == user.email_address:
-            chatRoom.unviewCount = 0
-            chatRoom.save()
+            # Create Chat Component and Get Chat Room
+            chatSystem = ChatSystem()
+            chatSystem.findChatRoom(ChatID)
 
-        # Display Message to the User
-        return httpSuccessJsonResponse(MessagesData)
-            
+            # Get All the Messages of the Chat
+            messages = chatSystem.chatMessages(userComponent.getUserModel())
 
-    # Something wrong just happen the process
+            # Now we Make the JSON Data
+            MessagesData = []
+            for message in messages:
+                if message.Sender.id != userComponent.getUserModel().id and message.Status == "Send":
+                    data = {
+                            "Status": message.Status,
+                            "Message": message.Message,
+                            "MessageType": message.Type,
+                            "Time": message.timestamp.strftime("%H:%M %p")
+                    }
+                    data['Type'] = "Reply"
+                    message.Status = "Viewed"
+                    message.save()
+                    
+                    MessagesData.append(data)
+
+            # Display Message to the User
+            return httpSuccessJsonResponse(MessagesData)
+
+        except Exception as e:
+            return httpErrorJsonResponse(str(e))
+
     except Exception as e:
-        return httpErrorJsonResponse("Error in the server or an invalid request")
+        print(f"-> Exception | {str(e)}")
+        return JsonResponse({"status":"error", "message":"Invalid Request"})
 
 
 @csrf_exempt

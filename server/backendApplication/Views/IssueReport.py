@@ -3,35 +3,43 @@ from django.views.decorators.csrf import csrf_exempt
 from ..models import *
 
 
+# Import our Components
+from ..Components.UserComponent import *
+from ..Components.ReportingSystem import *
+
+
 # Submit the Issue of the User
 @csrf_exempt
 def submitIssueReport(request):
 
-    # Check the User Authentications
-    authResult = checkUserLogin(request=request)
-    if authResult[0] == False:
-        return httpErrorJsonResponse(authResult[1])
-    
-    # Now we Get the User
-    user = authResult[1]
+     # Log The Terminal
+    print(f"=> Issue Submission Request | IP: {request.META.get('REMOTE_ADDR')}")
 
-    # Now we submit the new user issue report
     try:
         
-        # Get the other data files
+        # Get Data from Post Request
+        Email = request.POST['Email']
+        PrivateKey = request.POST['PrivateKey']
         issueType = request.POST['IssueType']
         issueDate = request.POST["IssueDate"]
         issueDetails = request.POST['IssueDetails']
 
-        # Now we store the issue of the User
-        newIssue = Issue(IssueType=issueType, IssueDate=issueDate, IssueDetails=issueDetails, SubmitBy=user)
-        newIssue.save()
+        try:
+            
+            # Create User Component for User
+            userComponent = UserComponent()
 
-        # Return a success response
-        return httpSuccessJsonResponse("Issue is submited successfully. Admin will try to resolve the issue as soon as possible.")
+            # Authenticate the Sender
+            userComponent.authenticateEmailPrivateKey(Email, PrivateKey)
 
+            # File a new Issue
+            ReportingSystem().submitGeneralIssue(issueType,issueDate,issueDetails, userComponent.getUserModel())
 
-    # Something wrong just happen the process
+            return httpSuccessJsonResponse("Issue Submitted. Admin will review")
+
+        except Exception as e:
+            return httpErrorJsonResponse(str(e))
+
     except Exception as e:
-        print(str(e))
-        return httpErrorJsonResponse("Error in the server or an invalid request")
+        print(f"-> Exception | {str(e)}")
+        return JsonResponse({"status":"error", "message":"Invalid Request"})

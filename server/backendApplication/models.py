@@ -40,6 +40,18 @@ class Chat(models.Model):
 
     def __str__(self):
         return "ID: " + str(self.id) + ">>\t\tBuyer: " + self.Buyer.full_name + "\t<---->\tSeller: " +self.Seller.full_name
+    
+    # Total Number of Unview Messages
+    def unViewCount(self, user: ApplicationUser):
+        if self.unviewPerson.id != user.id:
+            return 0
+        return self.unviewCount
+    
+    # Get the Other Person of Chat Room
+    def otherPerson(self, user: ApplicationUser):
+        if self.Buyer.id == user.id:
+            return self.Seller
+        return self.Buyer
 
 # Messages within Chat Room
 class ChatMessage(models.Model):

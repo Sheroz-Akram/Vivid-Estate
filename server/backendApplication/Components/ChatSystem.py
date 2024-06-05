@@ -88,6 +88,22 @@ class ChatSystem:
         
         return messages
 
+    # Get All the Chats of the User
+    def chats(self, user: ApplicationUser):
+
+        try:    
+
+            # Perform Database Query
+            if user.user_type == "Buyer":
+                chats = Chat.objects.filter(Buyer=user)
+            else:
+                chats = Chat.objects.filter(Seller=user)
+
+        except:
+            raise Exception("Error in chat messages database")
+
+        return chats
+
     # Send a new Message into Chat Room
     def sendMessage(self, sender: ApplicationUser, message: str):
 
