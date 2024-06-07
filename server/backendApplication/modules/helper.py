@@ -43,32 +43,3 @@ def httpErrorJsonResponse(message):
 # Give the HTTP User an Success Json Response
 def httpSuccessJsonResponse(message):
     return JsonResponse({"status":"success", "message": message})
-
-# Valid the Chat User Authentication
-def validUserChatAccess(user, chatID):
-    # Now Get the Chat Room User is in
-    try:
-        chatRoom = Chat.objects.get(id=int(chatID))
-    except Chat.DoesNotExist as e:
-        return False, "Given chat does not existd"
-
-    # Check if User is in the Chat or not
-    if chatRoom.Buyer.email_address != user.email_address and chatRoom.Seller.email_address != user.email_address:
-        return False, "User does not allowed in this chat"
-    
-    # User has access to the chat
-    return True, chatRoom
-
-# Find the search word and complete the remaining results only
-def completeWordSearch(Search , Text):
-    isFound = False
-    Text = Text.lower()
-    Search = Search.lower()
-    Result = ""
-    for x in Text.split(','):
-        if Search in x:
-            isFound = True
-        if isFound == True:
-            Result += x + ","
-
-    return Result

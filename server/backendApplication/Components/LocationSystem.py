@@ -10,8 +10,8 @@ class LocationSystem:
         # Store the Object
         self.geolocator = geoLocator
 
-    # Get the Complete Detail Location of User from Latitude and Longitude
-    def detailLocation(self, latitude, longitude) -> str:
+    # Get the Address from Latitude and Longitude
+    def queryAddress(self, latitude, longitude):
 
         # Access our Geo Locator Object
         geoLocator = self.geolocator
@@ -22,5 +22,22 @@ class LocationSystem:
         # Get Address from Location
         address = location.raw['address']
 
+        return address
+
+    # Get the Complete Detail Location of User from Latitude and Longitude
+    def detailLocation(self, latitude, longitude) -> str:
+
+        # Get the Address 
+        address = self.queryAddress(latitude, longitude)
+
         # Now Convert Address to String
         return ', '.join(address.values())
+
+    # Get the simple location from Latitude and Longitude
+    def simpleLocation(self, latitude, longitude) -> str:
+
+        # Get the Address 
+        address = self.queryAddress(latitude, longitude)
+
+        return address['suburb'] + ", " + address['district'] + ", " + address['state']
+
