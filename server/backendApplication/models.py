@@ -140,6 +140,13 @@ class PropertyReviews(models.Model):
     rating = models.IntegerField()
     timestamp = models.DateTimeField(auto_now_add=True) 
 
+# Store the Virtual Visit of the Property
+class PropertyVirtualVisit(models.Model):
+    propertyID = models.ForeignKey(Property, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    dimension = models.CharField(max_length=255)
+    fileLocation = models.CharField(max_length=255)
+    views = models.IntegerField()
 
 # Store the Favourite Properties of the User
 class Favourite(models.Model):

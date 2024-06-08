@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
@@ -13,7 +14,7 @@ import 'package:open_street_map_search_and_pick/open_street_map_search_and_pick.
 import 'package:vivid_estate_frontend_flutter/Classes/Seller.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 import 'package:vivid_estate_frontend_flutter/SellerScreens/2D%20Layout/drawing_page.dart';
-import 'package:vivid_estate_frontend_flutter/SellerScreens/360%20Virtual%20Visit/VirtualVisitCapture.dart';
+import 'package:vivid_estate_frontend_flutter/SellerScreens/360%20Virtual%20Visit/VirtualVisitList.dart';
 
 class NewPropertyAd extends StatefulWidget {
   const NewPropertyAd({super.key});
@@ -37,6 +38,9 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
   var propertySize = TextEditingController();
   var noBeds = "";
   var noFloors = "";
+
+  // Data of Virtual Visit
+  var VirtualVisitData = [];
 
   // store the Images from camera
   List<dynamic> propertyImages = [];
@@ -125,6 +129,10 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
         "Floors": noFloors,
         "Description": propertyDescription.text
       };
+
+      // Add Virtual Visit Data To Our List
+      propertyData['VirtualVisitCount'] = VirtualVisitData.length.toString();
+      propertyData['Visits'] = VirtualVisitData;
 
       // As we checked the data. Now we submit it to the server
       var seller = Seller();
@@ -873,16 +881,20 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                     ),
 
                     /**
-                     * Loads 360 Virtual Visit Creation Page
+                     * Load Page to List Virtual Visits
                      */
                     InkWell(
-                      onTap: () {
-                        // To Be Implemented
-                        Navigator.push(
+                      onTap: () async {
+                        // Open Virtual Visit List
+                        var newVirtualVisitData = await Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    const VirtualVisitCapture()));
+                                builder: (context) => VirtualVisitList(
+                                      VirtualVisitData: VirtualVisitData,
+                                    )));
+                        setState(() {
+                          VirtualVisitData = newVirtualVisitData;
+                        });
                       },
                       child: Container(
                           padding: const EdgeInsets.only(

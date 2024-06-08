@@ -10,6 +10,7 @@ from ..Components.UserComponent import *
 from ..Components.FileHandler import *
 from ..Components.ReportingSystem import *
 from ..Components.SearchingSystem import *
+from ..Components.VirtualVisitManager import *
 
 # Create your views here.
 
@@ -25,6 +26,8 @@ def StoreNewAd(request):
         Email = request.POST['Email']
         PrivateKey = request.POST['PrivateKey']
         PropertyData = json.loads(request.POST['PropertyData'])
+
+        print(PropertyData)
 
         try:
 
@@ -44,6 +47,18 @@ def StoreNewAd(request):
 
                 # Store the Image
                 propertyImage = propertyManager.addPropertyImage(imageFile, propertyModel, sellerUserComponent.getUserModel())
+
+            # Loop Through All The Virtual Visits and Store
+            virtualVisitManager = VirtualVisitManager()
+            for visit in PropertyData['Visits']:
+
+                # Store the Virtual Visit
+                virtualVisitManager.StoreNewVirtualVisit(
+                    propertyModel,
+                    visit['RoomName'],
+                    f"{visit['Length']}x{visit['Width']}x{visit['Height']}",
+                    visit['VirtualVisitLocation']
+                )
 
             return httpSuccessJsonResponse("New Property Created")
         
