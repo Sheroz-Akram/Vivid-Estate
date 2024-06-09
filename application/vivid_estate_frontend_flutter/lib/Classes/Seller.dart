@@ -81,9 +81,6 @@ class Seller extends User {
       "SellerID": sellerID.toString()
     };
 
-    // Varaible to Check Status of Request
-    bool requestStatus = false;
-
     // Seller Json Data Object
     dynamic sellerData = {
       "SellerName": "No Name",
@@ -98,7 +95,6 @@ class Seller extends User {
         context, "seller_profile_data", requestPayload, (result) {
       if (result['status'] == "success") {
         var data = result['message'];
-        requestStatus = true;
 
         // Now We Store the Data From Server
         sellerData = {

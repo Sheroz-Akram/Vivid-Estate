@@ -12,9 +12,9 @@ import 'package:vivid_estate_frontend_flutter/Classes/Seller.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 
 class SellerProfile extends StatefulWidget {
-  SellerProfile({super.key, required this.sellerID});
+  const SellerProfile({super.key, required this.sellerID});
 
-  dynamic sellerID;
+  final dynamic sellerID;
 
   @override
   State<SellerProfile> createState() => _SellerProfile();

@@ -55,7 +55,7 @@ dependencies:
   camera: ^0.9.4+18
   path_provider: ^2.0.9
   path: ^1.8.0
-  panorama: ^0.4.1
+  panorama_viewer: ^1.0.3
 
   # Used to Check the Responsive of the UI on Differet Screen Size
   device_preview: ^1.1.0

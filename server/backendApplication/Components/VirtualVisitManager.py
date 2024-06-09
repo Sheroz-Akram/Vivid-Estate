@@ -26,3 +26,13 @@ class VirtualVisitManager:
             raise Exception("Unable to Save Virtual Visit")
 
         return virtualVisit
+
+    # Get All the Virtual Visits of the Property
+    def virtualVisits(self, property: Property):
+        # Query the Database
+        try:
+            visits = PropertyVirtualVisit.objects.filter(propertyID=property)
+        except:
+            raise Exception("Unable to get virtual visits")
+        
+        return visits

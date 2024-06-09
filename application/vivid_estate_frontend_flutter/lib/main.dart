@@ -4,7 +4,6 @@ import 'package:vivid_estate_frontend_flutter/Authentication/Welcome.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerMain.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/User.dart';
 import 'package:vivid_estate_frontend_flutter/SellerMain.dart';
-import 'package:vivid_estate_frontend_flutter/SellerScreens/360%20Virtual%20Visit/VirtualVisitCapture.dart';
 
 void main() {
   runApp(const MyApp());

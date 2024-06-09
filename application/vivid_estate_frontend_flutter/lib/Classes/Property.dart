@@ -34,6 +34,10 @@ class Property {
   var isFavourite = false;
   var isLike = false;
 
+  // Store the Virtual Visits Data
+  var visitsCount = 0;
+  var visits = [];
+
   // Helper Classes
   var serverHelper = ServerInfo(); // Helps to Communicate with the Server
   var displayHelper = DisplayHelper(); // Helps to Display Messages on Screen
@@ -72,9 +76,9 @@ class Property {
         sellerEmail = result['message']['SellerEmail'];
         isFavourite = result['message']['IsFavourite'];
         isLike = result['message']['IsLike'];
+        visitsCount = result['message']['TotalVisits'];
+        visits = result['message']['Visits'];
       }
-
-      print(result['message']['IsFavourite']);
     });
   }
 

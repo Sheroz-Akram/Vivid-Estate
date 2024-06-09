@@ -37,7 +37,7 @@ class WelcomePage extends StatelessWidget {
         );
 
         // Return the result from the dialog
-        return shouldExit ?? false;
+        return shouldExit;
       },
       child: Scaffold(
         appBar: AppBar(

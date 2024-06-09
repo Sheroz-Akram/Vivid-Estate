@@ -4,9 +4,9 @@ import 'package:flutter/widgets.dart';
 import 'package:vivid_estate_frontend_flutter/SellerScreens/360%20Virtual%20Visit/VirtualVisitCapture.dart';
 
 class VirtualVisitList extends StatefulWidget {
-  VirtualVisitList({super.key, required this.VirtualVisitData});
+  const VirtualVisitList({super.key, required this.VirtualVisitData});
 
-  var VirtualVisitData;
+  final VirtualVisitData;
 
   @override
   State<VirtualVisitList> createState() => _VirtualVisitListState();

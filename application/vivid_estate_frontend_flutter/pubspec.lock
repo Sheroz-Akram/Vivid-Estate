@@ -177,6 +177,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.6"
+  dchs_motion_sensors:
+    dependency: transitive
+    description:
+      name: dchs_motion_sensors
+      sha256: "0f1cac6cd876fad2afff47405a963913f39a67221cbfc4f00aa04da2845bab0a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   device_frame:
     dependency: transitive
     description:
@@ -685,14 +693,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
-  motion_sensors:
-    dependency: transitive
-    description:
-      name: motion_sensors
-      sha256: "4e2734a76cd6da633013bcdc68a9efe9fbbcff906e6d6c45040932edda3fa5d6"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.0"
   nested:
     dependency: transitive
     description:
@@ -709,14 +709,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.1"
-  panorama:
+  panorama_viewer:
     dependency: "direct main"
     description:
-      name: panorama
-      sha256: "9e8b0908c3e4e2a223aff9a7d11670783179aa0ed18a84747b9d92a71aaeeccc"
+      name: panorama_viewer
+      sha256: "66b51a28921df33463968ebb411394551f6dbb065cc98474401820d6c2676e57"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.1"
+    version: "1.0.5"
   path:
     dependency: "direct main"
     description:

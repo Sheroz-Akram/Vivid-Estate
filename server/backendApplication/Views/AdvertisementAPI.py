@@ -225,6 +225,20 @@ def GetPropertyDetail(request):
             for image in images:
                 message['Images'].append(image.imageLocation)
 
+            # Get Virtual Visits of Property
+            visits = VirtualVisitManager().virtualVisits(property)
+
+            # Add Virtual Visits to our Message
+            message['Visits'] = []
+            message['TotalVisits'] = visits.count()
+            if visits.count() > 0:    
+                for visit in visits:
+                    message['Visits'].append({
+                        "RoomName": visit.title,
+                        "Dimensions": visit.dimension,
+                        "FileLocation": visit.fileLocation
+                    })
+
             # Update the View Count of Property
             property.views = message['Views']
             property.save()

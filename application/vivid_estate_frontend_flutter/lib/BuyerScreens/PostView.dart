@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerScreens/ReviewPanel.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerScreens/SellerProfile.dart';
+import 'package:vivid_estate_frontend_flutter/BuyerScreens/VirtualVisitListBuyer.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/ChatScreen.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Buyer.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Chat.dart';
@@ -578,23 +579,26 @@ class _PostView extends State<PostView> {
                               ],
                             ),
                             // Display Property Type
-                            Row(
-                              children: [
-                                const Text(
-                                  "Property Type: ",
-                                  style: TextStyle(
-                                      color: Color(0XFF5F5F5F),
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16),
-                                ),
-                                Text(
-                                  property.propertyType,
-                                  style: const TextStyle(
-                                      color: Color(0XFF8D8D8D),
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16),
-                                ),
-                              ],
+                            Container(
+                              margin: const EdgeInsets.only(top: 10),
+                              child: Row(
+                                children: [
+                                  const Text(
+                                    "Property Type: ",
+                                    style: TextStyle(
+                                        color: Color(0XFF5F5F5F),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16),
+                                  ),
+                                  Text(
+                                    property.propertyType,
+                                    style: const TextStyle(
+                                        color: Color(0XFF8D8D8D),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16),
+                                  ),
+                                ],
+                              ),
                             ),
                             // Display Listing Type
                             Row(
@@ -848,6 +852,67 @@ class _PostView extends State<PostView> {
                     maxLines: 10,
                   ),
                 ),
+
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  margin: const EdgeInsets.only(left: 20, top: 20),
+                  child: const Text(
+                    "Interactive View",
+                    style: TextStyle(
+                        color: Color(0XFF5F5F5F),
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+
+                // Display Option to View Virtual Visits
+                property.visitsCount > 0
+                    ? Container(
+                        margin: const EdgeInsets.only(left: 15, right: 15),
+                        child: InkWell(
+                          onTap: () {
+                            // Open Virtual Visit List
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => VirtualVisitListBuyer(
+                                        VirtualVisitData: property.visits)));
+                          },
+                          child: Container(
+                              padding: const EdgeInsets.only(
+                                  top: 10.0,
+                                  left: 10.0,
+                                  right: 10.0,
+                                  bottom: 10.0),
+                              decoration: BoxDecoration(
+                                  color: const Color(0xFFECECEC),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  boxShadow: getBoxShadow()),
+                              margin: const EdgeInsets.only(top: 15),
+                              width: MediaQuery.of(context).size.width,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: SizedBox(
+                                      width: MediaQuery.of(context).size.width,
+                                      child: const ListTile(
+                                        leading: Icon(
+                                          Icons.vrpano_sharp,
+                                          size: 30,
+                                        ),
+                                        title: Text("View Virtual Visits",
+                                            style: TextStyle(fontSize: 16)),
+                                        trailing: InkWell(
+                                            child:
+                                                Icon(Icons.arrow_forward_ios)),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              )),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
 
                 /**
                  * 
