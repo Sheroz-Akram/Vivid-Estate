@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:vivid_estate_frontend_flutter/BuyerScreens/PanoramaView.dart';
 import 'package:vivid_estate_frontend_flutter/SellerScreens/360%20Virtual%20Visit/VirtualVisitCapture.dart';
 
 class VirtualVisitList extends StatefulWidget {
@@ -153,7 +154,7 @@ class _VirtualVisitListState extends State<VirtualVisitList> {
                                               "Length": length,
                                               "Width": width,
                                               "Height": height,
-                                              "VirtualVisitLocation":
+                                              "FileLocation":
                                                   virtualVistLocation
                                             });
                                           });
@@ -193,7 +194,13 @@ class _VirtualVisitListState extends State<VirtualVisitList> {
                         return InkWell(
                           onTap: () {
                             // View Property in 360 View
-                            // To Be Implemented
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => PanoramaView(
+                                        VisitLocation:
+                                            VirtualVisitData.elementAt(
+                                                index)['FileLocation'])));
                           },
                           child: Container(
                             padding: const EdgeInsets.all(5),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Seller.dart';
+import 'package:vivid_estate_frontend_flutter/SellerScreens/CreateNewAd/NewPropertyAdd.dart';
+import 'package:vivid_estate_frontend_flutter/SellerScreens/EditProperty.dart';
 import 'package:vivid_estate_frontend_flutter/SellerScreens/SellerAdPreview.dart';
 
 class AdList extends StatefulWidget {
@@ -94,6 +96,16 @@ class _AdList extends State<AdList> {
                           // Remove Property From Seller Account
                           print(propertyID);
                           removeFromAccount(context, propertyID.toString());
+                        },
+
+                        // When User Press the Edit Property Button
+                        onEditPressed: (propertyID) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => EditProperty(
+                                        propertyID: propertyID.toString(),
+                                      )));
                         },
                       );
                     },

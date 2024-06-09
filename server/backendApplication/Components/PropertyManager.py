@@ -94,6 +94,43 @@ class PropertyManager:
         
         return newProperty
 
+    # Edit The Stored Property in the System
+    def EditProperty(self, propertyData, property: Property, seller: ApplicationUser):
+
+        # Check If Seller has Access to Property
+        if property.seller.id != seller.id:
+            raise Exception("Permission Denied to Edit")
+
+        # Get Fields from Property Data
+        try:
+            property.propertyType = propertyData['PropertyType']
+            property.listingType = propertyData['ListingType']
+            property.latitude = propertyData['Location']['Latitude']
+            property.longitude = propertyData['Location']['Longitude']
+            property.price = propertyData['Price']
+            property.size = propertyData['Size']
+            property.beds = propertyData['Beds']
+            property.floors = propertyData['Floors']
+            property.description = propertyData['Description']
+        except:
+            raise Exception("Error in POST Request")
+
+        # Get the Address of the Property
+        try:
+            property.abstractLocation = self.geoInfomation.simpleLocation(propertyData['Location']['Latitude'], propertyData['Location']['Longitude'])
+            property.location = self.geoInfomation.detailLocation(propertyData['Location']['Latitude'], propertyData['Location']['Longitude'])
+        except:
+            raise Exception("Unable to Get Property Address")
+
+        # Now Save the Property
+        try:
+            property.save()
+        except:
+            raise Exception("Unable to Save Property")
+
+        return property
+
+
     # Get the First Image of the Property
     def firstImage(self, property: Property):
 
@@ -141,7 +178,8 @@ class PropertyManager:
                 raise Exception("No property images found")
             
             return images
-        except:
+        except Exception as e:
+            print(str(e))
             raise Exception("Unable to get property images")
 
 

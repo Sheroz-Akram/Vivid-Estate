@@ -14,7 +14,8 @@ class SellerAdPreview extends StatefulWidget {
       required this.TimeAgo,
       required this.Views,
       required this.Likes,
-      required this.onCrossPressed});
+      required this.onCrossPressed,
+      required this.onEditPressed});
 
   // Variables For Our Views
   int PropertyID;
@@ -25,6 +26,7 @@ class SellerAdPreview extends StatefulWidget {
   String Views;
   String Likes;
   final Function onCrossPressed;
+  final Function onEditPressed;
 
   @override
   State<SellerAdPreview> createState() => _SellerAdPreview();
@@ -207,7 +209,7 @@ class _SellerAdPreview extends State<SellerAdPreview> {
                     ))),
                 onPressed: () {
                   // Open Edit Page
-                  // To Be Implemented
+                  widget.onEditPressed(widget.PropertyID);
                 },
                 child: Container(
                   padding: const EdgeInsets.all(10),

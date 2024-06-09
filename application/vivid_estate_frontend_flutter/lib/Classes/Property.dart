@@ -15,6 +15,8 @@ class Property {
   var imagesCount = 0;
   var propertyType = "";
   var listingType = "";
+  var latitude = 0.0;
+  var longitude = 0.0;
 
   // Property Information
   var description = "";
@@ -64,6 +66,8 @@ class Property {
         propertyType = result['message']['PropertyType'];
         description = result['message']['Description'];
         location = result['message']['Location'];
+        latitude = result['message']['Latitude'];
+        longitude = result['message']['Longitude'];
         price = result['message']['Price'];
         size = result['message']['Size'];
         beds = result['message']['Beds'];

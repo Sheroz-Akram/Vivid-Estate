@@ -27,8 +27,6 @@ def StoreNewAd(request):
         PrivateKey = request.POST['PrivateKey']
         PropertyData = json.loads(request.POST['PropertyData'])
 
-        print(PropertyData)
-
         try:
 
             # Create a Seller Component Object and Authenticate
@@ -57,7 +55,7 @@ def StoreNewAd(request):
                     propertyModel,
                     visit['RoomName'],
                     f"{visit['Length']}x{visit['Width']}x{visit['Height']}",
-                    visit['VirtualVisitLocation']
+                    visit['FileLocation']
                 )
 
             return httpSuccessJsonResponse("New Property Created")
@@ -69,6 +67,82 @@ def StoreNewAd(request):
         print(f"-> Exception | {str(e)}")
         return JsonResponse({"status":"error", "message":"Invalid Request"})
 
+
+# Edit the Property Stored in Server
+@csrf_exempt
+def EditProperty(request):
+
+     # Log The Terminal
+    print(f"=> Edit Property Request | IP: {request.META.get('REMOTE_ADDR')}")
+
+    try:
+        # Get Data From POST Request
+        Email = request.POST['Email']
+        PrivateKey = request.POST['PrivateKey']
+        PropertyData = json.loads(request.POST['PropertyData'])
+        PropertyID = request.POST['PropertyID']
+
+        try:
+
+            # Handle File
+            fileHandler = FileHandler()
+
+            # Create User Component and Authenticate User
+            sellerUserComponent = UserComponent()
+            sellerUserComponent.authenticateEmailPrivateKey(Email, PrivateKey)
+
+            # Create Object of Property System
+            propertyManager = PropertyManager()
+
+            # Find the Property
+            propertyModel = propertyManager.findProperty(PropertyID)
+
+            # Edit the Property
+            propertyModel = propertyManager.EditProperty(PropertyData, propertyModel, sellerUserComponent.getUserModel())
+
+            # Delete the Existing Images
+            serverImages = propertyManager.propertyImages(propertyModel)
+            if serverImages.count() > 0:
+                for serverImage in serverImages:
+                    # Delete the Image
+                    fileHandler.deleteFile(serverImage.imageLocation)
+                    serverImage.delete()
+
+            # Delete Existing Visits and Store New One
+            virtualVisitManager = VirtualVisitManager()
+            serverVisits = virtualVisitManager.virtualVisits(propertyModel)
+            if serverVisits.count() > 0:
+                for serverVisit in serverVisits:
+                    serverVisit.delete()
+
+            # Now Store the Images of the Property In Server
+            for x in range(1, int(request.POST['PicturesCount']) + 1):
+
+                # Get the Image Data
+                imageFile = request.FILES['PropertyImage' + str(x)]
+
+                # Store the Image
+                propertyImage = propertyManager.addPropertyImage(imageFile, propertyModel, sellerUserComponent.getUserModel())
+
+            # Loop Through All The Virtual Visits and Store
+            for visit in PropertyData['Visits']:
+
+                # Store the Virtual Visit
+                virtualVisitManager.StoreNewVirtualVisit(
+                    propertyModel,
+                    visit['RoomName'],
+                    f"{visit['Length']}x{visit['Width']}x{visit['Height']}",
+                    visit['FileLocation']
+                )
+
+            return httpSuccessJsonResponse("Property Edited")
+        
+        except Exception as e:
+            return httpErrorJsonResponse(str(e))
+
+    except Exception as e:
+        print(f"-> Exception | {str(e)}")
+        return JsonResponse({"status":"error", "message":"Invalid Request"})
 
 # Search the properties based upon the user query
 @csrf_exempt
@@ -205,6 +279,8 @@ def GetPropertyDetail(request):
                 "Description": property.description,
                 "ListingType": property.listingType,
                 "Location": property.abstractLocation,
+                "Latitude": property.latitude,
+                "Longitude": property.longitude,
                 "Price": property.price,
                 "Size": property.size,
                 "Beds": property.beds,
@@ -236,6 +312,9 @@ def GetPropertyDetail(request):
                     message['Visits'].append({
                         "RoomName": visit.title,
                         "Dimensions": visit.dimension,
+                        "Length": visit.dimension.split("x")[0],
+                        "Width": visit.dimension.split("x")[1],
+                        "Height": visit.dimension.split("x")[2],
                         "FileLocation": visit.fileLocation
                     })
 
