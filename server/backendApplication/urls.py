@@ -64,6 +64,9 @@ urlpatterns = [
     path("report_property", view=AdvertisementAPI.StorePropertyReport, name="Buyer Report Property to Admin"),
     path("get_all_reviews", view=AdvertisementAPI.GetPropertyReviews, name="Get All The Reviews of the Property"),
     path("submit_review", view=AdvertisementAPI.StorePropertyReview, name="Store the new review of property"),
+    path("seller_ads_list", view=AdvertisementAPI.SellerProperties, name="List of Seller Properties"),
+    path("remove_from_seller_account", view=AdvertisementAPI.RemoveProperty, name="Remove Property from seller account"),
+
 
     # Virtual Visit Views
     path("stitch_panaroma", view=VirtualVisitViews.StitchImagesView, name="Stitch Images Together to create panaroma"),

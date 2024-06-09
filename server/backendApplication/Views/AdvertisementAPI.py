@@ -441,6 +441,44 @@ def RemoveFromFavourite(request):
         return JsonResponse({"status":"error", "message":"Invalid Request"})
 
 
+# Remove Property from Seller Account
+@csrf_exempt
+def RemoveProperty(request):
+
+    # Log The Terminal
+    print(f"=> Property Remove Request | IP: {request.META.get('REMOTE_ADDR')}")
+
+    try:
+
+        # Get Data From POST Request
+        Email = request.POST['Email']
+        PrivateKey = request.POST['PrivateKey']
+        PropertyID = request.POST['PropertyID']
+
+        try:
+
+            # Create User Component and Authenticate User
+            userComponent = UserComponent()
+            userComponent.authenticateEmailPrivateKey(Email, PrivateKey)
+
+            # Create Object of Property System
+            propertyManager = PropertyManager()
+
+            # Find the Property
+            property = propertyManager.findProperty(PropertyID)
+
+            # Remove Property
+            propertyManager.removeProperty(property, userComponent.getUserModel())
+
+            return httpSuccessJsonResponse("Property Removed")
+
+        except Exception as e:
+            return httpErrorJsonResponse(str(e))
+
+    except Exception as e:
+        print(f"-> Exception | {str(e)}")
+        return JsonResponse({"status":"error", "message":"Invalid Request"})
+
 # Likes the Property by the Buyer
 @csrf_exempt
 def LikeProperty(request):
@@ -567,6 +605,67 @@ def GetFavouritePropertiesList(request):
                         "TimeAgo": property.propertyID.days_ago(),
                         "Views": property.propertyID.views,
                         "Likes": property.propertyID.likes
+                    })
+
+            return httpSuccessJsonResponse(message)
+
+        except Exception as e:
+            return httpErrorJsonResponse(str(e))
+
+    except Exception as e:
+        print(f"-> Exception | {str(e)}")
+        return JsonResponse({"status":"error", "message":"Invalid Request"})
+
+
+# Get the list of seller properties
+@csrf_exempt
+def SellerProperties(request):
+
+    # Log The Terminal
+    print(f"=> Seller Properties Request | IP: {request.META.get('REMOTE_ADDR')}")
+
+    try:
+
+        # Get Data From POST Request
+        Email = request.POST['Email']
+        PrivateKey = request.POST['PrivateKey']
+
+        try:
+
+            # Create User Component and Authenticate User
+            userComponent = UserComponent()
+            userComponent.authenticateEmailPrivateKey(Email, PrivateKey)
+
+            # Create Object of Property System
+            propertyManager = PropertyManager()
+
+            # Get List of Sellet Properties
+            properties = propertyManager.sellerProperties(userComponent.getUserModel())
+
+            # Prepare our response message
+            message = {
+                "PropertiesCount": properties.count(),
+                "Properties" : []
+            }
+
+            # Check Property Count
+            if properties.count() > 0:
+
+                # Loop Through Each Property
+                for property in properties:
+
+                    # Get the Image of the Property
+                    picture = propertyManager.firstImage(property)
+
+                    # Store in Our Message
+                    message['Properties'].append({
+                        "PropertyID": property.id,
+                        "Image": picture.imageLocation,
+                        "Price": picture.propertyID.price,
+                        "Location": property.abstractLocation,
+                        "TimeAgo": property.days_ago(),
+                        "Views": property.views,
+                        "Likes": property.likes
                     })
 
             return httpSuccessJsonResponse(message)

@@ -112,4 +112,71 @@ class Seller extends User {
 
     return sellerData;
   }
+
+  // Get the Ad List From Server
+  Future<List<dynamic>> geAdList(BuildContext context) async {
+    // Make A Payload to Send to the Server
+    var requestPayload = {
+      "Email": emailAddress,
+      "PrivateKey": privateKey,
+    };
+
+    // Store the Result Data
+    var adList = [];
+
+    // Send Request to Our Server
+    await serverHelper
+        .sendPostRequest(context, "seller_ads_list", requestPayload, (result) {
+      // Check the Status of Our Request
+      if (result['status'] == "success") {
+        // Loop Through All The favourites from the list
+        for (var i = 0; i < result['message']['PropertiesCount']; i++) {
+          // Add Each Property to our result
+          adList.add({
+            "PropertyID": result['message']['Properties'][i]['PropertyID'],
+            "Image":
+                "${serverHelper.host}/static/${result['message']['Properties'][i]['Image']}",
+            "Price": displayHelper
+                .formatNumber(result['message']['Properties'][i]['Price']),
+            "Location": result['message']['Properties'][i]['Location'],
+            "TimeAgo": result['message']['Properties'][i]['TimeAgo'],
+            "Views": displayHelper
+                .formatNumber(result['message']['Properties'][i]['Views']),
+            "Likes": displayHelper
+                .formatNumber(result['message']['Properties'][i]['Likes']),
+          });
+        }
+      }
+    });
+
+    return adList;
+  }
+
+  // Remove A Property From The Seller Account
+  Future<bool> removePropertyFromAccount(
+      BuildContext context, propertyID) async {
+    // Variable to Check Status Of Our Request
+    var requestStatus = false;
+
+    // Make A Payload to Send to the Server
+    var requestPayload = {
+      "Email": emailAddress,
+      "PrivateKey": privateKey,
+      "PropertyID": propertyID
+    };
+
+    // Send Request to Our Server
+    await serverHelper.sendPostRequest(
+        context, "remove_from_seller_account", requestPayload, (result) {
+      // Check the Status of Our Request
+      if (result['status'] == "success") {
+        requestStatus = true;
+      }
+      // Display a Status Message to the User
+      displayHelper.displaySnackBar(
+          result['message'], result['status'] == "success", context);
+    });
+
+    return requestStatus;
+  }
 }

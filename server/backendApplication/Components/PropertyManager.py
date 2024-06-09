@@ -5,6 +5,7 @@ from django.db.models import Q
 from .LocationSystem import *
 from .Mail import *
 from .FileHandler import *
+from .VirtualVisitManager import *
 
 class PropertyManager:
 
@@ -13,6 +14,7 @@ class PropertyManager:
         # Load Other Components
         self.geoInfomation = LocationSystem() # Helps in Location Service
         self.fileHandler = FileHandler() # Handles Files Storage
+        self.virtualVisitManager = VirtualVisitManager() # Handles Virtual Visits of Property
 
     # Find the Property from Database
     def findProperty(self, propertyID):
@@ -180,6 +182,49 @@ class PropertyManager:
             raise Exception("Unable to get favorite property list")
         
         return properties
+
+    # Get the List of Seller Properties
+    def sellerProperties(self, seller: ApplicationUser):
+
+        # Query The Database
+        try:
+            properties = Property.objects.filter(seller=seller)
+        except:
+            raise Exception("Unable to get favorite property list")
+        
+        return properties
+
+    # Remove a Property from Seller Account and Database
+    def removeProperty(self, property: Property, seller: ApplicationUser):
+
+        # Check if user is the seller or not
+        if property.seller.id != seller.id:
+            raise Exception("Permission Denied to Delete Property")
+
+        # Remove Images of the Property
+        try:
+            images = self.propertyImages(property)
+
+            # Loop Through Each Image and Delete it
+            if images.count() > 0:
+                for image in images:
+                    self.fileHandler.deleteFile(image.imageLocation)
+        except:
+            raise Exception("Unable to delete property images")
+        
+        # Remove the Virtual Visits
+        try:
+            visits = self.virtualVisitManager.virtualVisits(property)
+
+            # Loop Through each and delete their files
+            if visits.count() > 0:
+                for visit in visits:
+                    self.fileHandler.deleteFile(visit.fileLocation)
+        except:
+            raise Exception("Unable to delete virtual visits")
+        
+        # Now At Last Remove the Property from Database
+        property.delete()
 
     # Add a Property to User Favorite List
     def addPropertyToFavorite(self, property: Property, user: ApplicationUser):

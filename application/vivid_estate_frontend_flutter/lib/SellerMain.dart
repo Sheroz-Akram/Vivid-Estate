@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/ChatHome.dart';
 import 'package:vivid_estate_frontend_flutter/Profile/ProfileHome.dart';
+import 'package:vivid_estate_frontend_flutter/SellerScreens/AdsList.dart';
 import 'package:vivid_estate_frontend_flutter/SellerScreens/SellerDashboard.dart';
 
 class SellerMain extends StatefulWidget {
@@ -15,8 +16,7 @@ class _SellerMain extends State<SellerMain> {
   static const List<Widget> _widgetOptions = <Widget>[
     SellerDashboard(),
     ChatHome(),
-    Text('Ads Page',
-        style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+    AdList(),
     ProfileHome(),
   ];
 
