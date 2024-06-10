@@ -313,7 +313,7 @@ def storeCNICData(request):
             userComponent.authenticateEmailPassword(UserEmail, UserPassword)
 
             # Perform the CNIC Storage Operation
-            userComponent.storeCNICInformation(UserEmail, UserPassword, cnicNumber, cnicName, cnicFather, cnicDob)
+            userComponent.storeCNICInformation(cnicNumber, cnicName, cnicFather, cnicDob)
 
             return httpSuccessJsonResponse("CNIC Data Stored Successfully")
 
@@ -572,11 +572,15 @@ def sellerDashboardInfo(request):
                     if propertyReviews.count() > 0:
                         for review in propertyReviews:
                             TotalPropertyRating = TotalPropertyRating + review.rating
-                    AverageRating = TotalPropertyRating / propertyReviews.count()
+                    AverageRating = 0.0
+                    if propertyReviews.count() > 0:
+                        AverageRating = TotalPropertyRating / propertyReviews.count()
                     TotalRating = TotalRating + AverageRating
 
             # Now Calculate the Total Average Rating
-            TotalAverageRating = TotalRating / properties.count()
+            TotalAverageRating = 0.0
+            if properties.count() > 0:
+                TotalAverageRating = TotalRating / properties.count()
 
             # Get the address of user using latitude and longitude
             address = locationSystem.queryAddress(userModel.langitude, userModel.longitude)

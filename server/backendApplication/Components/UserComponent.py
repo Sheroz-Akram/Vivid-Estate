@@ -66,7 +66,19 @@ class UserComponent:
 
     # Login A User With His Email And Password
     def login(self):
+
+        # Check the Status of the Account:
+        if self.user.account_verification == "Pending":
+            raise Exception("Account Verification Pending. Please Wait..")
         
+        # Check if Account is Rejected
+        if self.user.account_verification == "Rejected":
+            raise Exception("Account rejected in verification.")
+
+        # Check if Account is Suspended
+        if self.user.account_verification == "Suspended":
+            raise Exception("Account is Suspended")
+    
         try:
             # Update The Private Key Of User
             self.user.private_key = self.generateRandomPrivateKey()

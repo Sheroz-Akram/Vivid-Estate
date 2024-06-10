@@ -2,6 +2,14 @@ from django.db import models
 from django.contrib import admin
 from django.utils import timezone
 
+# Choices given to the admin for the account status
+AccountVerificationTypes = (
+    ("Verified", "Verified"),
+    ("Pending", "Pending"),
+    ("Rejected", "Rejected"),
+    ("Suspended", "Suspended")
+)
+
 # User model that store the data of both Buyer and Seller
 class ApplicationUser(models.Model):
     private_key = models.CharField(max_length=60)
@@ -15,6 +23,7 @@ class ApplicationUser(models.Model):
     longitude = models.FloatField()
     location = models.CharField(max_length=255)
     verification_status = models.CharField(max_length=10)
+    account_verification = models.CharField(max_length=20, choices=AccountVerificationTypes, default="Pending")
     user_type = models.CharField(max_length=10)
     cnic_file = models.CharField(max_length=255)
     cnic_name = models.CharField(max_length=150)

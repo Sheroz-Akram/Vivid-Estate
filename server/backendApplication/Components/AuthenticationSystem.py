@@ -33,6 +33,18 @@ class AuthenticationSystem:
             if user.verification_status == "No":
                 return False, "User is not verified"
 
+            # Check the Status of the Account:
+            if user.account_verification == "Pending":
+                return False, "Account Verification Pending. Please Wait.."
+            
+            # Check if Account is Rejected
+            if user.account_verification == "Rejected":
+                return False, "Account rejected in verification."
+
+            # Check if Account is Suspended
+            if user.account_verification == "Suspended":
+                return False, "Account is Suspended"
+
             # Return a Success Response
             return True, "User is authenticated", user
 
