@@ -39,5 +39,5 @@ class LocationSystem:
         # Get the Address 
         address = self.queryAddress(latitude, longitude)
 
-        return address['suburb'] + ", " + address['district'] + ", " + address['state']
+        return address['suburb'] + ", " + address['district']
 

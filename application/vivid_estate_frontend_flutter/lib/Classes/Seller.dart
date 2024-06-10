@@ -169,6 +169,35 @@ class Seller extends User {
     return sellerData;
   }
 
+  // Get The Profile Data Of Seller
+  dynamic getSellerDashboardData(
+    BuildContext context,
+  ) async {
+    // Now Set the request payload
+    var requestPayload = {
+      "Email": emailAddress,
+      "PrivateKey": privateKey,
+    };
+
+    // Seller Json Data Object
+    dynamic sellerDashboardData;
+
+    // Send Request to Our Server
+    await serverHelper.sendPostRequest(
+        context, "seller_dashboard_data", requestPayload, (result) {
+      if (result['status'] == "success") {
+        var data = result['message'];
+
+        // Now We Store the Data From Server
+        sellerDashboardData = data;
+      }
+
+      displayHelper.displaySnackBar(result['message'], false, context);
+    });
+
+    return sellerDashboardData;
+  }
+
   // Get the Ad List From Server
   Future<List<dynamic>> geAdList(BuildContext context) async {
     // Make A Payload to Send to the Server

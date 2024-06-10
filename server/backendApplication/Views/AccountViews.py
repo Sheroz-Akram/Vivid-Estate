@@ -7,6 +7,8 @@ import string
 
 # Import Application Components
 from ..Components.UserComponent import *
+from ..Components.LocationSystem import *
+from ..Components.PropertyManager import *
 
 # API to OCR the CNIC card and return the results
 @csrf_exempt
@@ -522,7 +524,82 @@ def updateProfileData(request):
         print(f"-> Exception | {str(e)}")
         return JsonResponse({"status":"error", "message":"Invalid Request"})
 
+# Get the Informationn of the Seller Dashboard
+@csrf_exempt
+def sellerDashboardInfo(request):
 
+    # Log The Terminal
+    print(f"=> Seller Dashboard Data | IP: {request.META.get('REMOTE_ADDR')}")
+
+    try:
+
+        # Get the Data from Post Request
+        email = request.POST['Email']
+        privateKey = request.POST['PrivateKey']
+
+        # Authenticate the User
+        authentication = AuthenticationSystem()
+        result = authentication.authenticateEmailPrivateKey(email,privateKey)
+    
+        # Check the Status of our Response
+        if result[0] == True:
+
+            # Get the User Model Object
+            userModel = result[2]
+
+            # Our Components
+            locationSystem = LocationSystem()
+            propertyManager = PropertyManager()
+
+            # Get the List of Ads
+            properties = propertyManager.sellerProperties(userModel)
+            chats = Chat.objects.filter(Seller=userModel)
+
+            # Combines Views, Likes, Reviews Counts
+            Views = 0
+            Likes = 0
+            Reviews = 0
+            TotalRating = 0
+            if properties.count() > 0:
+                for property in properties:
+                    Views = Views + property.views
+                    Likes = Likes + property.likes
+                    propertyReviews = propertyManager.reviews(property)
+                    Reviews = Reviews + propertyReviews.count()
+
+                    # Find All the Ratings
+                    TotalPropertyRating = 0
+                    if propertyReviews.count() > 0:
+                        for review in propertyReviews:
+                            TotalPropertyRating = TotalPropertyRating + review.rating
+                    AverageRating = TotalPropertyRating / propertyReviews.count()
+                    TotalRating = TotalRating + AverageRating
+
+            # Now Calculate the Total Average Rating
+            TotalAverageRating = TotalRating / properties.count()
+
+            # Get the address of user using latitude and longitude
+            address = locationSystem.queryAddress(userModel.langitude, userModel.longitude)
+
+            # Get Our Profile Picture
+            return httpSuccessJsonResponse({
+                "profilePic": userModel.profile_pic,
+                "userFullName": userModel.full_name,
+                "location": address['suburb'] + ", " + address['district'],
+                "propertyCount": properties.count(),
+                "chatCount": chats.count(),
+                "View": Views,
+                "Likes": Likes,
+                "Reviews": Reviews,
+                "AverageRating": TotalAverageRating
+            })
+
+        else:
+            return httpErrorJsonResponse(result[1])
+
+    except Exception as e:
+        print(f"-> Exception | {str(e)}")
+        return JsonResponse({"status":"error", "message":"Invalid Request"})
 
 # Update the feedback of the user
 @csrf_exempt

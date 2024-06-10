@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
+import 'package:vivid_estate_frontend_flutter/Classes/Seller.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
 import 'package:vivid_estate_frontend_flutter/SellerScreens/CreateNewAd/NewPropertyAdd.dart';
 
@@ -14,6 +17,46 @@ class SellerDashboard extends StatefulWidget {
 }
 
 class _SellerDashboardState extends State<SellerDashboard> {
+  // Create a Seller Object
+  Seller seller = Seller();
+  var server = ServerInfo();
+  // Seler Dashboard Data Structure
+  dynamic SellerDashboardData = {
+    "profilePic": "logo.png",
+    "userFullName": "Seller Name",
+    "location": "Seller Location",
+    "propertyCount": 0,
+    "chatCount": 0,
+    "View": 0,
+    "Likes": 0,
+    "Reviews": 0,
+    "AverageRating": 5.0
+  };
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    loadSellerDashboard(context);
+  }
+
+  // Load the Dashboard of Seller
+  void loadSellerDashboard(BuildContext context) async {
+    // Load Our Data from User
+    await seller.getAuthData();
+
+    // Get the Data of Seller from Server
+    var responseData = await seller.getSellerDashboardData(context);
+
+    print(responseData);
+
+    // Update our State
+    setState(() {
+      SellerDashboardData = responseData;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,18 +76,19 @@ class _SellerDashboardState extends State<SellerDashboard> {
           SizedBox(
             width: MediaQuery.of(context).size.width,
             child: ListTile(
-              leading: const CircleAvatar(
-                backgroundImage: AssetImage("assets/images/sheroz.jpg"),
+              leading: CircleAvatar(
+                backgroundImage: NetworkImage(
+                    "${server.host}/static/${SellerDashboardData['profilePic']}"),
               ),
-              title: const Text(
-                "Sheroz Akram",
-                style: TextStyle(
+              title: Text(
+                SellerDashboardData['userFullName'],
+                style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: Color(0XFF7D7D7D)),
               ),
-              subtitle: const Text("Lahore, Pakistan",
-                  style: TextStyle(
+              subtitle: Text(SellerDashboardData['location'],
+                  style: const TextStyle(
                       color: Color(0XFF9D9D9D),
                       fontSize: 14,
                       fontWeight: FontWeight.bold)),
@@ -70,7 +114,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
                     width: MediaQuery.of(context).size.width,
                     padding: const EdgeInsets.only(top: 5, bottom: 10),
                     child: const Text(
-                      "This Month",
+                      "Metrics Report",
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
@@ -85,20 +129,16 @@ class _SellerDashboardState extends State<SellerDashboard> {
                             width: 50,
                           ),
                           const Text(
-                            "Impression",
+                            "Reviews",
                             style: TextStyle(
                                 fontSize: 15, fontWeight: FontWeight.bold),
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
-                                "20K",
-                                style: TextStyle(fontSize: 15),
-                              ),
-                              Image.asset(
-                                "assets/UI/up.png",
-                                width: 25,
+                              Text(
+                                SellerDashboardData['Reviews'].toString(),
+                                style: const TextStyle(fontSize: 15),
                               ),
                             ],
                           )
@@ -108,18 +148,17 @@ class _SellerDashboardState extends State<SellerDashboard> {
                         children: [
                           Image.asset("assets/UI/likes.png", width: 50),
                           const Text(
-                            "View",
+                            "Views",
                             style: TextStyle(
                                 fontSize: 15, fontWeight: FontWeight.bold),
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
-                                "5K",
-                                style: TextStyle(fontSize: 15),
-                              ),
-                              Image.asset("assets/UI/down.png", width: 25),
+                              Text(
+                                SellerDashboardData['View'].toString(),
+                                style: const TextStyle(fontSize: 15),
+                              )
                             ],
                           )
                         ],
@@ -135,33 +174,59 @@ class _SellerDashboardState extends State<SellerDashboard> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
-                                "510K",
-                                style: TextStyle(fontSize: 15),
-                              ),
-                              Image.asset("assets/UI/up.png", width: 25),
+                              Text(
+                                SellerDashboardData['Likes'].toString(),
+                                style: const TextStyle(fontSize: 15),
+                              )
                             ],
                           )
                         ],
                       ),
                     ],
                   ),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    padding: const EdgeInsets.only(top: 15),
+                    child: const Text(
+                      "Average Rating",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  RatingBar.builder(
+                    initialRating: SellerDashboardData['AverageRating'],
+                    minRating: 1,
+                    direction: Axis.horizontal,
+                    allowHalfRating: true,
+                    itemCount: 5,
+                    itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    itemBuilder: (context, _) => const Icon(
+                      Icons.star,
+                      color: Color(0xFF006E86),
+                    ),
+                    onRatingUpdate: (rating) {
+                      // This callback will not be called because gestures are ignored
+                    },
+                    ignoreGestures: true, // Disable interactions
+                  )
                 ],
               ),
             ),
           ),
           Container(
             margin: const EdgeInsets.only(top: 15.0, left: 25.0, right: 25.0),
-            child: const Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Active Ads : 2",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  "Active Ads : ${SellerDashboardData['propertyCount']}",
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  "Totals Chats : 5",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  "Totals Chats : ${SellerDashboardData['chatCount'].toString()}",
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ],
             ),

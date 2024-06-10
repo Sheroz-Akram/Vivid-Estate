@@ -35,6 +35,7 @@ urlpatterns = [
     path("delete_account", view=AccountViews.deleteAccount, name="Delete User Account"),
     path("profile_data", view=AccountViews.getUserProfileData, name="Get User Profile Data"),
     path("seller_profile_data", view=AccountViews.getSellerProfileData, name="Get Seller Profile Data"),
+    path("seller_dashboard_data", view=AccountViews.sellerDashboardInfo, name="Get Seller Dashboard Information"),
     path("update_profile_picture", view=AccountViews.updateProfilePicture, name="Update User Profile Picture"),
     path("update_profile", view=AccountViews.updateProfileData, name="Update the User Profile Data"),
     path("update_feedback", view=AccountViews.updateFeedback, name="Update User Feedback"),
