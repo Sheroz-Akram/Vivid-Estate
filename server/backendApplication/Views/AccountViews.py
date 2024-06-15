@@ -228,6 +228,7 @@ def loginUser(request):
         # Get the other data files
         UserEmail = request.POST['Email']
         UserPassword = request.POST['Password']
+        UserType = request.POST['UserType']
 
         try:
             # Create User Component and Perform Authentication
@@ -235,7 +236,7 @@ def loginUser(request):
             userComponent.authenticateEmailPassword(UserEmail, UserPassword)
 
             # Update the Profile Picture
-            userComponent.login()
+            userComponent.login(UserType)
 
             # Get our User Model
             user = userComponent.getUserModel()

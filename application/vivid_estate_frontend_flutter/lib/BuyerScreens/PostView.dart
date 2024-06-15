@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
+import 'package:vivid_estate_frontend_flutter/BuyerScreens/FullScreenPhotoView.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerScreens/ReviewPanel.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerScreens/SellerProfile.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerScreens/VirtualVisitListBuyer.dart';
@@ -349,11 +350,22 @@ class _PostView extends State<PostView> {
                                 carouselController: imageCarousalController,
                                 itemCount: property.imagesCount,
                                 itemBuilder: (context, index, pageviewIndex) {
-                                  return Image.network(
-                                    "${server.host}/static/${property.images[index]}",
-                                    fit: BoxFit.fill,
-                                    height: 300,
-                                    width: MediaQuery.of(context).size.width,
+                                  return InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  FullScreenImageView(
+                                                      images: property.images,
+                                                      initialIndex: index)));
+                                    },
+                                    child: Image.network(
+                                      "${server.host}/static/${property.images[index]}",
+                                      fit: BoxFit.fill,
+                                      height: 300,
+                                      width: MediaQuery.of(context).size.width,
+                                    ),
                                   );
                                 },
                                 options: CarouselOptions(

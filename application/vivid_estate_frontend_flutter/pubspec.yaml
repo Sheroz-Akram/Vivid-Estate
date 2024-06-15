@@ -56,6 +56,7 @@ dependencies:
   path_provider: ^2.0.9
   path: ^1.8.0
   panorama_viewer: ^1.0.3
+  photo_view: ^0.14.0
 
   # Used to Check the Responsive of the UI on Differet Screen Size
   device_preview: ^1.1.0

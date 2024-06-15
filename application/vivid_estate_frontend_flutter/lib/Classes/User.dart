@@ -155,7 +155,8 @@ class User {
   }
 
   // Login the User (This will generate a new private key)
-  dynamic login(BuildContext context, String email, String password) async {
+  dynamic login(BuildContext context, String email, String password,
+      String userNewType) async {
     // *** 1. Input Data Validation ***
     // 1.1 Email Validation
     if (!inputValidator.validateEmailAddress(email)) {
@@ -169,7 +170,11 @@ class User {
     }
 
     // *** 2. Prepare Payload ***
-    var sendData = {"Email": email, "Password": password};
+    var sendData = {
+      "Email": email,
+      "Password": password,
+      "UserType": userNewType
+    };
 
     // *** 3. Send Request ***
     // 3.1 Check Reponse Status

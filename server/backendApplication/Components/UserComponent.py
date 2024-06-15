@@ -65,7 +65,7 @@ class UserComponent:
             raise Exception("User not found")
 
     # Login A User With His Email And Password
-    def login(self):
+    def login(self, userType: str):
 
         # Check the Status of the Account:
         if self.user.account_verification == "Pending":
@@ -82,6 +82,7 @@ class UserComponent:
         try:
             # Update The Private Key Of User
             self.user.private_key = self.generateRandomPrivateKey()
+            self.user.user_type = userType
             self.user.save()
         except Exception as e:
             raise Exception("Unable to Login")

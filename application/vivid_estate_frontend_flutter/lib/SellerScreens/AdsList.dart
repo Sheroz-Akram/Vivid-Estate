@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Seller.dart';
-import 'package:vivid_estate_frontend_flutter/SellerScreens/CreateNewAd/NewPropertyAdd.dart';
 import 'package:vivid_estate_frontend_flutter/SellerScreens/EditProperty.dart';
 import 'package:vivid_estate_frontend_flutter/SellerScreens/SellerAdPreview.dart';
 

@@ -19,10 +19,43 @@ class _LoginPage extends State<LoginPage> {
   // User Class to Perform Different User Functions
   var user = User();
 
+  Future<String?> showLoginDialog(BuildContext context) async {
+    return showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Login as'),
+          content: const Text('Please choose your role:'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop('Buyer');
+              },
+              child: const Text('Buyer'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop('Seller');
+              },
+              child: const Text('Seller'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   // Perform the User Login
   void performLogin(BuildContext context, String email, String password) async {
+    // Ask User to Login as Buyer or Seller
+    String? userType = await showLoginDialog(context);
+    if (userType == null) {
+      user.displayHelper
+          .displaySnackBar("Please select your user type", false, context);
+    }
+
     // Make a User Login Request
-    if (await user.login(context, email, password)) {
+    if (await user.login(context, email, password, userType!)) {
       // Move to Home Page. Depends Upon User Type
       Navigator.pop(context);
       Navigator.pop(context);
