@@ -12,15 +12,18 @@ Our mobile app named Vivid Estate transforms property and hostel exploration, ut
 - **Chat System:** Communicate with property owners/managers for inquiries and negotiations.
 - **Bidding System:** Enable fair competition for properties with multiple interested parties
 
-For more info visit: <a href="https://sheroz.pages.dev/FYP/">FYP Documents</a>
+For more information visit (Requires Password): <a href="https://sheroz.pages.dev/FYP/">FYP Documents</a>
 
 ### Group Members
-Here are the group members of my FYP project.
+Here are the group members of Vivid Estate (FYP):
 
-|**Roll No**|**Name**|
-|------|-----|
-|L1F20BSSE0454|Sheroz Akram 🌟|
+|**Roll No**|**Name**|**Contact**|
+|------|-----|-----|
+|L1F20BSSE0454|Sheroz Akram 🌟|<a href="https://sheroz.pages.dev/">Website</a>| 
 |L1F20BSSE0288|Hafiz Ali Asghar|
 |L1F20BSSE0471|Muhammad Nauman Nawaz|
 
+Roll No = Student IDs of group members at **University of Central Punjab, Lahore Campus**.
+
+🌟 = Group Leader
 
