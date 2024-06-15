@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:vivid_estate_frontend_flutter/BuyerScreens/PostView.dart';
+import 'package:vivid_estate_frontend_flutter/SellerScreens/BiddingList.dart';
 
 // ignore: must_be_immutable
 class SellerAdPreview extends StatefulWidget {
@@ -14,6 +15,7 @@ class SellerAdPreview extends StatefulWidget {
       required this.TimeAgo,
       required this.Views,
       required this.Likes,
+      required this.BiddingData,
       required this.onCrossPressed,
       required this.onEditPressed});
 
@@ -25,6 +27,7 @@ class SellerAdPreview extends StatefulWidget {
   int TimeAgo;
   String Views;
   String Likes;
+  dynamic BiddingData;
   final Function onCrossPressed;
   final Function onEditPressed;
 
@@ -195,33 +198,73 @@ class _SellerAdPreview extends State<SellerAdPreview> {
           ),
 
           // Property Options
-          SizedBox(
-            width: (MediaQuery.of(context).size.width) - 40,
-            child: TextButton(
-                style: ButtonStyle(
-                    backgroundColor:
-                        const MaterialStatePropertyAll(Color(0xFF146479)),
-                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                      // Rounded border
-                      side: const BorderSide(
-                          color: Color(0xFF0E0F33), width: 2.0), // Border style
-                      borderRadius: BorderRadius.circular(0.0),
-                    ))),
-                onPressed: () {
-                  // Open Edit Page
-                  widget.onEditPressed(widget.PropertyID);
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  child: const Text("Edit Property",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontFamily: "Berlin Sans", // Use a standard font
-                      )),
-                )),
+          Row(
+            children: [
+              SizedBox(
+                width: (MediaQuery.of(context).size.width * 0.5) - 40,
+                child: TextButton(
+                    style: ButtonStyle(
+                        backgroundColor:
+                            const MaterialStatePropertyAll(Color(0xFF146479)),
+                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                          // Rounded border
+                          side: const BorderSide(
+                              color: Color(0xFF0E0F33),
+                              width: 2.0), // Border style
+                          borderRadius: BorderRadius.circular(0.0),
+                        ))),
+                    onPressed: () {
+                      // Open Edit Page
+                      widget.onEditPressed(widget.PropertyID);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      child: const Text("Edit Property",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 12.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontFamily: "Berlin Sans", // Use a standard font
+                          )),
+                    )),
+              ),
+
+              // Display The List of Bids
+              SizedBox(
+                width: (MediaQuery.of(context).size.width * 0.5) - 40,
+                child: TextButton(
+                    style: ButtonStyle(
+                        backgroundColor:
+                            const MaterialStatePropertyAll(Color(0xFF146479)),
+                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                          // Rounded border
+                          side: const BorderSide(
+                              color: Color(0xFF0E0F33),
+                              width: 2.0), // Border style
+                          borderRadius: BorderRadius.circular(0.0),
+                        ))),
+                    onPressed: () {
+                      // Open Bidding List Page
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => BiddingList(
+                                  BiddingData: widget.BiddingData)));
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      child: const Text("Bidding List",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 12.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontFamily: "Berlin Sans", // Use a standard font
+                          )),
+                    )),
+              ),
+            ],
           ),
         ],
       ),

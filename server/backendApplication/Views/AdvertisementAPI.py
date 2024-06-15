@@ -11,6 +11,8 @@ from ..Components.FileHandler import *
 from ..Components.ReportingSystem import *
 from ..Components.SearchingSystem import *
 from ..Components.VirtualVisitManager import *
+from ..Components.ChatSystem import *
+from ..Components.BiddingSystem import *
 
 # Create your views here.
 
@@ -736,6 +738,19 @@ def SellerProperties(request):
                     # Get the Image of the Property
                     picture = propertyManager.firstImage(property)
 
+                    # Get All the Bids of the Property
+                    biddingSystem = BiddingSystem()
+                    propertyBids = biddingSystem.getBiddingList(property, userComponent.getUserModel())
+
+                    # Bids
+                    Bids = []
+                    if propertyBids.count() > 0:
+                        for bid in propertyBids:
+                            Bids.append({
+                                "Amount": bid.bid_amount,
+                                "Name": bid.bidder.full_name
+                            })
+
                     # Store in Our Message
                     message['Properties'].append({
                         "PropertyID": property.id,
@@ -744,7 +759,8 @@ def SellerProperties(request):
                         "Location": property.abstractLocation,
                         "TimeAgo": property.days_ago(),
                         "Views": property.views,
-                        "Likes": property.likes
+                        "Likes": property.likes,
+                        "BiddingData": Bids
                     })
 
             return httpSuccessJsonResponse(message)
@@ -797,6 +813,54 @@ def StorePropertyReport(request):
             )
 
             return httpSuccessJsonResponse("Property Report Submitted")
+
+        except Exception as e:
+            return httpErrorJsonResponse(str(e))
+
+    except Exception as e:
+        print(f"-> Exception | {str(e)}")
+        return JsonResponse({"status":"error", "message":"Invalid Request"})
+
+
+# Store the Bids on a Property
+@csrf_exempt
+def PropertyBid(request):
+
+    # Log The Terminal
+    print(f"=> Submit New BID Request | IP: {request.META.get('REMOTE_ADDR')}")
+
+    try:
+
+        # Get Data from POST Request
+        Email = request.POST['Email']
+        PrivateKey = request.POST['PrivateKey']
+        PropertyID = request.POST['PropertyID']
+        BidAmount = request.POST['BidAmount']
+
+        try:
+
+            # Create User Component and Authenticate the User
+            userComponent = UserComponent()
+            userComponent.authenticateEmailPrivateKey(Email, PrivateKey)
+
+            # Create Object of Property System
+            propertyManager = PropertyManager()
+
+            # Find the Property
+            property = propertyManager.findProperty(PropertyID)
+
+            # Places a Bid on Property
+            biddingSystem = BiddingSystem()
+            message, bid = biddingSystem.bidsOnProperty(property, userComponent.getUserModel(), BidAmount)
+
+            # Now Send Message Update to the User About Bidding
+            chatSystem = ChatSystem()
+            chatRoom = chatSystem.findChatElseCreate(userComponent.getUserModel(), bid.propertyID.seller)
+
+            # Now Send the Message to Seller About Bidding
+            chatSystem.sendBidMessage(userComponent.getUserModel(), bid, message)
+
+            return httpSuccessJsonResponse("Bid Placed on Property")
 
         except Exception as e:
             return httpErrorJsonResponse(str(e))

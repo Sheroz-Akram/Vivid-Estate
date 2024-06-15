@@ -350,4 +350,3 @@ class PropertyManager:
             return True
         return False
 
-

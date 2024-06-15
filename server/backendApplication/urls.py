@@ -68,6 +68,7 @@ urlpatterns = [
     path("seller_ads_list", view=AdvertisementAPI.SellerProperties, name="List of Seller Properties"),
     path("remove_from_seller_account", view=AdvertisementAPI.RemoveProperty, name="Remove Property from seller account"),
     path("edit_property", view=AdvertisementAPI.EditProperty, name="Edit Property in Server"),
+    path("place_bid", view=AdvertisementAPI.PropertyBid, name="Place Bid on Property Successfully"),
 
     # Virtual Visit Views
     path("stitch_panaroma", view=VirtualVisitViews.StitchImagesView, name="Stitch Images Together to create panaroma"),

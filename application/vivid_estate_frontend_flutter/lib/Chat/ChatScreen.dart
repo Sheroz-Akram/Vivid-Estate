@@ -2,8 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:vivid_estate_frontend_flutter/Authentication/ServerInfo.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/Reply.dart';
+import 'package:vivid_estate_frontend_flutter/Chat/ReplyBidMessage.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/ReplyFileMessage.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/Send.dart';
+import 'package:vivid_estate_frontend_flutter/Chat/SendBidMessage.dart';
 import 'package:vivid_estate_frontend_flutter/Chat/SendFileMessage.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Chat.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/User.dart';
@@ -226,17 +228,33 @@ class _ChatScreen extends State<ChatScreen> {
                                   time: chat.getMessage(index).Time,
                                   status: chat.getMessage(index).Status)
                           :
-                          // Display File Messages
-                          chat.getMessage(index).Type == "Reply"
-                              ? ReplyFileMessage(
-                                  message:
-                                      chat.getMessage(index).MessageContent,
-                                  time: chat.getMessage(index).Time)
-                              : SendFileMessage(
-                                  message:
-                                      chat.getMessage(index).MessageContent,
-                                  time: chat.getMessage(index).Time,
-                                  status: chat.getMessage(index).Status),
+                          // Again Perform Chat To Find Wheter it is Bid Message or File Message
+                          chat.getMessage(index).MessageType == "file"
+                              ?
+                              // File Message
+                              chat.getMessage(index).Type == "Reply"
+                                  ? ReplyFileMessage(
+                                      message:
+                                          chat.getMessage(index).MessageContent,
+                                      time: chat.getMessage(index).Time)
+                                  : SendFileMessage(
+                                      message:
+                                          chat.getMessage(index).MessageContent,
+                                      time: chat.getMessage(index).Time,
+                                      status: chat.getMessage(index).Status)
+                              :
+                              // Bid Message
+
+                              chat.getMessage(index).Type == "Reply"
+                                  ? ReplyBidMessage(
+                                      message:
+                                          chat.getMessage(index).MessageContent,
+                                      time: chat.getMessage(index).Time)
+                                  : SendBidMessage(
+                                      message:
+                                          chat.getMessage(index).MessageContent,
+                                      time: chat.getMessage(index).Time,
+                                      status: chat.getMessage(index).Status),
                   itemCount: chat.getTotalMessages(),
                 ),
               ),

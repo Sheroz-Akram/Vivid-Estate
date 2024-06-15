@@ -200,6 +200,35 @@ class Property {
     return requestStatus;
   }
 
+  // Place a Bid on Property
+  Future<bool> placeBidOnProperty(BuildContext context, String emailAddress,
+      String privateKey, double bidAmount) async {
+    // Variable to Check Status Of Our Request
+    var requestStatus = false;
+
+    // Make A Payload to Send to the Server
+    var requestPayload = {
+      "Email": emailAddress,
+      "PrivateKey": privateKey,
+      "PropertyID": propertyID,
+      "BidAmount": bidAmount.toString()
+    };
+
+    // Send Request to Our Server
+    await serverHelper.sendPostRequest(context, "place_bid", requestPayload,
+        (result) {
+      // Check the Status of Our Request
+      if (result['status'] == "success") {
+        requestStatus = true;
+      }
+      // Display a Status Message to the User
+      displayHelper.displaySnackBar(
+          result['message'], result['status'] == "success", context);
+    });
+
+    return requestStatus;
+  }
+
   // Get All Reviews Of the Property By Sending a Request to Server
   Future<List<Review>> retriveReviews(
       BuildContext context, String emailAddress, String privateKey) async {

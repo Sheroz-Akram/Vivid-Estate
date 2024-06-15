@@ -1,6 +1,7 @@
 from ..models import *
 from .FileHandler import *
 import json
+from .PropertyManager import *
 
 # System Component to Perform Chat Functionality
 class ChatSystem:
@@ -22,6 +23,17 @@ class ChatSystem:
         self.chatRoom = chatRoom
 
         return chatRoom
+
+    # Find the Chat Room with Buyer and Seller
+    def findChatElseCreate(self, buyer: ApplicationUser, seller: ApplicationUser):
+
+        # Query the Database
+        try:
+            chat = Chat.objects.get(Buyer=buyer, Seller=seller)
+            self.chatRoom = chat
+            return chat
+        except:
+            return self.initiateChat(buyer,seller)
 
     # Initiate a Chat between Buyer and Seller
     def initiateChat(self, buyer: ApplicationUser, seller: ApplicationUser):
@@ -57,10 +69,6 @@ class ChatSystem:
         # Check if the User is Buyer or Not
         if buyer.user_type != "Buyer":
             raise Exception("Chat initiator is not Buyer")
-
-        # Check the Other Person is Seller or not
-        if seller.user_type != "Seller":
-            raise Exception("Other Person must have to be Seller")
 
         # Check If Already Chat Initiated or not
         if (Chat.objects.filter(Buyer=buyer, Seller=seller)).exists():
@@ -135,6 +143,58 @@ class ChatSystem:
                 Status="Send",
                 Type="text",
                 Message=message
+            )
+            chatMessage.save()
+        except:
+            raise Exception("Not Able to Send Message")
+        
+        return chatMessage
+
+    
+    # Send a Bid Message to Other User in the Chat
+    def sendBidMessage(self, sender: ApplicationUser, bid: Bid, message: str):
+
+        # Check Is User is Allowed in this Chat Room or not
+        self.__checkUserChatRoomAccess(self.chatRoom, sender)
+
+        # Create a Property Manager
+        propertyManger = PropertyManager()
+
+        # Create a Bid Message
+        userFileMessage = json.dumps(
+        {
+            "BidID": bid.id,
+            "PropertyID": bid.propertyID.id,
+            "PropertyPicture": propertyManger.firstImage(bid.propertyID).imageLocation,
+            "BidAmount": bid.bid_amount,
+            "Message": message
+        })
+
+        # Update the Chat Room
+        try:
+            # Store the Unview Person
+            if sender.user_type == "Buyer":
+                unviewPerson = self.chatRoom.Seller
+            else:
+                unviewPerson = self.chatRoom.Buyer
+
+            # Update Chat Room
+            self.chatRoom.unviewPerson = unviewPerson
+            self.chatRoom.unviewCount = self.chatRoom.unviewCount + 1
+            self.chatRoom.LastMessage = f"Bid Placed! RS {bid.bid_amount}"
+            self.chatRoom.save()
+
+        except:
+            raise Exception("Unable to update Chat Room")
+
+        # Create a New Message
+        try:
+            chatMessage = ChatMessage(
+                ChatRoom=self.chatRoom,
+                Sender=sender,
+                Status="Send",
+                Type="bid",
+                Message=userFileMessage
             )
             chatMessage.save()
         except:

@@ -176,3 +176,10 @@ class PropertyReport(models.Model):
     issueType = models.CharField(max_length=50)
     reportDetails = models.TextField()
 
+# Store the Bids on Properties
+class Bid(models.Model):
+    propertyID = models.ForeignKey(Property, on_delete=models.CASCADE)
+    bidder = models.ForeignKey(ApplicationUser, on_delete=models.CASCADE)
+    bid_amount = models.FloatField()
+    timestamp = models.DateTimeField(auto_now_add=True) 
+

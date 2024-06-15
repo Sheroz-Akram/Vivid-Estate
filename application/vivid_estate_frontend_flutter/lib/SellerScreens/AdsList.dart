@@ -89,6 +89,7 @@ class _AdList extends State<AdList> {
                         TimeAgo: propertiesList[index]['TimeAgo'],
                         Views: propertiesList[index]['Views'],
                         Likes: propertiesList[index]['Likes'],
+                        BiddingData: propertiesList[index]['BiddingData'],
 
                         // Whenever The User Press the Cross Buttom
                         onCrossPressed: (propertyID) {

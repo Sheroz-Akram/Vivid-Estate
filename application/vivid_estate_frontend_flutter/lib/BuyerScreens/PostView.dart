@@ -157,6 +157,58 @@ class _PostView extends State<PostView> {
     }
   }
 
+  // Display Dialog Box to Bid on a Property
+  Future<double?> showBidDialog(BuildContext context) async {
+    TextEditingController controller = TextEditingController();
+    double? bidAmount;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Enter your bid'),
+          content: TextField(
+            controller: controller,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: const InputDecoration(
+              hintText: 'Enter bid amount',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Submit'),
+              onPressed: () {
+                bidAmount = double.tryParse(controller.text);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    return bidAmount;
+  }
+
+  // Submit a Bid of the User
+  void submitBid(context) async {
+    // Ask the User for Bid Amount
+    double? bidAmount = await showBidDialog(context);
+    if (bidAmount == null || bidAmount == 0.0) {
+      buyer.displayHelper.displaySnackBar(
+          "Please enter bid amount to place bid on property", false, context);
+      return;
+    }
+    await property.placeBidOnProperty(
+        context, buyer.emailAddress, buyer.privateKey, bidAmount);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -511,7 +563,7 @@ class _PostView extends State<PostView> {
                                         fontSize: 20)),
                                 onTap: () {
                                   // Option to Place Bid on the Property
-                                  print("Place BID");
+                                  submitBid(context);
                                 },
                               ),
                             ],

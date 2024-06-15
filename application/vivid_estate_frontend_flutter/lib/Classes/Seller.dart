@@ -229,6 +229,7 @@ class Seller extends User {
                 .formatNumber(result['message']['Properties'][i]['Views']),
             "Likes": displayHelper
                 .formatNumber(result['message']['Properties'][i]['Likes']),
+            "BiddingData": result['message']['Properties'][i]['BiddingData']
           });
         }
       }
