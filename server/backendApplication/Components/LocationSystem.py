@@ -22,6 +22,8 @@ class LocationSystem:
         # Get Address from Location
         address = location.raw['address']
 
+        print(address)
+
         return address
 
     # Get the Complete Detail Location of User from Latitude and Longitude
@@ -39,5 +41,5 @@ class LocationSystem:
         # Get the Address 
         address = self.queryAddress(latitude, longitude)
 
-        return address['suburb'] + ", " + address['district']
+        return (list(address.values()))[0] + ", " + address['district']
 

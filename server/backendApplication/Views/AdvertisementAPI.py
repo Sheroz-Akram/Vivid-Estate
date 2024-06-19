@@ -59,6 +59,18 @@ def StoreNewAd(request):
                     f"{visit['Length']}x{visit['Width']}x{visit['Height']}",
                     visit['FileLocation']
                 )
+            
+            # Loop Through All the Layouts and Store them in database
+            for layout in PropertyData['Layouts']:
+
+                # Store the Layout
+                layoutModel = PropertyLayout(
+                    propertyID=propertyModel,
+                    title=layout['FloorName'],
+                    fileLocation=layout['FileLocation'],
+                    views=0
+                )
+                layoutModel.save()
 
             return httpSuccessJsonResponse("New Property Created")
         
@@ -117,6 +129,12 @@ def EditProperty(request):
                 for serverVisit in serverVisits:
                     serverVisit.delete()
 
+            # Delete Existing 2D Layouts and Store new New
+            layouts = PropertyLayout.objects.filter(propertyID=propertyModel)
+            if layouts.count() > 0:
+                for layout in layouts:
+                    layout.delete()
+
             # Now Store the Images of the Property In Server
             for x in range(1, int(request.POST['PicturesCount']) + 1):
 
@@ -136,6 +154,18 @@ def EditProperty(request):
                     f"{visit['Length']}x{visit['Width']}x{visit['Height']}",
                     visit['FileLocation']
                 )
+            
+            # Loop Through All the Layouts and Store them in database
+            for layout in PropertyData['Layouts']:
+
+                # Store the Layout
+                layoutModel = PropertyLayout(
+                    propertyID=propertyModel,
+                    title=layout['FloorName'],
+                    fileLocation=layout['FileLocation'],
+                    views=0
+                )
+                layoutModel.save()
 
             return httpSuccessJsonResponse("Property Edited")
         
@@ -318,6 +348,19 @@ def GetPropertyDetail(request):
                         "Width": visit.dimension.split("x")[1],
                         "Height": visit.dimension.split("x")[2],
                         "FileLocation": visit.fileLocation
+                    })
+            
+            # Get All the Layouts of our Property
+            layouts = PropertyLayout.objects.filter(propertyID=property)
+
+            # Add Layouts to our Message
+            message['Layouts'] = []
+            message['TotalLayouts'] = layouts.count()
+            if layouts.count() > 0:
+                for layout in layouts:
+                    message['Layouts'].append({
+                        "FloorName": layout.title,
+                        "FileLocation": layout.fileLocation
                     })
 
             # Update the View Count of Property
@@ -766,6 +809,7 @@ def SellerProperties(request):
             return httpSuccessJsonResponse(message)
 
         except Exception as e:
+            print(str(e))
             return httpErrorJsonResponse(str(e))
 
     except Exception as e:
@@ -861,6 +905,40 @@ def PropertyBid(request):
             chatSystem.sendBidMessage(userComponent.getUserModel(), bid, message)
 
             return httpSuccessJsonResponse("Bid Placed on Property")
+
+        except Exception as e:
+            return httpErrorJsonResponse(str(e))
+
+    except Exception as e:
+        print(f"-> Exception | {str(e)}")
+        return JsonResponse({"status":"error", "message":"Invalid Request"})
+
+
+# Store the 2D Layouts of the Properties
+@csrf_exempt
+def StoreLayout(request):
+
+    # Log The Terminal
+    print(f"=> New 2D Layout Store Request | IP: {request.META.get('REMOTE_ADDR')}")
+
+    try:
+
+        # Get Data from POST Request
+        Email = request.POST['Email']
+        PrivateKey = request.POST['PrivateKey']
+        LayoutFile = request.FILES['LayoutFile']
+
+        try:
+
+            # Create User Component and Authenticate the User
+            userComponent = UserComponent()
+            userComponent.authenticateEmailPrivateKey(Email, PrivateKey)
+
+            # Create File Handler Object and Save the File to Sever
+            fileHandler = FileHandler()
+            fileName = fileHandler.storeFile(LayoutFile)
+
+            return httpSuccessJsonResponse(fileName)
 
         except Exception as e:
             return httpErrorJsonResponse(str(e))

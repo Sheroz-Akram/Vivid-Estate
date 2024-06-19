@@ -12,7 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:open_street_map_search_and_pick/open_street_map_search_and_pick.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Seller.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
-import 'package:vivid_estate_frontend_flutter/SellerScreens/2D%20Layout/drawing_page.dart';
+import 'package:vivid_estate_frontend_flutter/SellerScreens/2D%20Layout/LayoutList.dart';
 import 'package:vivid_estate_frontend_flutter/SellerScreens/360%20Virtual%20Visit/VirtualVisitList.dart';
 
 class NewPropertyAd extends StatefulWidget {
@@ -40,6 +40,9 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
 
   // Data of Virtual Visit
   var VirtualVisitData = [];
+
+  // Data of 2D Layout
+  var LayoutData = [];
 
   // store the Images from camera
   List<dynamic> propertyImages = [];
@@ -132,6 +135,10 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
       // Add Virtual Visit Data To Our List
       propertyData['VirtualVisitCount'] = VirtualVisitData.length.toString();
       propertyData['Visits'] = VirtualVisitData;
+
+      // Add Layout Data To Our List
+      propertyData['LayoutCount'] = LayoutData.length.toString();
+      propertyData['Layouts'] = LayoutData;
 
       // As we checked the data. Now we submit it to the server
       var seller = Seller();
@@ -844,10 +851,15 @@ class _NewPropertyAdState extends State<NewPropertyAd> {
                       onTap: () {
                         // To Be Implemented
                         print("Open 2D Layout Creation");
-                        Navigator.push(
+                        dynamic newLayoutData = Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const DrawingPage()));
+                                builder: (context) => LayoutList(
+                                      LayoutData: LayoutData,
+                                    )));
+                        setState(() {
+                          LayoutData = newLayoutData;
+                        });
                       },
                       child: Container(
                           padding: const EdgeInsets.only(

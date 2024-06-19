@@ -78,6 +78,12 @@ class CanvasSideBar extends HookWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _IconBox(
+                  iconData: Icons.text_fields, // Add this line
+                  selected: drawingMode.value == DrawingMode.text,
+                  onTap: () => drawingMode.value = DrawingMode.text,
+                  tooltip: 'Text',
+                ),
+                _IconBox(
                   iconData: FontAwesomeIcons.pencil,
                   selected: drawingMode.value == DrawingMode.pencil,
                   onTap: () => drawingMode.value = DrawingMode.pencil,

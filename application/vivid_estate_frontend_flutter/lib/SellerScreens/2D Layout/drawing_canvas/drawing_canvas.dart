@@ -42,11 +42,15 @@ class DrawingCanvas extends HookWidget {
   Widget build(BuildContext context) {
     return MouseRegion(
       cursor: SystemMouseCursors.precise,
-      child: Stack(
-        children: [
-          buildAllSketches(context),
-          buildCurrentPath(context),
-        ],
+      child: SizedBox(
+        height: height,
+        width: width,
+        child: Stack(
+          children: [
+            buildAllSketches(context),
+            buildCurrentPath(context),
+          ],
+        ),
       ),
     );
   }
@@ -55,20 +59,70 @@ class DrawingCanvas extends HookWidget {
     final box = context.findRenderObject() as RenderBox;
     final offset = box.globalToLocal(details.position);
 
-    currentSketch.value = Sketch.fromDrawingMode(
-      Sketch(
-        points: [offset],
-        size: drawingMode.value == DrawingMode.eraser
-            ? eraserSize.value
-            : strokeSize.value,
-        color: drawingMode.value == DrawingMode.eraser
-            ? Colors.white
-            : selectedColor.value,
-        sides: polygonSides.value,
-      ),
-      drawingMode.value,
-      filled.value,
-    );
+    if (drawingMode.value == DrawingMode.text) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          final textController = TextEditingController();
+          return AlertDialog(
+            title: const Text('Enter Text'),
+            content: TextField(
+              controller: textController,
+              decoration: const InputDecoration(
+                hintText: 'Enter your text here',
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  final text = textController.text;
+                  if (text.isNotEmpty) {
+                    final newSketch = Sketch.fromDrawingMode(
+                      Sketch(
+                        points: [offset],
+                        size: strokeSize.value,
+                        color: selectedColor.value,
+                        sides: polygonSides.value,
+                        filled: filled.value,
+                        text: text,
+                      ),
+                      drawingMode.value,
+                      filled.value,
+                    );
+                    allSketches.value = List<Sketch>.from(allSketches.value)
+                      ..add(newSketch);
+                    currentSketch.value = null;
+                  }
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Ok'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      currentSketch.value = Sketch.fromDrawingMode(
+        Sketch(
+          points: [offset],
+          size: drawingMode.value == DrawingMode.eraser
+              ? eraserSize.value
+              : strokeSize.value,
+          color: drawingMode.value == DrawingMode.eraser
+              ? Colors.white
+              : selectedColor.value,
+          sides: polygonSides.value,
+        ),
+        drawingMode.value,
+        filled.value,
+      );
+    }
   }
 
   void onPointerMove(PointerMoveEvent details, BuildContext context) {
@@ -113,23 +167,20 @@ class DrawingCanvas extends HookWidget {
   }
 
   Widget buildAllSketches(BuildContext context) {
-    return SizedBox(
-      height: height,
-      width: width,
-      child: ValueListenableBuilder<List<Sketch>>(
-        valueListenable: allSketches,
-        builder: (context, sketches, _) {
-          return RepaintBoundary(
-            key: canvasGlobalKey,
-            child: CustomPaint(
-              painter: SketchPainter(
-                sketches: sketches,
-                backgroundImage: backgroundImage.value,
-              ),
+    return ValueListenableBuilder<List<Sketch>>(
+      valueListenable: allSketches,
+      builder: (context, sketches, _) {
+        return RepaintBoundary(
+          key: canvasGlobalKey,
+          child: CustomPaint(
+            size: Size(width, height),
+            painter: SketchPainter(
+              sketches: sketches,
+              backgroundImage: backgroundImage.value,
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -142,13 +193,10 @@ class DrawingCanvas extends HookWidget {
         valueListenable: currentSketch,
         builder: (context, sketch, child) {
           return RepaintBoundary(
-            child: SizedBox(
-              height: height,
-              width: width,
-              child: CustomPaint(
-                painter: SketchPainter(
-                  sketches: sketch == null ? [] : [sketch],
-                ),
+            child: CustomPaint(
+              size: Size(width, height),
+              painter: SketchPainter(
+                sketches: sketch == null ? [] : [sketch],
               ),
             ),
           );
@@ -191,7 +239,6 @@ class SketchPainter extends CustomPainter {
 
       path.moveTo(points[0].dx, points[0].dy);
       if (points.length < 2) {
-        // If the path only has one line, draw a dot.
         path.addOval(
           Rect.fromCircle(
             center: Offset(points[0].dx, points[0].dy),
@@ -220,17 +267,10 @@ class SketchPainter extends CustomPainter {
         paint.strokeWidth = sketch.size;
       }
 
-      // define first and last points for convenience
       Offset firstPoint = sketch.points.first;
       Offset lastPoint = sketch.points.last;
-
-      // create rect to use rectangle and circle
       Rect rect = Rect.fromPoints(firstPoint, lastPoint);
-
-      // Calculate center point from the first and last points
       Offset centerPoint = (firstPoint / 2) + (lastPoint / 2);
-
-      // Calculate path's radius from the first and last points
       double radius = (firstPoint - lastPoint).distance / 2;
 
       if (sketch.type == SketchType.scribble) {
@@ -244,13 +284,10 @@ class SketchPainter extends CustomPainter {
         canvas.drawLine(firstPoint, lastPoint, paint);
       } else if (sketch.type == SketchType.circle) {
         canvas.drawOval(rect, paint);
-        // Uncomment this line if you need a PERFECT CIRCLE
-        // canvas.drawCircle(centerPoint, radius , paint);
       } else if (sketch.type == SketchType.polygon) {
         Path polygonPath = Path();
         int sides = sketch.sides;
         var angle = (math.pi * 2) / sides;
-
         double radian = 0.0;
 
         Offset startPoint =
@@ -267,6 +304,24 @@ class SketchPainter extends CustomPainter {
         }
         polygonPath.close();
         canvas.drawPath(polygonPath, paint);
+      } else if (sketch.type == SketchType.text && sketch.text != null) {
+        final textSpan = TextSpan(
+          text: sketch.text,
+          style: TextStyle(
+            color: sketch.color,
+            fontSize: 20,
+          ),
+        );
+        final textPainter = TextPainter(
+          text: textSpan,
+          textAlign: TextAlign.left,
+          textDirection: TextDirection.ltr,
+        );
+        textPainter.layout(
+          minWidth: 0,
+          maxWidth: size.width,
+        );
+        textPainter.paint(canvas, sketch.points.first);
       }
     }
   }

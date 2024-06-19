@@ -40,6 +40,10 @@ class Property {
   var visitsCount = 0;
   var visits = [];
 
+  // Store the Layouts Data
+  var layoutsCount = 0;
+  var layouts = [];
+
   // Helper Classes
   var serverHelper = ServerInfo(); // Helps to Communicate with the Server
   var displayHelper = DisplayHelper(); // Helps to Display Messages on Screen
@@ -82,6 +86,8 @@ class Property {
         isLike = result['message']['IsLike'];
         visitsCount = result['message']['TotalVisits'];
         visits = result['message']['Visits'];
+        layoutsCount = result['message']['TotalLayouts'];
+        layouts = result['message']['Layouts'];
       }
     });
   }

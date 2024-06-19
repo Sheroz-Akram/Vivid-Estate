@@ -119,7 +119,8 @@ class PropertyManager:
         try:
             property.abstractLocation = self.geoInfomation.simpleLocation(propertyData['Location']['Latitude'], propertyData['Location']['Longitude'])
             property.location = self.geoInfomation.detailLocation(propertyData['Location']['Latitude'], propertyData['Location']['Longitude'])
-        except:
+        except Exception as e:
+            print(e)
             raise Exception("Unable to Get Property Address")
 
         # Now Save the Property

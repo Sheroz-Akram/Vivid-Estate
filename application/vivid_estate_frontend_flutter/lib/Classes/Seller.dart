@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
@@ -14,6 +15,7 @@ class Seller extends User {
   // Create a new Property Ad in the Server
   void submitNewPropertyAdd(BuildContext userContext,
       List<dynamic> propertyImages, Map<String, Object> PropertyData) async {
+    displayHelper.displayLoadingbar();
     // Our API End Point
     var host = ServerInfo().host;
     var url = Uri.parse("$host/submit_new_ad");
@@ -56,11 +58,14 @@ class Seller extends User {
         ScaffoldMessenger.of(userContext)
             .showSnackBar(SnackBar(content: Text(result['message'])));
 
+        displayHelper.stopLoadingBar(true);
+
         // Pop Out of the Page is it is Successfull
         Navigator.pop(userContext);
       }
     } catch (e) {
       // An error has error in sending the file
+      displayHelper.stopLoadingBar(false);
       ScaffoldMessenger.of(userContext).showSnackBar(
           const SnackBar(content: Text("A network error has occured")));
     }
@@ -69,6 +74,7 @@ class Seller extends User {
   // Edit the Property Ad in the Server
   void editProperty(BuildContext userContext, List<dynamic> propertyImages,
       Map<String, Object> PropertyData, propertyID) async {
+    displayHelper.displayLoadingbar();
     // Our API End Point
     var host = ServerInfo().host;
     var url = Uri.parse("$host/edit_property");
@@ -112,10 +118,13 @@ class Seller extends User {
         ScaffoldMessenger.of(userContext)
             .showSnackBar(SnackBar(content: Text(result['message'])));
 
+        displayHelper.stopLoadingBar(true);
+
         // Pop Out of the Page is it is Successfull
         //Navigator.pop(userContext);
       }
     } catch (e) {
+      displayHelper.stopLoadingBar(false);
       // An error has error in sending the file
       ScaffoldMessenger.of(userContext).showSnackBar(
           const SnackBar(content: Text("A network error has occured")));
@@ -236,6 +245,44 @@ class Seller extends User {
     });
 
     return adList;
+  }
+
+  // Upload 2D Layout to the Server
+  Future<String> uploadLayout(File? fileToUpload) async {
+    // Upload URL
+    final uri = Uri.parse("${serverHelper.host}/upload_layout");
+
+    // Create a Multipart Request
+    var request = http.MultipartRequest('POST', uri);
+
+    // Attached to Request
+    request.files.add(
+        await http.MultipartFile.fromPath('LayoutFile', fileToUpload!.path));
+
+    // Add Other Data to Fields
+    request.fields['Email'] = emailAddress;
+    request.fields['PrivateKey'] = privateKey;
+
+    // Now we send our request
+    var response = await request.send();
+
+    // Get a Response from the Server
+    if (response.statusCode == 200) {
+      // listen for response
+      var responseString = response.stream.transform(utf8.decoder).single;
+
+      // Json Decode the Result
+      var result = jsonDecode(await responseString);
+
+      // If the Result is Success
+      if (result['status'] == "success") {
+        return result['message'].toString();
+      }
+    } else {
+      return "error";
+    }
+
+    return "error";
   }
 
   // Remove A Property From The Seller Account

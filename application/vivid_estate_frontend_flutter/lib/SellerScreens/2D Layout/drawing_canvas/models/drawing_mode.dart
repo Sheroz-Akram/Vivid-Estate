@@ -6,6 +6,7 @@ enum DrawingMode {
   square,
   circle,
   polygon,
+  text,
   none,
   undo,
   redo

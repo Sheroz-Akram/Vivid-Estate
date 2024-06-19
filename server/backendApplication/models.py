@@ -157,6 +157,13 @@ class PropertyVirtualVisit(models.Model):
     fileLocation = models.CharField(max_length=255)
     views = models.IntegerField()
 
+# Store the 2D Layout of the Property
+class PropertyLayout(models.Model):
+    propertyID = models.ForeignKey(Property, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    fileLocation = models.CharField(max_length=255)
+    views = models.IntegerField()
+
 # Store the Favourite Properties of the User
 class Favourite(models.Model):
     propertyID = models.ForeignKey(Property, on_delete=models.CASCADE)

@@ -17,7 +17,7 @@ import 'package:vivid_estate_frontend_flutter/Classes/Buyer.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Property.dart';
 import 'package:vivid_estate_frontend_flutter/Classes/Seller.dart';
 import 'package:vivid_estate_frontend_flutter/Helpers/Help.dart';
-import 'package:vivid_estate_frontend_flutter/SellerScreens/2D%20Layout/drawing_page.dart';
+import 'package:vivid_estate_frontend_flutter/SellerScreens/2D%20Layout/LayoutList.dart';
 import 'package:vivid_estate_frontend_flutter/SellerScreens/360%20Virtual%20Visit/VirtualVisitList.dart';
 
 class EditProperty extends StatefulWidget {
@@ -50,6 +50,9 @@ class _EditPropertyState extends State<EditProperty> {
 
   // Data of Virtual Visit
   var VirtualVisitData = [];
+
+  // Data of the 2D Layouts
+  var LayoutData = [];
 
   // store the Images from camera
   List<dynamic> propertyImages = [];
@@ -116,6 +119,7 @@ class _EditPropertyState extends State<EditProperty> {
       noFloors = responseProperty.floors.toString();
       noBeds = responseProperty.beds.toString();
       VirtualVisitData = responseProperty.visits;
+      LayoutData = responseProperty.layouts;
       propertyImages = downloadImages;
     });
   }
@@ -208,6 +212,10 @@ class _EditPropertyState extends State<EditProperty> {
       // Add Virtual Visit Data To Our List
       propertyData['VirtualVisitCount'] = VirtualVisitData.length.toString();
       propertyData['Visits'] = VirtualVisitData;
+
+      // Add Layout Data To Our List
+      propertyData['LayoutCount'] = LayoutData.length.toString();
+      propertyData['Layouts'] = LayoutData;
 
       // As we checked the data. Now we submit it to the server
       var seller = Seller();
@@ -920,13 +928,17 @@ class _EditPropertyState extends State<EditProperty> {
                      * Opens Page to create the 2D Layout of the property
                      */
                     InkWell(
-                      onTap: () {
-                        // To Be Implemented
-                        print("Open 2D Layout Creation");
-                        Navigator.push(
+                      onTap: () async {
+                        // Open 2D Layout List
+                        var newLayoutData = await Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const DrawingPage()));
+                                builder: (context) => LayoutList(
+                                      LayoutData: LayoutData,
+                                    )));
+                        setState(() {
+                          LayoutData = newLayoutData;
+                        });
                       },
                       child: Container(
                           padding: const EdgeInsets.only(
@@ -947,7 +959,7 @@ class _EditPropertyState extends State<EditProperty> {
                                       Icons.map_outlined,
                                       size: 30,
                                     ),
-                                    title: Text("Create 2D Layout",
+                                    title: Text("Edit 2D Layout",
                                         style: TextStyle(fontSize: 16)),
                                     trailing: InkWell(
                                         child: Icon(Icons.arrow_forward_ios)),

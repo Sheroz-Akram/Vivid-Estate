@@ -8,6 +8,7 @@ class Sketch {
   final SketchType type;
   final bool filled;
   final int sides;
+  final String? text;
 
   Sketch({
     required this.points,
@@ -16,6 +17,7 @@ class Sketch {
     this.filled = true,
     this.sides = 3,
     required this.size,
+    this.text,
   });
 
   factory Sketch.fromDrawingMode(
@@ -46,10 +48,13 @@ class Sketch {
             return SketchType.circle;
           case DrawingMode.polygon:
             return SketchType.polygon;
+          case DrawingMode.text:
+            return SketchType.text;
           default:
             return SketchType.scribble;
         }
       }(),
+      text: sketch.text,
     );
   }
 
@@ -62,6 +67,7 @@ class Sketch {
       'filled': filled,
       'type': type.toRegularString(),
       'sides': sides,
+      'text': text,
     };
   }
 
@@ -75,11 +81,12 @@ class Sketch {
       filled: json['filled'],
       type: (json['type'] as String).toSketchTypeEnum(),
       sides: json['sides'],
+      text: json['text'],
     );
   }
 }
 
-enum SketchType { scribble, line, square, circle, polygon }
+enum SketchType { scribble, line, square, circle, polygon, text }
 
 extension SketchTypeX on SketchType {
   String toRegularString() => toString().split('.')[1];

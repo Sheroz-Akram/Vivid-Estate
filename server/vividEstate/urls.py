@@ -29,6 +29,7 @@ admin.site.register(PropertyReport)
 admin.site.register(PropertyReviews)
 admin.site.register(PropertyVirtualVisit)
 admin.site.register(Bid)
+admin.site.register(PropertyLayout)
 
 
 urlpatterns = [
