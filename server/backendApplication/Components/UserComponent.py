@@ -109,14 +109,6 @@ class UserComponent:
         otpCode = self.generateRandomOTP()
         privateKey = self.generateRandomOTP()
 
-        # Send OTP to User by Email
-        mailService = Mail("Vivid Estate - OTP Verify")
-        mailService.addRecipients(email)
-        try:
-            mailService.sendOTP(otpCode)
-        except:
-            raise Exception("Error in Mail Service")
-
         # Create Account and Save Data in Server
         try:
             newUser = ApplicationUser(
@@ -137,6 +129,14 @@ class UserComponent:
             newUser.save()
         except:
             raise Exception("User Already Exists")
+
+        # Send OTP to User by Email
+        mailService = Mail("Vivid Estate - OTP Verify")
+        mailService.addRecipients(email)
+        try:
+            mailService.sendOTP(otpCode)
+        except:
+            raise Exception("Error in Mail Service")
         
         # Store the User
         self.user = newUser

@@ -584,13 +584,13 @@ def sellerDashboardInfo(request):
                 TotalAverageRating = TotalRating / properties.count()
 
             # Get the address of user using latitude and longitude
-            address = locationSystem.queryAddress(userModel.langitude, userModel.longitude)
+            address = list(locationSystem.queryAddress(userModel.langitude, userModel.longitude).values())
 
             # Get Our Profile Picture
             return httpSuccessJsonResponse({
                 "profilePic": userModel.profile_pic,
                 "userFullName": userModel.full_name,
-                "location": address['suburb'] + ", " + address['district'],
+                "location": address[0] + ", " + address[1],
                 "propertyCount": properties.count(),
                 "chatCount": chats.count(),
                 "View": Views,

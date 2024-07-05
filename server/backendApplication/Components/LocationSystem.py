@@ -41,5 +41,5 @@ class LocationSystem:
         # Get the Address 
         address = self.queryAddress(latitude, longitude)
 
-        return (list(address.values()))[0] + ", " + address['district']
+        return (list(address.values()))[0] + ", " + (list(address.values()))[1] 
 
