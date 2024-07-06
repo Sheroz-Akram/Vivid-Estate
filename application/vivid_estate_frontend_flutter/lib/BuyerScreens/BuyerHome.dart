@@ -57,6 +57,17 @@ class _BuyerHome extends State<BuyerHome> {
     },
   ];
 
+  // Open Search Page with Applied Filters
+  void openSearchPage(BuildContext context) {
+    // Push our Search Screen into Navigator
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => PropertySearch(
+                  filterData: FilterData,
+                )));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -647,7 +658,11 @@ class _BuyerHome extends State<BuyerHome> {
                                 // Hostel icon and text
                                 InkWell(
                                   onTap: () {
-                                    print(" Tap on Hostel");
+                                    // Set Property Type to Hostel
+                                    setState(() {
+                                      FilterData['PropertyType'] = "Hostel";
+                                    });
+                                    openSearchPage(context);
                                   },
                                   hoverColor: Colors.cyan,
                                   child: Card(
@@ -678,7 +693,11 @@ class _BuyerHome extends State<BuyerHome> {
                                 // House icon and text
                                 InkWell(
                                   onTap: () {
-                                    print(" Tap on House");
+                                    // Set Property Type to House
+                                    setState(() {
+                                      FilterData['PropertyType'] = "House";
+                                    });
+                                    openSearchPage(context);
                                   },
                                   hoverColor: Colors.cyan,
                                   child: Card(
@@ -709,7 +728,11 @@ class _BuyerHome extends State<BuyerHome> {
                                 // Apartment icon and text
                                 InkWell(
                                   onTap: () {
-                                    print(" Tap on Apartment");
+                                    // Set Property Type to Apartment
+                                    setState(() {
+                                      FilterData['PropertyType'] = "Apartment";
+                                    });
+                                    openSearchPage(context);
                                   },
                                   hoverColor: Colors.cyan,
                                   child: Card(
@@ -742,7 +765,11 @@ class _BuyerHome extends State<BuyerHome> {
                                   children: [
                                     InkWell(
                                       onTap: () {
-                                        print(" Tap on Rooms");
+                                        // Set Property Type to Room
+                                        setState(() {
+                                          FilterData['PropertyType'] = "Room";
+                                        });
+                                        openSearchPage(context);
                                       },
                                       hoverColor: Colors.cyan,
                                       child: Card(

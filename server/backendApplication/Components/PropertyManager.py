@@ -319,6 +319,10 @@ class PropertyManager:
     # Add a new review for Property
     def giveReview(self, property: Property, reviewPerson: ApplicationUser, comment, rating):
 
+        # Check if the Person giving the review is seller or not
+        if property.seller.id == reviewPerson.id:
+            raise Exception("Seller can't review on his own property")
+
         # Store the new review
         try:
             review = PropertyReviews(

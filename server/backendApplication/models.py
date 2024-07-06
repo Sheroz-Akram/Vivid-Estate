@@ -149,6 +149,9 @@ class PropertyReviews(models.Model):
     rating = models.IntegerField()
     timestamp = models.DateTimeField(auto_now_add=True) 
 
+    def __str__(self):
+        return "ID: " + str(self.id) + ">>\t\tReview: " + ' '.join(self.comment.split()[:5]) + "..." + "\t|\tRating: " + str(self.rating) + "\t|\tPerson: " + str(self.reviewPerson.full_name)
+
 # Store the Virtual Visit of the Property
 class PropertyVirtualVisit(models.Model):
     propertyID = models.ForeignKey(Property, on_delete=models.CASCADE)
@@ -157,6 +160,9 @@ class PropertyVirtualVisit(models.Model):
     fileLocation = models.CharField(max_length=255)
     views = models.IntegerField()
 
+    def __str__(self):
+        return "ID: " + str(self.id) + ">>\t\tRoom: " + ' '.join(self.title) + "..." + "\t|\tProperty: " + str(self.propertyID.id) + "\t|\tDimensions: " + str(self.dimension)
+
 # Store the 2D Layout of the Property
 class PropertyLayout(models.Model):
     propertyID = models.ForeignKey(Property, on_delete=models.CASCADE)
@@ -164,11 +170,17 @@ class PropertyLayout(models.Model):
     fileLocation = models.CharField(max_length=255)
     views = models.IntegerField()
 
+    def __str__(self):
+        return "ID: " + str(self.id) + ">>\t\tRoom: " + ' '.join(self.title) + "..." + "\t|\tProperty: " + str(self.propertyID.id) + "\t|\tFile: " + str(self.fileLocation)
+
 # Store the Favourite Properties of the User
 class Favourite(models.Model):
     propertyID = models.ForeignKey(Property, on_delete=models.CASCADE)
     user = models.ForeignKey(ApplicationUser, on_delete=models.CASCADE)
-    timestamp = models.DateTimeField(auto_now_add=True) 
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "ID: " + str(self.id) + ">>\t\tPerson: " + self.user.full_name + "\t<---->\tProperty: " + str(self.propertyID.id)
 
 # Store the Likes of the Property and By Whom
 class Like(models.Model):

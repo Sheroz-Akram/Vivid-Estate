@@ -26,11 +26,22 @@ class _PropertySearch extends State<PropertySearch> {
   // Our Buyer Object
   var buyer = Buyer();
 
+  // Store the Filter Data
+  dynamic FilterData;
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      FilterData = widget.filterData;
+    });
+  }
+
   // Perform the Search Operation based upon the user query
   void searchQuery(BuildContext userContext) async {
     // Perform the Search Operation
     var responseData = await buyer.searchQuery(
-        userContext, searchQueryController.text, widget.filterData);
+        userContext, searchQueryController.text, FilterData);
 
     // Update our State
     setState(() {
@@ -95,8 +106,7 @@ class _PropertySearch extends State<PropertySearch> {
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   SearchResult(
-                                                      filterData:
-                                                          widget.filterData,
+                                                      filterData: FilterData,
                                                       searchQuery:
                                                           searchQueryController
                                                               .text)));
@@ -132,7 +142,7 @@ class _PropertySearch extends State<PropertySearch> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => SearchResult(
-                                      filterData: widget.filterData,
+                                      filterData: FilterData,
                                       searchQuery: searchResults[index])));
                         },
                         child: Container(
@@ -167,12 +177,21 @@ class _PropertySearch extends State<PropertySearch> {
                   Column(
                     children: [
                       IconButton(
-                        icon: Image.asset(
-                          "assets/PropertyLogos/hostelLogo.png",
-                          height: 32,
+                        icon: Container(
+                          decoration: BoxDecoration(
+                              color: FilterData['PropertyType'] == "Hostel"
+                                  ? const Color.fromARGB(255, 177, 177, 177)
+                                  : null),
+                          child: Image.asset(
+                            "assets/PropertyLogos/hostelLogo.png",
+                            height: 32,
+                          ),
                         ),
                         onPressed: () {
-                          // Navigate to home or perform other action
+                          // Set Property Type to Hostel
+                          setState(() {
+                            FilterData['PropertyType'] = "Hostel";
+                          });
                         },
                       ),
                       const Text(
@@ -185,12 +204,21 @@ class _PropertySearch extends State<PropertySearch> {
                   Column(
                     children: [
                       IconButton(
-                        icon: Image.asset(
-                          "assets/PropertyLogos/houseLogo.png",
-                          height: 32,
+                        icon: Container(
+                          decoration: BoxDecoration(
+                              color: FilterData['PropertyType'] == "House"
+                                  ? const Color.fromARGB(255, 177, 177, 177)
+                                  : null),
+                          child: Image.asset(
+                            "assets/PropertyLogos/houseLogo.png",
+                            height: 32,
+                          ),
                         ),
                         onPressed: () {
-                          // Navigate to home or perform other action
+                          // Set Property Type to Apartment
+                          setState(() {
+                            FilterData['PropertyType'] = "House";
+                          });
                         },
                       ),
                       const Text(
@@ -203,12 +231,21 @@ class _PropertySearch extends State<PropertySearch> {
                   Column(
                     children: [
                       IconButton(
-                        icon: Image.asset(
-                          "assets/PropertyLogos/apartmentLogo.png",
-                          height: 32,
+                        icon: Container(
+                          decoration: BoxDecoration(
+                              color: FilterData['PropertyType'] == "Apartment"
+                                  ? const Color.fromARGB(255, 177, 177, 177)
+                                  : null),
+                          child: Image.asset(
+                            "assets/PropertyLogos/apartmentLogo.png",
+                            height: 32,
+                          ),
                         ),
                         onPressed: () {
-                          // Navigate to home or perform other action
+                          // Set Property Type to Apartment
+                          setState(() {
+                            FilterData['PropertyType'] = "Apartment";
+                          });
                         },
                       ),
                       const Text(
@@ -221,12 +258,21 @@ class _PropertySearch extends State<PropertySearch> {
                   Column(
                     children: [
                       IconButton(
-                        icon: Image.asset(
-                          "assets/PropertyLogos/roomLogo.png",
-                          height: 32,
+                        icon: Container(
+                          decoration: BoxDecoration(
+                              color: FilterData['PropertyType'] == "Room"
+                                  ? const Color.fromARGB(255, 177, 177, 177)
+                                  : null),
+                          child: Image.asset(
+                            "assets/PropertyLogos/roomLogo.png",
+                            height: 32,
+                          ),
                         ),
                         onPressed: () {
-                          // Navigate to home or perform other action
+                          // Set Property Type to Room
+                          setState(() {
+                            FilterData['PropertyType'] = "Room";
+                          });
                         },
                       ),
                       const Text(

@@ -426,6 +426,8 @@ class _PostView extends State<PostView> {
                                   autoPlay: false,
                                   autoPlayCurve: Curves.fastOutSlowIn,
                                   enableInfiniteScroll: true,
+                                  scrollPhysics:
+                                      const NeverScrollableScrollPhysics(),
                                   autoPlayAnimationDuration:
                                       const Duration(milliseconds: 800),
                                   viewportFraction: 1,
