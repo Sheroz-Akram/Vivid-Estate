@@ -1,0 +1,7 @@
+Django==4.1.7
+django-cors-headers==4.3.1
+django-jazzmin==2.6.1
+easyocr==1.7.1
+opencv-python==4.7.0.72
+matplotlib==3.7.1
+geopy==2.4.1
