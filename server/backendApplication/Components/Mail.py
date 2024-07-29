@@ -5,8 +5,8 @@ from email.mime.multipart import MIMEMultipart
 class Mail:
 
     # Credintials for our email service
-    sender = "vivid.estate01@gmail.com"
-    password = "lnoijpjsnggukynp"
+    sender = "YOUR EMAIL ADDRESS"
+    password = "YOUR PASSWORD"
 
     # Constructor Mail Class
     def __init__(self, subject:str):

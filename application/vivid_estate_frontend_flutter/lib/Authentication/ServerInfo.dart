@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 class ServerInfo {
   // Store our Server Address
-  final host = "http://192.168.137.1:8080";
+  final host = "IP:PORT"; // PUT Your ip address and port number of your server
 
   // Get a User Authentication Data
   dynamic getAuthData() async {
